@@ -1,0 +1,1 @@
+<select name="${tag.name}" id="${tag.id}" onkeyup="$n.limpaCombo(event,this);" onchange="${tag.reloadOnChangeString}" ${tag.dynamicAttributesToString}>${tag.selectoneblankoption}${tag.selectItensString}</select>

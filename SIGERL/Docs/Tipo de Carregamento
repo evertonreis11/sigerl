@@ -1,0 +1,13 @@
+TIPO DE CARREGAMENTO
+
+Tipocarregamento.java
+TipocarregamentoDAO.java
+TipocarregamentoService.java
+TipocarregamentoFiltro.java
+TipocarregamentoCrud.java
+GerarSeparacaoExpedicaoProcess.java
+gerarSeparacaoExpedicao.jsp
+tipocarregamentoEntrada.jsp
+tipocarregamentoListagem.jsp
+
+Histórico SVN: 222,223

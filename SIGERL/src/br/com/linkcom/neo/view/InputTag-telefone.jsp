@@ -1,0 +1,1 @@
+<input type="text" id="${tag.id}" mask="telefone" name="${tag.name}" maxlength="14" value="${tag.escapeValueToString}" onKeyUp="${tag.onKeyUp}" onKeyPress="${tag.onKeyPress}" onchange="${tag.reloadOnChangeString}" ${tag.dynamicAttributesToString}/>

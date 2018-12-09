@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+	version="2.0">
+
+	<description>WMS library</description>
+	<display-name>WMS Util</display-name>
+	<tlib-version>1.0</tlib-version>
+	<short-name>wms</short-name>
+	<uri>wms</uri>
+
+	<tag>
+		<description>Monta um agrupamento</description>
+		<name>tableGroup</name>
+		<tag-class>br.com.linkcom.wms.util.tag.TableGroupTag</tag-class>
+		<body-content>scriptless</body-content>
+		<attribute>
+			<description>Quantidade de colunas para a definição do panelgrid</description>
+			<name>columns</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>Adiciona um colspam ao panel</description>
+			<name>panelColspan</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>Define o width do panelGrid</description>
+			<name>panelgridWidth</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<description></description>
+		<name>checklist</name>
+		<tag-class>br.com.linkcom.wms.util.tag.CheckListTag</tag-class>
+		<body-content>empty</body-content>	
+	
+		<attribute>
+			<description></description>
+			<name>itens</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>propertyDescription</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>	
+		<attribute>
+			<description></description>
+			<name>itensField</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>name</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>label</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>renderas</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>prefix</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>inputOnChange</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
+			<name>inputOnClick</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>		
+	</tag>
+	
+	<tag>
+		<description>Verifica se o usuário logado tem permissão para a ação</description>
+		<name>hasAuthorization</name>
+		<tag-class>br.com.linkcom.wms.util.tag.HasAuthorizationTag</tag-class>
+		<body-content>scriptless</body-content>	
+		<attribute>
+			<description></description>
+			<name>acao</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>Coloca esse valor true quando é necessáriuo verificar se o usuario não tem aquela permissão.</description>
+			<name>hasNotAuthorization</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<description>Monta um menu</description>
+		<name>menuBootstrap</name>
+		<tag-class>br.com.linkcom.wms.util.tag.MenuBootstrapTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<description>Path onde se encontra o menu</description>
+			<name>menupath</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>	
+	
+	<tag>
+		<description>Tag de mensagens a ser exibidas na pagina</description>
+		<name>messages</name>
+		<tag-class>br.com.linkcom.wms.util.tag.MessagesTag</tag-class>
+		<body-content>empty</body-content>
+	</tag>
+	
+	<function>
+		<name>truncate</name>
+		<function-class>br.com.linkcom.wms.util.tag.TagFunctions</function-class>
+		<function-signature>java.lang.String truncate(java.lang.String, java.lang.Integer)</function-signature>
+	</function>
+	
+	<function>
+		<name>getdescricaotela</name>
+		<function-class>br.com.linkcom.wms.util.tag.TagFunctions</function-class>
+		<function-signature>java.lang.String getTelaDescricao()</function-signature>
+	</function>
+	
+	<function>
+		<name>geturl</name>
+		<function-class>br.com.linkcom.wms.util.tag.TagFunctions</function-class>
+		<function-signature>java.lang.String getPartialURL()</function-signature>
+	</function>
+	
+	<function>
+		<name>gettotalpage</name>
+		<function-class>br.com.linkcom.wms.util.tag.TagFunctions</function-class>
+		<function-signature>java.lang.String getTotalPage(br.com.linkcom.neo.controller.crud.FiltroListagem)</function-signature>
+	</function>
+	
+	<function>
+		<name>finduserbycd</name>
+		<function-class>br.com.linkcom.wms.util.tag.TagFunctions</function-class>
+		<function-signature>java.lang.String findUserByCd(java.lang.Integer)</function-signature>
+	</function>
+	
+	<function>
+		<name>formatadata2</name>
+		<function-class>br.com.linkcom.wms.util.tag.TagFunctions</function-class>
+		<function-signature>java.lang.String formataData(java.util.Date, java.lang.String)</function-signature>
+	</function>
+	
+	<function>
+		<name>formatadata</name>
+		<function-class>br.com.linkcom.wms.util.tag.TagFunctions</function-class>
+		<function-signature>java.lang.String formataData(java.util.Date)</function-signature>
+	</function>
+
+	<function>
+		<name>getQtde</name>
+		<function-class>br.com.linkcom.wms.util.tag.TagFunctions</function-class>
+		<function-signature>java.lang.Long getQtde(java.lang.Long, br.com.linkcom.wms.geral.bean.Produtoembalagem)</function-signature>
+	</function>
+	
+	<function>
+		<name>message</name>
+		<function-class>br.com.linkcom.wms.util.tag.TagFunctions</function-class>
+		<function-signature>java.lang.String getMessage(java.lang.String)</function-signature> 
+	</function>
+	
+	<function>
+		<name>getBooleanConfig</name>
+		<function-class>br.com.linkcom.wms.util.WmsUtil</function-class>
+		<function-signature>java.lang.Boolean getBooleanConfig(java.lang.String)</function-signature>
+	</function>
+	
+	<function>
+		<name>concatenar</name>
+		<function-class>br.com.linkcom.wms.util.tag.TagFunctions</function-class>
+		<function-signature>java.lang.String concatenar(java.util.List, java.lang.String, java.lang.String)</function-signature>
+	</function>
+	
+	<function>
+		<name>formataSemestre</name>
+		<function-class>br.com.linkcom.wms.util.tag.TagFunctions</function-class>
+		<function-signature>java.lang.String formataSemestre(java.util.Date)</function-signature>
+	</function>
+
+</taglib>

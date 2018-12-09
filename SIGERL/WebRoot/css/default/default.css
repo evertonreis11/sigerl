@@ -1,0 +1,651 @@
+BODY {
+	margin: 0px;
+	background-color: #EFEBE0;
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size: 11px;
+}
+
+table {font-size: 11px;}
+table td{vertical-align: top;}
+
+.showDragHandle {
+	background-image: url("../../imagens/updown2.gif");
+	background-position:center center;
+	background-repeat:no-repeat;
+	cursor:move;
+}
+
+/* 
+ *  Tabela mais externa. Utilizada nas tags listagem, entrada, tela
+ */
+.outterTable {
+ 	width: 100%;
+}
+
+.outterTableHeader{
+	color: #444444;
+	font-weight: bold;
+	font-size: 15pt;
+	font-family:arial;
+	background-image: url("../../imagens/line_separator.gif");
+	background-repeat: no-repeat;
+	background-position: 0% 100%;
+}
+
+.outterTableHeader img{border: 0px;}
+
+.tableBody{
+	padding-top: 10px;
+
+}
+
+.entrada1{
+	padding-bottom: 0px;
+}
+
+.outterTableHeaderLeft{
+	float:left; 
+	padding-top:2px;
+	padding-left:6px;
+	padding-bottom:2px;
+	text-transform: none;	
+}
+.outterTableHeaderRight{
+	float:right;
+	padding-right: 5px;
+	font-size: 11px;
+	padding-top: 5px;
+	color: #dadada;
+}
+
+.outterTableFooterRight{
+	text-align:right;
+	float:right;
+	padding-right: 5px;
+	font-size: 11px;
+	padding-top: 5px;
+	color: #dadada;
+	padding-top:30px;
+	font-weight: bold;
+	width:450px;
+}
+
+#btn_limpar, .btn_limpar {
+	background-image: url("../../imagens/icone/btnLimpar.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+}
+
+#btn_filtro, .btn_filtro {
+	background-image: url("../../imagens/icone/btnPesquisar.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+}
+
+#btn_confirmar {
+	background-image: url("../../imagens/icone/btnConfirmar.gif");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 18px;
+}
+
+#btn_engrenagem, .btn_engrenagem {
+	background-image: url("../../imagens/icone/btnEngrenagem.gif");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding: 5px;
+	padding-bottom: 2px; 
+	padding-left: 20px;
+}
+
+#btn_atualizar, .btn_atualizar {
+	background-image: url("../../imagens/icone/btnAtualizar.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding: 5px;
+	padding-bottom: 2px; 
+	padding-left: 20px;
+}
+
+#btn_listagem, .btn_listagem {
+	background-image: url("../../imagens/icone/btnListagem.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding: 5px;
+	padding-bottom: 2px; 
+	padding-left: 20px;
+}
+
+#btn_engrenagem2 {
+	background-image: url("../../imagens/icone/btnEngrenagem.gif");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding: 5px;
+	padding-bottom: 6px; 
+	padding-left: 20px;
+}
+
+
+#btn_novo, .btn_novo {
+	background-image: url("../../imagens/icone/btnNovo.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+}
+
+#btn_excluir, .btn_excluir {
+	background-image: url("../../imagens/icone/btnDeletar.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+}
+
+#btn_associar {
+	background-image: url("../../imagens/icone/btnAssociar.gif");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+}
+
+#btn_up {
+	background-image: url("../../imagens/icone/btnUp.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+}
+#btn_imprimir {
+	background-image: url("../../imagens/icone/btnImprimir.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+}
+
+#btn_down {
+	background-image: url("../../imagens/icone/btnDown.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+}
+
+#btn_editar, .btn_editar {
+	background-image: url("../../imagens/icone/btnEditar.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+}
+
+.link-excel {
+	background-image: url("../../imagens/icone/page_excel.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+}
+
+#btn_cancelar, .btn_cancelar {
+	background-image: url("../../imagens/icone/btnCancelar.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+}
+#btn_voltar {
+	background-image: url("../../imagens/icone/btnVoltar.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+}
+
+.botao{
+	border: 2px solid #dadada;
+	background-color: #fafafa;
+	display: block;
+}
+
+.botaoExcluir{
+	border: 2px solid #dadada;
+	background-color: #fafafa;
+	display: block;
+	background-image: url('../../imagens/icone/btnDeletar.png'); 
+	background-repeat:no-repeat; 
+	background-position:0% 50%; 
+	padding:5px; 
+	padding-left: 22px;	
+}
+
+.botao:hover{
+	border: 2px solid #aaaaaa;
+	text-decoration: none;
+}
+
+.posiciona span{
+	display: block;
+	clear: both;
+	margin-bottom: 2px;
+}
+
+.posiciona{
+	padding-top: 11px;
+}
+
+
+#btn_gravar {
+	background-image: url("../../imagens/icone/btnSalvar.png");
+	background-repeat: no-repeat;
+	background-position:0% 50%;
+	padding:5px;
+	padding-left: 22px;
+	border: 0px;
+	background-color: transparent;
+	font-weight: bold;
+	font-size: 11px;
+	font-family: arial;
+	width: auto;
+	height: auto;
+}
+
+.outterTableHeaderLink:hover {
+	text-decoration: underline;
+}
+
+
+/*
+ * Janela. Utilizando em JanelaFiltro, JanelaResultados, JanelaEntrada
+ */
+.window {
+	width: 100%;
+	margin-top: 9px;
+}
+.window TD {
+	font-family: tahoma;
+	font-size:   11px;
+	vertical-align: top;
+}
+.window BUTTON,.btnApp {
+	background-color: #FDFDFD; 
+	border: 2px solid #4CA546;
+	color: #4CA546;
+	font-weight: bold;
+	font-size: 10px;
+	font-family:arial;
+	text-transform: uppercase;
+	padding: 1px;
+}
+
+input {
+	font-size: 13px;
+	border: 1px solid #808080;
+	padding:2px;
+	width: auto;	
+	text-transform: none;
+}
+
+.desativado{
+	font-size: 12px;
+	border: 1px solid #808080;
+	padding:2px;
+	height: 20px;
+	background-color: red;
+}
+
+textarea {
+	font-size: 12px;
+	border: 1px solid #808080;
+	padding:2px;
+	font-family: verdana;
+	text-transform: none;
+}
+
+select {
+	font-size: 15px;
+	border: 1px solid #808080;
+	text-transform: none;
+	height: 20px;
+}
+
+select{
+	height: auto;
+	margin-top: 1px;		
+}
+
+select > option {
+	width: inherit;
+}
+
+
+
+.inputWindow {
+}
+
+.resultWindow {
+	background-color: white;
+	padding: 4px;
+}
+
+/*
+ * Utilizados em PanelGrids que s�o tabelas de entrada de dados.
+ */
+.inputTable {
+	padding: 3px;
+}
+ 
+.labelColumn {
+	white-space: nowrap;
+	width: 1%;
+	padding-right: 20px;
+	padding-left: 3px;
+	padding-bottom: 3px;
+	text-transform:uppercase;
+	font-family: Verdana;
+	font-size: 10px;
+	text-align: left;
+	color: #535353;
+}
+
+.labelColumnR {
+	white-space: nowrap;
+	width: 1%;
+	padding-right: 20px;
+	padding-left: 3px;
+	text-transform:uppercase;
+	font-family: Verdana;
+	font-size: 10px;
+	text-align: right;
+	color: #535353;
+}
+
+.labelColumn SPAN{
+	font-weight: bold;
+	font-family: Verdana;
+	font-size: 10px;
+}
+
+.doublelineformat{
+	white-space: nowrap;
+	width: 1%;
+	text-transform:uppercase;
+	font-family: Verdana;
+	font-size: 10px;
+	text-align: left;
+	color: #535353;
+	padding-bottom:5px;
+}
+
+.tela-fazenda select,.tela-fazenda input{
+	width: 350px;
+}
+
+.radioClass{
+	width: auto;
+	border: none; 
+	background-image: none;
+}
+
+.requiredMark{
+	color: #EA6464;	
+}
+
+.propertyColumn{
+	
+}
+
+.actionBar {
+	padding: 3px;
+	text-align: right;
+	border-bottom: 1px solid #cfcfcf; 
+}
+
+
+/**
+ * Estilo padr�o para o dataGrid
+ */
+ .dgh td, .dgh th{
+	background-color: #8ED389;
+	color: #FFFFFF;
+	font-family: Verdana;
+	font-weight: bold;	
+	text-align: left;
+	padding: 7px;
+}
+
+.dghChk td, .dghChk th{
+	padding: 4px;
+}
+
+.dghChk td{
+	padding-top: 7px;
+}
+ 
+ 
+.dataGrid {
+	font-family: tahoma;
+	font-size: 11px;	
+	color: #000000;
+	background-color: #FFFFFF;
+}
+.dataGridHeader {
+	background-color: #4CB46B;
+	color: #FFFFFF;
+	font-family: Verdana;
+	font-weight: bold;	
+	text-align: left;
+}
+
+.dataGridHeader A{
+	color: #FFFFFF;
+	font-family: Verdana;
+}
+.dataGridHeader th{
+	color: #FFFFFF;
+	font-family: Verdana;
+	padding: 3px;
+	padding-top:5px;
+	padding-bottom:5px;
+	border-left: 1px solid #BDFFB8;
+	text-transform: none;
+}
+
+.dataGridBody1 {
+	background-color:  #f5f7f8;
+}
+
+.dataGridBody1 td{
+	padding: 3px;
+	vertical-align: middle;
+	border-top: 1px solid #ffffff;
+}
+
+
+.dataGridBody2 {
+	background-color: #edeff0;
+}
+
+.dataGridBody2 td{
+	padding: 3px;
+	vertical-align: middle;
+	border-top: 1px solid #ffffff;
+}
+.dataGridFooter {
+}
+
+
+
+/**
+ * Estilo padr�o de link
+ */
+A {
+	color: #000000;
+	text-decoration: none;
+	font-weight: bold;
+}
+A:hover {
+	text-decoration: underline;
+}
+
+
+/**
+ * Estilos das abas
+ */
+.detailTabSelected {
+	background-color: #dadada;
+	padding: 4px;
+	font-family: helvetica;
+	font-weight: bold;
+	font-size: 11px;
+	
+}
+
+.detailTabSelected:link {
+	color: #000000;
+	text-decoration: none;
+}
+
+.detailTabSelected:visited {
+}
+
+.detailTabSelected:hover {
+	
+}
+
+.detailTabSelected:active {
+	font-family: sans-serif;
+	color: #000000;
+	text-decoration: none;
+}
+
+.tabPanelLink{
+	background-repeat: repeat-x;
+	padding: 2px;
+	border-bottom: 1px solid #dadada;
+	margin-bottom: 3px;
+}
+
+.detailTabUnselected {
+	background-color: #F0F0F0;
+	padding: 4px;
+	font-family: helvetica;
+	font-weight: bold;
+	font-size: 11px;
+}
+
+.detailTabUnselected:link {
+	color: #000000;
+	text-decoration: none;
+}
+
+.detailTabUnselected:visited {
+	background-color: #F0F0F0;
+}
+
+.detailTabUnselected:hover {
+
+}
+
+.detailTabUnselected:active {
+
+}
+
+/**
+ * Detalhe
+ */
+.detailBlock {
+	background-color: white;
+}
+
+/* Gerais */
+.titulo1{
+	font-size: 14px;
+	font-weight: bold;
+	background-image: url("../../imagens/line_separator.gif");
+	background-repeat: no-repeat;
+	background-position: 0% 100%;
+	display: block;
+	padding: 3px;
+	margin: 2px;
+	text-align: left;
+}
+
+span.titulo{
+	font-weight: bold;
+	font-family: Verdana;
+	font-size: 14px;
+	padding: 5px;
+	padding-bottom: 8px;
+	margin-bottom:8px;
+	display: block;
+	border-bottom: 1px dashed #dadada;
+}
+
+.submitBar{
+	padding: 5px;
+	text-align: right;
+}
+
+.submitBar button,.excluirdetalhe{
+	border: none;
+	background-color: transparent;
+	cursor: pointer;
+}
+
+.required {
+	background-color: #fff9d0;
+}
+
+.checkBoxClass,.checkBoxClass{
+	border: none;
+}
+
+.lineNovalinha{padding: 5px;}
+
+/* formatacao tela veiculo */
+.incapacitated {
+	background-color: #dadada;
+	color: #000000;
+	text-align:right;
+}
+
+/* formatacao tela praca */
+#listaPraca  {
+	border:2px solid #888888;	
+	padding: 4px;
+}
+
+#listaPraca div {
+	padding: 4px;
+	border-bottom: 1px dashed #dadada ;
+} 
+
+#listaPraca span.ordem {
+	font-weight: bold;
+	font-size: 13px;
+	padding: 4px;	
+}
+
+#listaPraca select {
+	width:650px; 
+	margin-left:50px
+}
+
+#listaPraca .selecionado{
+	background-color: #cccccc;
+}
+
+#listaPraca .radio{
+	width: auto;
+	border: none; 
+	background-image: none;
+	margin-left:50px;
+}

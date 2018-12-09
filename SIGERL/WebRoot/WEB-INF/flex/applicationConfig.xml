@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host">
+			<value>smtp</value>
+		</property>
+	</bean>
+	
+	<bean name="config"	class="br.com.linkcom.wms.util.config.NeoConfig" autowire="autodetect">
+		<property name="properties">
+			<props>
+				<prop key="funcaoTiraacento">tiraacento</prop>
+				<prop key="showConsultarLink">true</prop>
+				<prop key="showExcluirLink">true</prop>
+				<prop key="showEditarLink">false</prop>
+				<prop key="showLazyWarnings">true</prop>
+				<prop key="trimProperties">true</prop>
+			</props>
+		</property>
+		<property name="authenticationConfig">
+            <ref bean="authenticationConfig" />
+        </property>
+	</bean>
+	
+	<bean id="authenticationConfig" class="br.com.linkcom.neo.core.config.AuthenticationConfig">
+        <property name="loginPage" value="/jsp/login.jsp"/>
+        <property name="logoutPage" value="/logout.jsp"/>
+        <property name="indexPage" value="/adm/index"/>
+        <property name="useStaticModuleAccess" value="false"/>
+    </bean>
+    
+    <!-- Configuração do jndi -->
+    <bean id="dataSource" class="br.com.linkcom.wms.util.JndiWmsFactory"/>
+	
+	<bean id="sessionFactory" class="br.com.linkcom.neo.hibernate.AnnotationSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="hibernateProperties">
+	 		<props>
+	 			<!-- <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+	 			<prop key="hibernate.cache.use_query_cache">true</prop> -->
+	 			<prop key="hibernate.dialect">org.hibernate.dialect.Oracle9iDialect</prop>
+	 			<!--<prop key="hibernate.show_sql">false</prop>-->
+	 		</props>
+	 	</property> 
+	</bean>
+
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="jdbcExceptionTranslator">
+			<ref bean="sqlErrorCodesTranslator"/>
+		</property>
+	</bean>
+	
+	<bean name="sqlErrorCodesTranslator" class="br.com.linkcom.neo.persistence.OracleSQLErrorCodeSQLExceptionTranslator">
+		<property name="dataSource">
+			<ref bean="dataSource"/>
+		</property>
+	</bean>
+
+	<bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager">
+			<ref bean="hibernateTransactionManager"/>
+		</property>
+	</bean>
+	
+	<bean id="hibernateTransactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="jdbcExceptionTranslator">
+			<ref bean="sqlErrorCodesTranslator"/>
+		</property>
+	</bean>
+	 
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource">
+			<ref bean="dataSource"/>
+		</property>
+	</bean>
+	
+</beans>

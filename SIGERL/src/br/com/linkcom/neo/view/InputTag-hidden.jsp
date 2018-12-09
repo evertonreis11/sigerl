@@ -1,0 +1,2 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<input type="hidden" id="${tag.id}" name="${tag.name}" value="${tag.escapeValueToString}" ${tag.dynamicAttributesToString}/><c:if test="${tag.write}"><span id="${tag.name}_value">${tag.booleanDescriptionToString}</span></c:if>

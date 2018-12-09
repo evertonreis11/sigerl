@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE security PUBLIC "//LinkCom//Neo Security Constraints 1.0//EN" "http://utilpub.linkcom.com.br/framework/dtd/security-constraints.dtd"> 
+<security>
+	<module name="modulo">
+		<rule>papel1</rule>
+		<rule>papel2</rule>
+	</module>
+	<module name="modulo2">
+		<rule>papel1</rule>
+	</module>
+</security>

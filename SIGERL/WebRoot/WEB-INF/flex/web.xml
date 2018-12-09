@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4"
+    xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+    http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    
+	<listener>
+		<listener-class>br.com.linkcom.neo.core.web.init.ContextLoaderListener</listener-class>
+	</listener>
+<!-- 
+	<listener>
+		<listener-class>br.com.linkcom.wms.sincronizador.SincronizadorListener</listener-class>
+	</listener>
+ -->
+	<filter>
+		<filter-name>neoFilter</filter-name>
+		<filter-class>br.com.linkcom.neo.core.web.NeoFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>neoFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping> 
+	
+	<!-- Granite - Integração com Flex -->    
+    <filter>
+        <filter-name>AMFMessageFilter</filter-name> 
+        <filter-class>org.granite.messaging.webapp.AMFMessageFilter</filter-class> 
+    </filter>
+    <filter-mapping>
+        <filter-name>AMFMessageFilter</filter-name> 
+        <url-pattern>/graniteamf/*</url-pattern> 
+    </filter-mapping>
+    
+    <servlet>
+        <servlet-name>AMFMessageServlet</servlet-name>
+        <servlet-class>org.granite.messaging.webapp.AMFMessageServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AMFMessageServlet</servlet-name>
+        <url-pattern>/graniteamf/*</url-pattern>
+    </servlet-mapping>
+   
+	<!-- Autenticação / Autorização -->
+	<filter>
+		<filter-name>wmsFilter</filter-name>
+		<filter-class>br.com.linkcom.wms.geral.filter.WmsFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>wmsFilter</filter-name>
+		<url-pattern>/sistema/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>wmsFilter</filter-name>
+		<url-pattern>/popup/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>wmsFilter</filter-name>
+		<url-pattern>/logistica/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>wmsFilter</filter-name>
+		<url-pattern>/recebimento/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>wmsFilter</filter-name>
+		<url-pattern>/expedicao/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>wmsFilter</filter-name>
+		<url-pattern>/adm/*</url-pattern>
+	</filter-mapping>
+	
+    <!-- Módulo Sistema -->
+    <servlet>
+        <servlet-name>sistema</servlet-name>
+        <servlet-class>br.com.linkcom.neo.controller.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>sistema</servlet-name>
+        <url-pattern>/sistema/*</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Módulo Logística -->
+    <servlet>
+        <servlet-name>logistica</servlet-name>
+        <servlet-class>br.com.linkcom.neo.controller.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>logistica</servlet-name>
+        <url-pattern>/logistica/*</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Módulo Recebimento -->
+    <servlet>
+        <servlet-name>recebimento</servlet-name>
+        <servlet-class>br.com.linkcom.neo.controller.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>recebimento</servlet-name>
+        <url-pattern>/recebimento/*</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Módulo Expedição -->
+    <servlet>
+        <servlet-name>expedicao</servlet-name>
+        <servlet-class>br.com.linkcom.neo.controller.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>expedicao</servlet-name>
+        <url-pattern>/expedicao/*</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Módulo ADM -->
+    <servlet>
+        <servlet-name>adm</servlet-name>
+        <servlet-class>br.com.linkcom.neo.controller.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>adm</servlet-name>
+        <url-pattern>/adm/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Módulo POPUP -->
+    <servlet>
+        <servlet-name>popup</servlet-name>
+        <servlet-class>br.com.linkcom.neo.controller.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>popup</servlet-name>
+        <url-pattern>/popup/*</url-pattern>
+    </servlet-mapping>
+ 
+    <servlet>
+        <servlet-name>resourceServlet</servlet-name>
+        <servlet-class>br.com.linkcom.neo.view.ResourceServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>resourceServlet</servlet-name>
+        <url-pattern>/resource/*</url-pattern>
+    </servlet-mapping>
+
+	<servlet>
+		<servlet-name>download</servlet-name>
+		<servlet-class>br.com.linkcom.wms.util.neo.DownloadFileServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>download</servlet-name>
+		<url-pattern>/DOWNLOADFILE/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>arquivofoto</servlet-name>
+		<servlet-class>br.com.linkcom.wms.controller.ArquivoFotoServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>arquivofoto</servlet-name>
+		<url-pattern>/ARQUIVOFOTO/*</url-pattern>
+	</servlet-mapping>	
+	
+	<servlet>
+		<servlet-name>ajaxServlet</servlet-name>
+		<servlet-class>br.com.linkcom.neo.view.AjaxServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ajaxServlet</servlet-name>
+		<url-pattern>/ajax/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>SelecionarCadastrarServlet</servlet-name>
+		<servlet-class>br.com.linkcom.neo.view.SelecionarCadastrarServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SelecionarCadastrarServlet</servlet-name>
+		<url-pattern>/SELECIONARCADASTRAR/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>XFireServlet</servlet-name>
+		<servlet-class>org.codehaus.xfire.transport.http.XFireConfigurableServlet</servlet-class>
+		<load-on-startup>0</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>XFireServlet</servlet-name>
+		<url-pattern>/webservices/*</url-pattern>
+	</servlet-mapping>
+
+	<session-config>
+    	<session-timeout>40</session-timeout>
+    </session-config>
+ 
+    <error-page>
+ 		<exception-type>java.lang.Exception</exception-type>
+ 		<location>/jsp/error.jsp</location>
+ 	</error-page>
+   
+</web-app> 

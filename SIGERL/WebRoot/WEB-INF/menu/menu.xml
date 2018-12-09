@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE menugroup PUBLIC "//LinkCom//Neo Menu 1.0//EN" "http://utilpub.linkcom.com.br/framework/dtd/menu.dtd">
+<menugroup>
+	<menu title="Recebimento">
+		<menu title="Conferência de recebimento" url="/recebimento/process/Conferenciarecebimento"/>
+		<menu title="Reconferência de recebimento" url="/recebimento/process/Reconferenciarecebimento"/>
+	</menu>
+	
+	<!-- <menu title="Expedição">
+		<menu title="Executar separação" url="/expedicao/process/Executarseparacao"/>
+		<menu title="Conferência de expedição" url="/expedicao/process/Conferenciaexpedicao"/>
+		<menu title="Reconferência de expedição" url="/expedicao/process/Reconferenciaexpedicao"/>
+		<menu title="Conferência de checkout" url="/expedicao/process/Conferenciacheckout"/>
+	</menu>
+	
+	<menu title="Armazenagem">
+		<menu title="Endereçamento manual" url="/armazenagem/process/Enderecamentomanual"/>
+		<menu title="Endereçamento automático" url="/armazenagem/process/Enderecamentoautomatico"/>
+		<menu title="Executar transferência" url="/armazenagem/process/Transferencia"/>
+		<menu title="Transferência manual" url="/armazenagem/process/Transferenciamanual"/>
+		<menu title="Executar reabastecimento" url="/armazenagem/process/Reabastecimento"/>
+		<menu title="Contagem de inventário" url="/armazenagem/process/Contageminventario"/>
+		<menu title="Recontagem de inventário" url="/armazenagem/process/Recontageminventario"/>
+	</menu>
+	
+	<menu title="Transportes">
+		<menu title="Registrar Entrada/Saída de Veículo" url="/transporte/process/AcompanhamentoVeiculo"/>
+		<menu title="Liberação de Saida (Manifesto)" url="/transporte/process/Liberacaosaidamanifesto"/>
+		<menu title="Liberação de Entrada (Manifesto)" url="/transporte/process/Liberacaoentradamanifesto"/>
+	</menu> -->
+	
+	<menu title="Consultar Produto" url="/produto/process/Consultarproduto" />
+	 
+	<menu title="Sair" url="/logout.jsp" />
+</menugroup>

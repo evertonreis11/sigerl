@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="RelatorioDivergenciaRecebimento"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Portrait"
+		 pageWidth="595"
+		 pageHeight="842"
+		 columnWidth="535"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="LOGO" isForPrompting="false" class="java.awt.Image"/>
+	<parameter name="SUBDIVERGENCIA" isForPrompting="false" class="net.sf.jasperreports.engine.JasperReport"/>
+
+	<field name="data" class="java.util.Date"/>
+	<field name="listaOrdemServicoProduto" class="java.util.List"/>
+	<field name="placa" class="java.lang.String"/>
+	<field name="transportador" class="java.lang.String"/>
+	<field name="totalDivergente" class="java.lang.Integer"/>
+	<field name="totalProdutos" class="java.lang.Integer"/>
+	<field name="recebimento" class="br.com.linkcom.wms.geral.bean.Recebimento"/>
+	<field name="conferente" class="java.lang.String"/>
+	<field name="fornecedorNotafiscal" class="java.util.TreeMap"/>
+
+
+		<group  name="grupo" isStartNewPage="true" minHeightToStartNewPage="1" >
+			<groupExpression><![CDATA[$F{recebimento}]]></groupExpression>
+			<groupHeader>
+			<band height="44"  isSplitAllowed="true" >
+				<rectangle radius="3" >
+					<reportElement
+						x="121"
+						y="7"
+						width="422"
+						height="23"
+						backcolor="#FFFFFF"
+						key="rectangle-1"/>
+					<graphicElement stretchType="NoStretch"/>
+				</rectangle>
+				<staticText>
+					<reportElement
+						x="279"
+						y="11"
+						width="256"
+						height="18"
+						forecolor="#000000"
+						key="staticText-1"/>
+					<box>					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+</box>
+					<textElement textAlignment="Right">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Divergências no recebimento]]></text>
+				</staticText>
+				<image  evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="3"
+						y="1"
+						width="102"
+						height="37"
+						key="image-1"/>
+					<box>					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+</box>
+					<graphicElement stretchType="NoStretch"/>
+					<imageExpression class="java.awt.Image"><![CDATA[$P{LOGO}]]></imageExpression>
+				</image>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</title>
+		<pageHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="15"  isSplitAllowed="true" >
+				<subreport  isUsingCache="true">
+					<reportElement
+						mode="Transparent"
+						x="1"
+						y="0"
+						width="530"
+						height="15"
+						key="subreport-2"
+						stretchType="RelativeToTallestObject"
+						positionType="Float"
+						isPrintWhenDetailOverflows="true"/>
+					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+					<subreportParameter  name="data">
+						<subreportParameterExpression><![CDATA[$F{data}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="placa">
+						<subreportParameterExpression><![CDATA[$F{placa}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="transportador">
+						<subreportParameterExpression><![CDATA[$F{transportador}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="totalDivergente">
+						<subreportParameterExpression><![CDATA[$F{totalDivergente}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="totalProdutos">
+						<subreportParameterExpression><![CDATA[$F{totalProdutos}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="recebimento">
+						<subreportParameterExpression><![CDATA[$F{recebimento}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="conferente">
+						<subreportParameterExpression><![CDATA[$F{conferente}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="fornecedorNotafiscal">
+						<subreportParameterExpression><![CDATA[$F{fornecedorNotafiscal}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{listaOrdemServicoProduto})]]></dataSourceExpression>
+					<subreportExpression  class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBDIVERGENCIA}]]></subreportExpression>
+				</subreport>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<summary>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

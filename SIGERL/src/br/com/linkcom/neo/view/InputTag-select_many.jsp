@@ -1,0 +1,2 @@
+<select name="${tag.name}" id="${tag.id}" onchange="${tag.reloadOnChangeString}" multiple="true" ${tag.dynamicAttributesToString}>${tag.selectItensString}</select>
+<input type="hidden" name="_${tag.name}" value=" "/>

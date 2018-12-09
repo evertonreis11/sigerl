@@ -1,0 +1,1 @@
+<input type="text" maxlength="9" size="9" id="${tag.id}" mask="cep" name="${tag.name}" value="${tag.valueToString}" onKeyUp="${tag.onKeyUp}" onKeyPress="${tag.onKeyPress}" onchange="${tag.reloadOnChangeString}" ${tag.dynamicAttributesToString}/>

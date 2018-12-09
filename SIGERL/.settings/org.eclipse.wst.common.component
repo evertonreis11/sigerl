@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="SIGERL">
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/" source-path="/WebRoot"/>
+        <dependent-module archiveName="Neo.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/Neo/Neo">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="java-output-path" value="/SIGERL/WebRoot/WEB-INF/classes"/>
+        <property name="context-root" value="SIGERL"/>
+    </wb-module>
+</project-modules>

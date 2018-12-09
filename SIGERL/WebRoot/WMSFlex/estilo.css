@@ -1,0 +1,28 @@
+/* CSS file */
+
+.backgroundSessao{
+	background-color: #dadada;
+}
+
+.backgroundTitulo{
+	background-color: #00AB18;
+}
+.fundoVermelho{
+	background-color: #ffa2a2;
+}
+
+.fundoVermelhoLabel{
+	color: Red;
+}
+
+.fundoBranco{
+	background-color: #ffffff;
+}
+
+.tituloSessao
+{
+	color: #00AB18;
+	fontSize: 11;
+	fontWeight: bold;
+	textAlign: left;
+}
