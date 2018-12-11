@@ -19,6 +19,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import br.com.linkcom.neo.authorization.AuthenticationControlFilter;
 import br.com.linkcom.neo.authorization.User;
 import br.com.linkcom.neo.types.ListSet;
+import br.com.linkcom.neo.util.Util;
 import br.com.linkcom.wms.geral.bean.Deposito;
 import br.com.linkcom.wms.geral.bean.Usuario;
 import br.com.linkcom.wms.geral.bean.Usuariodeposito;
@@ -75,6 +76,14 @@ public class WmsFilter extends AuthenticationControlFilter {
 		
 		if (StringUtils.isBlank(deposito)){
 			return null;
+		}
+		
+		// Inicio da Implementação da troca de senha.
+		if (((Usuario)user).getTrocasenha()){
+			Boolean exibeModalTrocaSenha = executaTrocaSenhaUsuario(user, request, deposito);
+			if (exibeModalTrocaSenha) {
+				return null;
+			}
 		}
 		
 		if (user instanceof Usuario){
@@ -168,5 +177,31 @@ public class WmsFilter extends AuthenticationControlFilter {
 	@Override
 	public boolean doLogin() {
 		return true;
+	}
+	
+	/**
+	 * Valida e executa a troca de senha para os usuario caso necessario.
+	 * 
+	 * 
+	 * @param user
+	 * @param request
+	 * @param deposito
+	 * @param novaSenha
+	 * @return
+	 */
+	private Boolean executaTrocaSenhaUsuario(User user, HttpServletRequest request, String deposito) {
+		String novaSenha = StringUtils.isNotEmpty(request.getParameter("novaSenha"))? request.getParameter("novaSenha") : null;
+		
+		if (StringUtils.isBlank(novaSenha)){
+			request.setAttribute("trocaSenha", 1);
+			request.setAttribute("depositoTrocaSenha", deposito);
+			request.setAttribute("username", request.getParameter("username"));
+			request.setAttribute("password", request.getParameter("password"));
+			return Boolean.TRUE;
+		}else{
+			updatePasswordOnDataBase(user, Util.crypto.makeHashJasypt(novaSenha));
+		}
+		
+		return Boolean.FALSE;
 	}
 }

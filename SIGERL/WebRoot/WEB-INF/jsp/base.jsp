@@ -89,7 +89,7 @@
 			</div>
 		</div>
 		
-		<footer style="background-color: rgb(243,247,129); color: #000;" id="footer">
+		<footer style="background-color: rgb(243,247,129); color: #f91700;" id="footer">
 			<div class="container">
 				<div class="row">
 					<div id="rodape" class="col-md-9 col-md-offset-3"> 

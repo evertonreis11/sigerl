@@ -15,7 +15,6 @@ import br.com.linkcom.wms.geral.bean.Empresa;
 import br.com.linkcom.wms.geral.bean.vo.ExtratoBorderoVO;
 import br.com.linkcom.wms.geral.dao.BorderoDAO;
 import br.com.linkcom.wms.modulo.expedicao.controller.process.filtro.BorderoFiltro;
-import br.com.linkcom.wms.sincronizador.IntegradorSqlUtil;
 import br.com.linkcom.wms.util.neo.persistence.GenericService;
 
 public class BorderoService extends GenericService<Bordero>{
@@ -39,8 +38,10 @@ public class BorderoService extends GenericService<Bordero>{
 	 * @return
 	 */
 	public List<Bordero> ratearBorderoPorEmpresa(Integer cdbordero) {
+		
+	return null;
 
-		Connection connection = null;
+		/*Connection connection = null;
 		CallableStatement cs = null;
 		
 		try {
@@ -125,7 +126,7 @@ public class BorderoService extends GenericService<Bordero>{
 				System.out.println("Erro ao fechar a conexção do banco.\n");
 				e.printStackTrace();
 			}
-		}
+		}*/
 	}
 	
 }

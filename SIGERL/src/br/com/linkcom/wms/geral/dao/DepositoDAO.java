@@ -96,8 +96,10 @@ public class DepositoDAO extends GenericDAO<Deposito> {
 		return query()
 				.select("deposito.cddeposito,deposito.nome")
 				.join("deposito.listaUsuarioDeposito listaUsuarioDeposito")
+				.join("deposito.tipodeposito tipodeposito")
 				.where("listaUsuarioDeposito.usuario=?", usuario)
 				.where("deposito.ativo=1")
+				.where("tipodeposito = ? ", Tipodeposito.LOJA)
 				// Comentado devido a aplicação passar a ter acesso ao todos os depósitos.
 				// Everton Reis das Dores - 14/04/2016
 //				.where("deposito.tmsativo = 0")

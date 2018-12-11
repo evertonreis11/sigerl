@@ -127,21 +127,71 @@ footer {
 
 
 .btn-primary {
-	background-color:#FE2E2E;
+	background-color:#0f5d11;
 }
 
 .btn-primary.focus,.btn-primary:focus, .btn-primary:hover,
 .btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary {
-	background-color:#DF0101;
+	background-color:#0a3103;
 }
 
 
 .panel-primary>.panel-heading {
-	color:#000;
+	color:#f91700;
 	background-color:rgba(243,247,129, 0.5);
-	border-color:#337ab7;
+	border-color:#027710;
 }
 
 .panel{
 	background-color:rgba(243,247,129, 0.5);
 }
+
+.form-control:focus{
+	border-color: #027710;
+}
+
+
+.h3, h3 {
+    font-size: 24px;
+}
+.h1, .h2, .h3, h1, h2, h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    color: #f91700;
+}
+.panel-primary {
+	border-color: #027710;
+}
+
+.titulo-pagina{
+    border-bottom: 1px solid green;
+    font-weight: bold;
+    font-family: sans-serif;
+}
+
+.corpo-pagina {
+    border: 1px solid green;
+    background-color:rgba(243,247,129, 0.5);/* #dfeae3 */;
+    border-radius: 20px;
+}
+
+label{
+ color: #f91700;
+}
+
+.dataGridHeader {
+	background-color: #4cb49c;
+	color: #FFFFFF;
+	font-family: Verdana;
+	font-weight: bold;	
+}
+
+.dataGridHeader > th{
+	text-align: center !important;
+}
+
+
+

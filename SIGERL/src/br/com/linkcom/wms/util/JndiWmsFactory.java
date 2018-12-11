@@ -45,19 +45,19 @@ public class JndiWmsFactory implements FactoryBean {
 	private String getJndiName() {
 		try {
 			if (Thread.currentThread().getName().startsWith("Connection")) {
-				return "java:/wmsre_OracleDS";
+				return "java:/sigerl_OracleDS";
 			}else if(Thread.currentThread() instanceof FinalizarInventarioThread){
 				String n = Thread.currentThread().getName();//refatorar, colocar regexp
 				return n.substring( n.indexOf("_")+1, n.lastIndexOf("_") );
 			}
 			else {
 				String databaseName = NeoWeb.getRequestContext().getServletRequest().getContextPath().replaceAll("/", "");
-				return databaseName.equals("") ? "java:/wms_OracleDS" : "java:/" + databaseName + "_OracleDS";
+				return databaseName.equals("") ? "java:/sigerl_OracleDS" : "java:/" + databaseName + "_OracleDS";
 			}
 		}
 		catch (NotInNeoContextException e) {
 			log.info("Não está em contexto NEO. Utilizando jndi wms_OracleDS");
-			return "java:/wms_OracleDS";
+			return "java:/sigerl_OracleDS";
 		}
 	}
 

@@ -146,6 +146,53 @@
 									      </div>
 									    </div>
 									</div> 
+									
+									<!-- Modal de troca de senha -->
+									<button id="buttonTrocaSenha" style="display: none;" type="button" class="btn" data-toggle="modal" data-target="#modalTrocaSenha"></button>
+									<input type="hidden" id="trocaSenha" name="trocaSenha" value="${trocaSenha}"/>
+									
+									<div class="modal fade" id="modalTrocaSenha" role="dialog">
+									    <div class="modal-dialog">
+									      <div class="modal-content">
+									        <div class="modal-header">
+									          <button type="button" class="close" data-dismiss="modal">&times;</button>
+									          <h4 class="modal-title">Será necessário efetuar a troca de senha para esse usuário</h4>
+									        </div>
+									        <div class="modal-body">
+									        	
+									        	<div class="alert alert-danger" style="display: none;" id="alertSenhaDiferente">
+							    				   A nova senha e a confirmação devem ser exatamente iguais.   	
+							  				    </div>
+							  				    
+							  				    <div class="alert alert-danger" style="display: none;" id="alertCampoObrigatorio">
+							    				 	O preenchimento dos campos é obrigatório.  	
+							  				    </div>
+							  				    
+							  				    <div class="alert alert-danger" style="display: none;" id="alertSenhaIgual">
+							    				 	A nova senha não pode ser igual a senha antiga. 	
+							  				    </div>
+									           
+									            <label class="control-label col-sm-2">Login:</label>
+											    <div>
+											      <label class="control-label">${username}</label>
+											    </div>
+											    
+									           	<br />
+									           					
+												<label class="control-label" for="novaSenha">Nova Senha:</label>
+												<input class="form-control required" name="novaSenha"  id="novaSenha" type="password" placeholder="Digite a nova Senha" onkeypress="$w.permiteNumeros(event);" maxlength="15"/>
+												<br>
+											    <label class="control-label" for="confirmarSenha" >Confirmar Senha:</label>
+												<input class="form-control required" id="confirmarSenha" type="password" placeholder="Confirme a Senha" onkeypress="$w.permiteNumeros(event);" maxlength="15"/>
+												<input type="hidden" id="depositoTrocaSenha" name="depositoTrocaSenha" value="${depositoTrocaSenha}"/>
+											      
+									        </div>
+									        <div class="modal-footer">
+									          <button type="button" class="btn btn-default" data-dismiss="modal" >Enviar</button>
+									        </div>
+									      </div>
+									    </div>
+									  </div>
 						            
 			            		</form>
 				                
@@ -158,13 +205,19 @@
 </HTML>
 
 
-<script>
+<script type="text/javascript">
+	
 	$(document).ready(function(){
 		// exibe modal de seleção de deposito.
 		if($('#habilitaModal').val()  == 1){
 			$('#buttonModal').click();	
 		}else{
 			$('#username').focus();
+		}
+		
+		// exibe modal de troca de senha.
+		if($('#trocaSenha').val() == 1){
+			$('#buttonTrocaSenha').click();	
 		}
 	});
 
@@ -317,6 +370,41 @@
  	 $(function() {
  	    $("#deposito").combobox();
  	  });
+ 	  
+ 	 // executa função antes de fechar modal de seleção de deposito
+	$("#modalTrocaSenha").on('hide.bs.modal', function(){
+		var novaSenha = $('#novaSenha').val();
+		var confirmarSenha = $('#confirmarSenha').val();
+		var senha = $('input[name=password]').val();
 
+		/* realiza validações de igualdade de senhas antiga e nova, 
+		   se a senha nova e a confirmação são iguais
+		   e se os campos estão preenchidos.
+		*/
+		if (novaSenha == '' || confirmarSenha == ''){
+			$('#alertCampoObrigatorio').show();
+			$('#alertSenhaDiferente').hide();
+			$('#alertSenhaIgual').hide();
+			return false;
+		}else if(senha == novaSenha){
+			$('#alertCampoObrigatorio').hide();
+			$('#alertSenhaDiferente').hide();
+			$('#alertSenhaIgual').show();
+			return false;
+		}else if(novaSenha != confirmarSenha){
+			$('#alertCampoObrigatorio').hide();
+			$('#alertSenhaDiferente').show();
+			$('#alertSenhaIgual').hide();
+			return false;	
+		}else{
+			$('#alertCampoObrigatorio').hide();
+			$('#alertSenhaDiferente').hide();
+			$('#alertSenhaIgual').hide();
+			//openDialog();
+    		$('#buttonSubmit').click();     
+		}
+
+	}) ;
+	
 	
 </script>

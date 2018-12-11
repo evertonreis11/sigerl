@@ -139,6 +139,12 @@ public class Deposito {
 	public Set<Area> getListaArea() {
 		return listaArea;
 	}
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "cdtipodeposito")
+	public Tipodeposito getTipodeposito() {
+		return tipodeposito;
+	}
 
 	public void setCddeposito(Integer cddeposito) {
 		this.cddeposito = cddeposito;
@@ -179,6 +185,10 @@ public class Deposito {
 	public void setEmpresa(Empresa empresa) {
 		this.empresa = empresa;
 	}
+	
+	public void setTipodeposito(Tipodeposito tipodeposito) {
+		this.tipodeposito = tipodeposito;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -197,6 +207,7 @@ public class Deposito {
 			return nome.substring(0,17)+("...");
 		else return nome;
 	}
+	
 	
 /*	@OneToMany(mappedBy="deposito")
 	public List<Box> getListaBox() {

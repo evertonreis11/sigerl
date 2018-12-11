@@ -98,6 +98,7 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
 		}
 		Usuario load = this.load(usuario);
 		load.setSenha(usuario.getSenha());
+		load.setTrocasenha(Boolean.FALSE);
 		save(load).execute();
 		getHibernateTemplate().flush();
 	}	

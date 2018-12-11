@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.java.dev.jaxb.array.StringArray;
-
 public class SqlUtil {
 
 	public static Integer getSequence(Connection connection, String nomeSequence) throws SQLException {
@@ -40,33 +38,7 @@ public class SqlUtil {
 		}
 	}
 
-	public static StringArray getListaDeposito(Connection connection) throws SQLException {
-		PreparedStatement statementSelect = null;
-		ResultSet resultSet = null;
-		try {
-			String sqlSelect = "select cnpj from deposito where cnpj is not null";
-			statementSelect = connection.prepareStatement(sqlSelect);
-			resultSet = statementSelect.executeQuery();
-
-			StringArray listaDeposito = new StringArray();
-			while (resultSet.next()) {
-				listaDeposito.getItem().add(resultSet.getString(1));
-			}
-			return listaDeposito;
-		}
-		finally {
-			try {
-				resultSet.close();
-			}
-			catch (Exception e) {
-			}
-			try {
-				statementSelect.close();
-			}
-			catch (Exception e) {
-			}
-		}
-	}
+	
 	
 	public static Integer getCdDeposito(Connection connection, String cnpj) throws SQLException {
 		PreparedStatement statementSelect = null;

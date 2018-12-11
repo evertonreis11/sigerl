@@ -11,6 +11,9 @@ public class Tipodeposito {
 	public static Tipodeposito CD = new Tipodeposito(1,"CD");
 	public static Tipodeposito CDA = new Tipodeposito(2,"CDA");
 	public static Tipodeposito CD_BASE = new Tipodeposito(3,"CD BASE");
+	public static Tipodeposito DAT = new Tipodeposito(4,"DAT");
+	public static Tipodeposito CENTRAL_MONTAGEM = new Tipodeposito(5,"CENTRAL MONTAGEM");
+	public static Tipodeposito LOJA = new Tipodeposito(6,"LOJA");
 	
 	private Integer cdtipodeposito;
 	private String nome;
