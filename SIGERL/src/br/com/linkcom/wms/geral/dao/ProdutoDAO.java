@@ -1424,7 +1424,8 @@ public class ProdutoDAO extends GenericDAO<Produto> {
 	 */
 	public Produto loadByCodigoBarras(String codigo) {
 		return query()
-		.where("produto.codigo = ?", codigo)
+		.join("produto.listaProdutoCodigoDeBarras produtoCodigoDeBarras")		
+		.where("produtoCodigoDeBarras.codigo = ?", codigo)
 		.unique();
 	}
 

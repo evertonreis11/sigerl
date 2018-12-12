@@ -125,17 +125,6 @@ footer {
     width: 100%;
 }
 
-
-.btn-primary {
-	background-color:#0f5d11;
-}
-
-.btn-primary.focus,.btn-primary:focus, .btn-primary:hover,
-.btn-primary.active,.btn-primary:active,.open>.dropdown-toggle.btn-primary {
-	background-color:#0a3103;
-}
-
-
 .panel-primary>.panel-heading {
 	color:#f91700;
 	background-color:rgba(243,247,129, 0.5);

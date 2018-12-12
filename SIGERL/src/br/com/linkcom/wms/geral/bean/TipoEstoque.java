@@ -102,4 +102,19 @@ public class TipoEstoque {
 		this.permiteExpedicao = permiteExpedicao;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj!=null && obj instanceof TipoEstoque){
+			TipoEstoque tipoEstoque = (TipoEstoque) obj;
+			try {
+				if(tipoEstoque.getCdTipoEstoque().equals(this.getCdTipoEstoque()))
+					return true;				
+			}catch (Exception e){
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return false;
+	}
+	
 }

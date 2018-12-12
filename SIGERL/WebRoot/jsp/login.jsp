@@ -83,7 +83,7 @@
 					                        <div class="input-group" style="padding-left:2%;">
 					                            <input class="form-control input-lg" id="username" name="username" placeholder="Login" value="${username}"  required/>
 					                            <span class="input-group-btn">
-					                                <label class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-user" aria-hidden="true"></label>
+					                                <label class="btn btn-success btn-lg"><span class="glyphicon glyphicon-user" aria-hidden="true"></label>
 					                            </span>
 					                        </div>
 					                    </div>
@@ -96,7 +96,7 @@
 					                        <div class="input-group" style="padding-left:2%;">
 					                            <input class="form-control input-lg" id="password" type="password" name="password" placeholder="Senha" value="${password}" required/>
 					                            <span class="input-group-btn">
-					                                <label class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-lock" aria-hidden="true"></label>
+					                                <label class="btn btn-success btn-lg"><span class="glyphicon glyphicon-lock" aria-hidden="true"></label>
 					                            </span>
 					                        </div>
 					                    </div>
@@ -106,7 +106,7 @@
 					                <div class="row">
 					                   <div class="col-lg-4"></div>
 					                   <div class="form-group col-lg-8" >
-					                        <button class="btn btn-primary btn-lg" type="submit" id="buttonSubmit">Entrar</button>
+					                        <button class="btn btn-success btn-lg" type="submit" id="buttonSubmit">Entrar</button>
 					                    </div> 
 					                </div>
 					                

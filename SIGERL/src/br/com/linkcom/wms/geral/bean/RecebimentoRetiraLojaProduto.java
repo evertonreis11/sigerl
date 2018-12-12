@@ -28,7 +28,7 @@ public class RecebimentoRetiraLojaProduto {
 	private Integer qtde;
 	
 	/** The notafiscalsaida. */
-	private Notafiscalsaida notafiscalsaida;
+	private Notafiscalsaida notaFiscalSaida;
 	
 	/** The recebimento retira loja. */
 	private RecebimentoRetiraLoja recebimentoRetiraLoja;
@@ -105,8 +105,8 @@ public class RecebimentoRetiraLojaProduto {
 	 */
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="cdnotafiscalsaida")
-	public Notafiscalsaida getNotafiscalsaida() {
-		return notafiscalsaida;
+	public Notafiscalsaida getNotaFiscalSaida() {
+		return notaFiscalSaida;
 	}
 
 	/**
@@ -114,8 +114,8 @@ public class RecebimentoRetiraLojaProduto {
 	 *
 	 * @param notafiscalsaida the new notafiscalsaida
 	 */
-	public void setNotafiscalsaida(Notafiscalsaida notafiscalsaida) {
-		this.notafiscalsaida = notafiscalsaida;
+	public void setNotaFiscalSaida(Notafiscalsaida notaFiscalSaida) {
+		this.notaFiscalSaida = notaFiscalSaida;
 	}
 	
 	/**
