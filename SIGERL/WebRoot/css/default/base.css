@@ -182,5 +182,22 @@ label{
 	text-align: center !important;
 }
 
+.glyphicon-glyphicon-ok-sign:before{ 
+  font-family: 'Glyphicons Halflings'; 
+  content:"\e084";
+}
 
+.glyphicon-glyphicon-exclamation-sign:before { 
+  font-family: 'Glyphicons Halflings'; 
+  content:"\e101"; 
+}
 
+.glyphicon-glyphicon-remove-sign:before { 
+  font-family: 'Glyphicons Halflings'; 
+  content:"\e083";
+}
+
+.tooltip  {
+	font-size: 14px;
+	width: 130px;
+}

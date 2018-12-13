@@ -1,5 +1,7 @@
 package br.com.linkcom.wms.geral.bean;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -20,6 +22,12 @@ public class EstoqueProdutoLoja {
 	private Integer qtde;
 	
 	private TipoEstoque tipoEstoque;
+	
+	private Deposito deposito;
+	
+	private Timestamp dtInclusao;
+	
+	private Timestamp dtAlteracao;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO, generator="sq_estoqueprodutoloja")
@@ -57,6 +65,32 @@ public class EstoqueProdutoLoja {
 
 	public void setTipoEstoque(TipoEstoque tipoEstoque) {
 		this.tipoEstoque = tipoEstoque;
+	}
+	
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="cddeposito")
+	public Deposito getDeposito() {
+		return deposito;
+	}
+
+	public void setDeposito(Deposito deposito) {
+		this.deposito = deposito;
+	}
+
+	public Timestamp getDtInclusao() {
+		return dtInclusao;
+	}
+
+	public void setDtInclusao(Timestamp dtInclusao) {
+		this.dtInclusao = dtInclusao;
+	}
+
+	public Timestamp getDtAlteracao() {
+		return dtAlteracao;
+	}
+
+	public void setDtAlteracao(Timestamp dtAlteracao) {
+		this.dtAlteracao = dtAlteracao;
 	}
 	
 }

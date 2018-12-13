@@ -19,6 +19,7 @@ public class RecebimentoRetiraLojaService extends GenericService<RecebimentoReti
 
 	private RecebimentoRetiraLojaDAO recebimentoRetiraLojaDAO;
 	private RecebimentoRetiraLojaProdutoService recebimentoRetiraLojaProdutoService;
+	private EstoqueProdutoLojaService estoqueProdutoLojaService;
 	
 	
 	public void setRecebimentoRetiraLojaDAO(RecebimentoRetiraLojaDAO recebimentoRetiraLojaDAO) {
@@ -30,10 +31,27 @@ public class RecebimentoRetiraLojaService extends GenericService<RecebimentoReti
 		this.recebimentoRetiraLojaProdutoService = recebimentoRetiraLojaProdutoService;
 	}
 	
-	public RecebimentoRetiraLoja findRecebimentoLojaWithCodigoEan(String codigoEan) {
-		RecebimentoRetiraLoja recebimentoRetiraLoja = recebimentoRetiraLojaDAO.findRecebimentoLojaWithCodigoEan(codigoEan);
+	public void setEstoqueProdutoLojaService(EstoqueProdutoLojaService estoqueProdutoLojaService) {
+		this.estoqueProdutoLojaService = estoqueProdutoLojaService;
+	}
+	
+	/**
+	 * Find recebimento loja.
+	 *
+	 * @param codigoEan the codigo ean
+	 * @param cdRecebimentoRetiraLoja the cd recebimento retira loja
+	 * @return the recebimento retira loja
+	 */
+	public RecebimentoRetiraLoja findRecebimentoLoja(String codigoEan, Integer cdRecebimentoRetiraLoja) {
+		RecebimentoRetiraLoja recebimentoRetiraLoja = null;
 		
-		if (recebimentoRetiraLoja == null){
+		if (cdRecebimentoRetiraLoja != null){
+			recebimentoRetiraLoja = recebimentoRetiraLojaDAO.findRecebimentoLoja(cdRecebimentoRetiraLoja);
+		}else{
+			recebimentoRetiraLoja = recebimentoRetiraLojaDAO.findRecebimentoLojaWithCodigoEan(codigoEan);
+		}
+		
+		if(codigoEan != null && recebimentoRetiraLoja == null){
 			recebimentoRetiraLoja = criaRecebimentoLoja(codigoEan);
 		}
 		
@@ -75,4 +93,25 @@ public class RecebimentoRetiraLojaService extends GenericService<RecebimentoReti
 		return recebimento;
 		
 	}
+
+	/**
+	 * Finalizar recebimento.
+	 *
+	 * @param recebimentoRetiraLoja the recebimento retira loja
+	 */
+	public void finalizarRecebimento(RecebimentoRetiraLoja recebimentoRetiraLoja) {
+		recebimentoRetiraLoja = recebimentoRetiraLojaDAO.findRecebimentoLoja(recebimentoRetiraLoja.getCdRecebimentoRetiraLoja());
+		
+		estoqueProdutoLojaService.atualizarEstoqueLojaRecebimento(recebimentoRetiraLoja.getListaRecebimentoRetiraLojaProduto(), 
+				recebimentoRetiraLoja.getDeposito().getCddeposito());
+		
+		recebimentoRetiraLoja.setRecebimentoRetiraLojaStatus(RecebimentoRetiraLojaStatus.CONCLUIDO);
+		
+		saveOrUpdate(recebimentoRetiraLoja);
+		
+		
+		
+	}
+
+	
 }

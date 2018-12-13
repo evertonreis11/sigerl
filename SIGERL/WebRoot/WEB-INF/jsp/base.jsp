@@ -13,14 +13,17 @@
 		
 		<script language="JavaScript" src="${ctx}/js/jquery.js"></script>	
 		<script type="text/javascript" src="${ctx}/js/bootstrap.min.js"></script>
-		<script  src="${ctx}/js/jquery-ui.js"></script>
-		<script language="JavaScript" src="${ctx}/js/wz_tooltip.js"></script>
+		<script src="${ctx}/js/bootstrap-confirmation.min.js"></script>
+		
+		</script>
+		<%-- <script  src="${ctx}/js/jquery-ui.js"></script> --%>
+		<%-- <script language="JavaScript" src="${ctx}/js/wz_tooltip.js"></script> --%>
 		
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 		
 		<link href="${ctx}/css/${tema_wms}/bootstrap.min.css" rel="stylesheet" media="screen"/>
-		<link rel="stylesheet"      href="${ctx}/css/${tema_wms}/jquery-ui.css">
+		<%-- <link rel="stylesheet"      href="${ctx}/css/${tema_wms}/jquery-ui.css"> --%>
 		<link rel="StyleSheet"        href="${ctx}/css/${tema_wms}/menu.css" type="text/css">
 		<link rel="StyleSheet"        href="${ctx}/css/${tema_wms}/base.css" type="text/css">
 		
@@ -131,7 +134,11 @@
 		</div> --%>
 	</body>
 </html>
-<script>
+<script type="text/javascript">
+	$(document).ready(function(){
+	    $('[data-toggle="tooltip"]').tooltip();   
+	});
+
 	/* var plus = {help : {}};
 	
 	$.getScript("http://suporte.linkcom.com.br/image.php?plus=1", function(){
