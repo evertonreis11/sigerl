@@ -31,7 +31,7 @@ public class RecebimentoRetiraLoja {
 	
 	private RecebimentoRetiraLojaStatus recebimentoRetiraLojaStatus;
 	
-	private List<RecebimentoRetiraLojaProduto> listaRecebimentoRetiraLojaProduto = new ListSet<RecebimentoRetiraLojaProduto>(RecebimentoRetiraLojaProduto.class);;
+	private List<RecebimentoRetiraLojaProduto> listaRecebimentoRetiraLojaProduto = new ListSet<RecebimentoRetiraLojaProduto>(RecebimentoRetiraLojaProduto.class);
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO, generator="sq_recebimentoretiraloja")

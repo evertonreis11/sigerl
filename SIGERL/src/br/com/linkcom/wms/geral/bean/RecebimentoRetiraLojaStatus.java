@@ -3,8 +3,10 @@ package br.com.linkcom.wms.geral.bean;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="RECEBRETIRALOJASTATUS")
 public class RecebimentoRetiraLojaStatus {
 	private Integer cdRecebimentoRetiraLojaStatus;
 	private String nome;

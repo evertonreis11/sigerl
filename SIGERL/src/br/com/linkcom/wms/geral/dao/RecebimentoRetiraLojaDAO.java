@@ -15,7 +15,6 @@ import br.com.linkcom.wms.geral.bean.RecebimentoRetiraLoja;
 import br.com.linkcom.wms.geral.bean.RecebimentoRetiraLojaProduto;
 import br.com.linkcom.wms.geral.bean.RecebimentoRetiraLojaStatus;
 import br.com.linkcom.wms.geral.bean.vo.RecebimentoLojaVO;
-import br.com.linkcom.wms.util.JndiWmsFactory;
 import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.WmsUtil;
 import br.com.linkcom.wms.util.neo.persistence.GenericDAO;
@@ -34,6 +33,19 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 				.where("recebimentoRetiraLojaStatus = ?", RecebimentoRetiraLojaStatus.EM_CONFERENCIA);
 		
 		
+		QueryBuilder<RecebimentoRetiraLoja> qb = criaConsultaRecebimentoRetiraLoja();
+		 	
+		qb.where("recebimentoRetiraLoja.cdRecebimentoRetiraLoja in ?", subQuery);
+		
+		return qb.unique();
+	}
+
+	/**
+	 * Cria consulta recebimento retira loja.
+	 *
+	 * @return the query builder
+	 */
+	private QueryBuilder<RecebimentoRetiraLoja> criaConsultaRecebimentoRetiraLoja() {
 		QueryBuilder<RecebimentoRetiraLoja> qb = query();
 		
 		qb.select("recebimentoRetiraLoja.cdRecebimentoRetiraLoja, recebimentoRetiraLoja.dtRecebimento, " +
@@ -41,8 +53,7 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 				  "recebimentoRetiraLojaStatus.cdRecebimentoRetiraLojaStatus, recebimentoRetiraLojaStatus.nome, " +
 				  "recebimentoRetiraLojaProduto.cdRecebimentoRetiraLojaProduto, recebimentoRetiraLojaProduto.qtde, " +
 				  "produto.cdproduto, produto.codigo, produto.descricao,notaFiscalSaida.cdnotafiscalsaida, "+
-				  "produtoCodigoDeBarras.cdprodutocodigobarras,produtoCodigoDeBarras.codigo,"+
-				  "pedidovenda.cdpedidovenda, pedidovenda.numero, tipoEstoque.cdTipoEstoque, tipoEstoque.descricao ")
+				  "produtoCodigoDeBarras.cdprodutocodigobarras,produtoCodigoDeBarras.codigo, tipoEstoque.cdTipoEstoque, tipoEstoque.descricao ")
 			.join("recebimentoRetiraLoja.listaRecebimentoRetiraLojaProduto recebimentoRetiraLojaProduto")
 			.join("recebimentoRetiraLoja.recebimentoRetiraLojaStatus recebimentoRetiraLojaStatus")
 			.join("recebimentoRetiraLoja.manifesto manifesto")
@@ -51,34 +62,23 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 		 	.join("recebimentoRetiraLojaProduto.produto produto")
 		 	.join("produto.listaProdutoCodigoDeBarras produtoCodigoDeBarras")
 		 	.join("recebimentoRetiraLojaProduto.notaFiscalSaida notaFiscalSaida")
-		 	.join("notaFiscalSaida.pedidovenda pedidovenda")
-		 	.join("recebimentoRetiraLojaProduto.tipoEstoque tipoEstoque")
-		 	.where("recebimentoRetiraLoja.cdRecebimentoRetiraLoja in ?", subQuery);
+		 	.join("recebimentoRetiraLojaProduto.tipoEstoque tipoEstoque");
 		
-		return qb.unique();
+		return qb;
 	}
 	
+	
+	/**
+	 * Find recebimento loja.
+	 *
+	 * @param cdRecebimentoRetiraLoja the cd recebimento retira loja
+	 * @return the recebimento retira loja
+	 */
 	public RecebimentoRetiraLoja findRecebimentoLoja(Integer cdRecebimentoRetiraLoja) {
-		QueryBuilder<RecebimentoRetiraLoja> qb = query();
 		
-		qb.select("recebimentoRetiraLoja.cdRecebimentoRetiraLoja, recebimentoRetiraLoja.dtRecebimento, " +
-				"usuario.cdpessoa, usuario.nome, usuario.login, deposito.cddeposito, manifesto.cdmanifesto, " +
-				"recebimentoRetiraLojaStatus.cdRecebimentoRetiraLojaStatus, recebimentoRetiraLojaStatus.nome, " +
-				"recebimentoRetiraLojaProduto.cdRecebimentoRetiraLojaProduto, recebimentoRetiraLojaProduto.qtde, " +
-				"produto.cdproduto, produto.codigo, produto.descricao,notaFiscalSaida.cdnotafiscalsaida, "+
-				"produtoCodigoDeBarras.cdprodutocodigobarras,produtoCodigoDeBarras.codigo,"+
-				"pedidovenda.cdpedidovenda, pedidovenda.numero, tipoEstoque.cdTipoEstoque, tipoEstoque.descricao ")
-		.join("recebimentoRetiraLoja.listaRecebimentoRetiraLojaProduto recebimentoRetiraLojaProduto")
-		.join("recebimentoRetiraLoja.recebimentoRetiraLojaStatus recebimentoRetiraLojaStatus")
-		.join("recebimentoRetiraLoja.manifesto manifesto")
-		.join("recebimentoRetiraLoja.usuario usuario")
-		.join("recebimentoRetiraLoja.deposito deposito")
-		.join("recebimentoRetiraLojaProduto.produto produto")
-		.join("produto.listaProdutoCodigoDeBarras produtoCodigoDeBarras")
-		.join("recebimentoRetiraLojaProduto.notaFiscalSaida notaFiscalSaida")
-		.join("notaFiscalSaida.pedidovenda pedidovenda")
-		.join("recebimentoRetiraLojaProduto.tipoEstoque tipoEstoque")
-		.where("recebimentoRetiraLoja.cdRecebimentoRetiraLoja = ", cdRecebimentoRetiraLoja)
+		QueryBuilder<RecebimentoRetiraLoja> qb = criaConsultaRecebimentoRetiraLoja();
+		
+		qb.where("recebimentoRetiraLoja.cdRecebimentoRetiraLoja = ", cdRecebimentoRetiraLoja)
 		.where("recebimentoRetiraLojaStatus = ?", RecebimentoRetiraLojaStatus.EM_CONFERENCIA);
 		
 		return qb.unique();
@@ -113,7 +113,6 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 						vo.setCdProdutoCodigoBarras(rs.getInt("CDPRODUTOCODIGOBARRAS"));
 						vo.setCodigoBarras(rs.getString("CODIGO_BARRAS"));
 						vo.setCdNotaFiscalSaida(rs.getInt("CDNOTAFISCALSAIDA"));
-						vo.setCdPedidoVenda(rs.getInt("CDPEDIDOVENDA"));
 						vo.setNumeroPedido(rs.getString("NUMERO_PEDIDO"));
 						vo.setQtde(rs.getInt("QTDE"));
 

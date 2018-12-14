@@ -2,5 +2,6 @@
 <!DOCTYPE menugroup PUBLIC "//LinkCom//Neo Menu 1.0//EN" "http://utilpub.linkcom.com.br/framework/dtd/menu.dtd">
 <menugroup>
 	<menu title="Recebimento" url="/recebimento/process/recebimentoloja"/>
+	<menu title="Confirmar Entrega" url="/expedicao/process/expedicaoloja"/>
 	<menu title="Sair" url="/logout.jsp" />
 </menugroup>

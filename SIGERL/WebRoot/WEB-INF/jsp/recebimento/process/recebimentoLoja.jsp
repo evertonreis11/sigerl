@@ -9,7 +9,7 @@
 	<n:form method="post" action="${Ttela.formAction}" validateFunction="validarFormulario">
 		<n:bean name="filtro" valueType="<%=RecebimentoLojaFiltro.class%>">
 			<jsp:include page="../../inputPage.jsp"></jsp:include>
-			<br>
+			<br />
 			<c:if test="${not empty filtro.recebimentoRetiraLoja}">
 				<div class="row">
 					<div class="form-group col-md-12">
@@ -24,13 +24,13 @@
 					</div>
 				</div>
 			</c:if>
-			<br>
+			<br />
 			<div class="panel panel-default">
 				<div class="table-responsive">
 					<n:dataGrid itens="recebimentoRetiraLoja.listaRecebimentoRetiraLojaProduto" id="tabelaId" itemType="<%=RecebimentoRetiraLojaProduto.class %>" var="recebimentoProduto" styleClass="table table-striped table-bordered">
-						<t:property name="produto.codigo" label="Código"/>
-						<t:property name="produto.descricao" label="Produto"/>
-						<t:property name="notaFiscalSaida.pedidovenda.numero" label="Pedido"/>
+						<t:property name="produto.codigo" label="Código" mode="output"/>
+						<t:property name="produto.descricao" label="Produto" mode="output"/>
+						<t:property name="notaFiscalSaida.numeropedido" label="Pedido" mode="output"/>
 						<n:column header="Situação">
 						 	<t:property name="tipoEstoque.cdTipoEstoque" type="hidden" mode="input"/>
 						 	

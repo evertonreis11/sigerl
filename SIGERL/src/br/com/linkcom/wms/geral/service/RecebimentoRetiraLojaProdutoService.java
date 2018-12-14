@@ -68,10 +68,7 @@ public class RecebimentoRetiraLojaProdutoService extends GenericService<Recebime
 		
 		Notafiscalsaida notaFiscalSaida = new Notafiscalsaida();
 		notaFiscalSaida.setCdnotafiscalsaida(vo.getCdNotaFiscalSaida());		
-		
-		Pedidovenda pedidovenda = new Pedidovenda(vo.getCdPedidoVenda());
-		pedidovenda.setNumero(vo.getNumeroPedido());
-		notaFiscalSaida.setPedidovenda(pedidovenda);
+		notaFiscalSaida.setNumeropedido(vo.getNumeroPedido());
 		
 		produtoRetiraLoja.setNotaFiscalSaida(notaFiscalSaida);
 		

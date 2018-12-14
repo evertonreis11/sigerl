@@ -52,6 +52,10 @@
     <filter-name>wmsFilter</filter-name>
     <url-pattern>/recebimento/*</url-pattern>
   </filter-mapping>
+  <filter-mapping>
+    <filter-name>wmsFilter</filter-name>
+    <url-pattern>/expedicao/*</url-pattern>
+  </filter-mapping>
   <servlet>
     <servlet-name>adm</servlet-name>
     <servlet-class>br.com.linkcom.neo.controller.DispatcherServlet</servlet-class>
@@ -78,6 +82,15 @@
   <servlet-mapping>
     <servlet-name>recebimento</servlet-name>
     <url-pattern>/recebimento/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>expedicao</servlet-name>
+    <servlet-class>br.com.linkcom.neo.controller.DispatcherServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>expedicao</servlet-name>
+    <url-pattern>/expedicao/*</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>resourceServlet</servlet-name>

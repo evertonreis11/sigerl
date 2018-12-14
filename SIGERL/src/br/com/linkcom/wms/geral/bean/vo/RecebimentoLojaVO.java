@@ -16,8 +16,6 @@ public class RecebimentoLojaVO {
 	
 	private Integer cdNotaFiscalSaida;
 	
-	private Integer cdPedidoVenda;
-	
 	private String numeroPedido;
 	
 	private Integer qtde;
@@ -76,14 +74,6 @@ public class RecebimentoLojaVO {
 
 	public void setCdNotaFiscalSaida(Integer cdNotaFiscalSaida) {
 		this.cdNotaFiscalSaida = cdNotaFiscalSaida;
-	}
-
-	public Integer getCdPedidoVenda() {
-		return cdPedidoVenda;
-	}
-
-	public void setCdPedidoVenda(Integer cdPedidoVenda) {
-		this.cdPedidoVenda = cdPedidoVenda;
 	}
 
 	public String getNumeroPedido() {
