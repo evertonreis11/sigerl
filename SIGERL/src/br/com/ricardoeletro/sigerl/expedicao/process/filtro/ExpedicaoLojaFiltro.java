@@ -9,6 +9,8 @@ public class ExpedicaoLojaFiltro extends GenericFilter {
 	
 	private String codigoBarras;
 	
+	private Integer expedicaoImprimirTermo;
+	
 
 	public ExpedicaoRetiraLoja getExpedicaoRetiraLoja() {
 		return expedicaoRetiraLoja;
@@ -25,7 +27,13 @@ public class ExpedicaoLojaFiltro extends GenericFilter {
 	public void setCodigoBarras(String codigoBarras) {
 		this.codigoBarras = codigoBarras;
 	}
-	
-	
+
+	public Integer getExpedicaoImprimirTermo() {
+		return expedicaoImprimirTermo;
+	}
+
+	public void setExpedicaoImprimirTermo(Integer expedicaoImprimirTermo) {
+		this.expedicaoImprimirTermo = expedicaoImprimirTermo;
+	}
 
 }

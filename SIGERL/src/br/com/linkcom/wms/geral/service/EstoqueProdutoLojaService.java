@@ -67,4 +67,16 @@ public class EstoqueProdutoLojaService extends GenericService<EstoqueProdutoLoja
 		
 	}
 
+	/**
+	 * Validar estoque produto.
+	 *
+	 * @param cdproduto the cdproduto
+	 * @param qtde the qtde
+	 * @return true, if successful
+	 */
+	public boolean validarEstoqueProduto(Integer cdproduto, Integer qtde) {
+		EstoqueProdutoLoja estoqueProdutoLoja = estoqueProdutoLojaDAO.recuperaEstoqueProdutoDepositoLogado(cdproduto);
+		return estoqueProdutoLoja != null && estoqueProdutoLoja.getQtde().equals(qtde);
+	}
+
 }

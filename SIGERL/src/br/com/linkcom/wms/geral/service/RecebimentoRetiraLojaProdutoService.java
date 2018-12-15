@@ -11,6 +11,7 @@ import br.com.linkcom.wms.geral.bean.Notafiscalsaida;
 import br.com.linkcom.wms.geral.bean.Pedidovenda;
 import br.com.linkcom.wms.geral.bean.Produto;
 import br.com.linkcom.wms.geral.bean.Produtocodigobarras;
+import br.com.linkcom.wms.geral.bean.RecebimentoRetiraLoja;
 import br.com.linkcom.wms.geral.bean.RecebimentoRetiraLojaProduto;
 import br.com.linkcom.wms.geral.bean.TipoEstoque;
 import br.com.linkcom.wms.geral.bean.vo.RecebimentoLojaVO;
@@ -46,9 +47,10 @@ public class RecebimentoRetiraLojaProdutoService extends GenericService<Recebime
 	 * Cria recebimento loja produto.
 	 *
 	 * @param vo the vo
+	 * @param recebimento 
 	 * @return the recebimento retira loja produto
 	 */
-	public RecebimentoRetiraLojaProduto criaRecebimentoLojaProduto(RecebimentoLojaVO vo) {
+	public RecebimentoRetiraLojaProduto criaRecebimentoLojaProduto(RecebimentoLojaVO vo, RecebimentoRetiraLoja recebimento) {
 		
 		RecebimentoRetiraLojaProduto produtoRetiraLoja = new RecebimentoRetiraLojaProduto();
 		
@@ -71,6 +73,8 @@ public class RecebimentoRetiraLojaProdutoService extends GenericService<Recebime
 		notaFiscalSaida.setNumeropedido(vo.getNumeroPedido());
 		
 		produtoRetiraLoja.setNotaFiscalSaida(notaFiscalSaida);
+		
+		produtoRetiraLoja.setRecebimentoRetiraLoja(recebimento);
 		
 		return produtoRetiraLoja;
 	}

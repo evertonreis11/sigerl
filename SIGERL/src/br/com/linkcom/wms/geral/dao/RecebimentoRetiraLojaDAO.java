@@ -29,8 +29,10 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 				.join("recebimentoRetiraLojaProduto.recebimentoRetiraLoja recebimentoRetiraLoja")
 				.join("recebimentoRetiraLojaProduto.produto produto")
 				.join("produto.listaProdutoCodigoDeBarras produtoCodigoDeBarras")
+				.join("recebimentoRetiraLoja.deposito deposito")
 				.where("produtoCodigoDeBarras.codigo = ?", codigoEan)
-				.where("recebimentoRetiraLojaStatus = ?", RecebimentoRetiraLojaStatus.EM_CONFERENCIA);
+				.where("recebimentoRetiraLojaStatus = ?", RecebimentoRetiraLojaStatus.EM_CONFERENCIA)
+				.where("deposito = ?", WmsUtil.getDeposito());
 		
 		
 		QueryBuilder<RecebimentoRetiraLoja> qb = criaConsultaRecebimentoRetiraLoja();
@@ -84,6 +86,12 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 		return qb.unique();
 	}
 
+	/**
+	 * Recupera dados recebimento retira loja.
+	 *
+	 * @param codigoEan the codigo ean
+	 * @return the list
+	 */
 	public List<RecebimentoLojaVO> recuperaDadosRecebimentoRetiraLoja(String codigoEan) {
 		Deposito deposito = WmsUtil.getDeposito();
 		List<Object> args = new ArrayList<Object>();
@@ -91,12 +99,54 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 		try {
 			StringBuilder sql = new StringBuilder();
 			
-			//TODO montar SQL
-//			StringBuilder sql = createSqlPrevisaoPagamento(filtro, args);
+			sql.append(" SELECT MAN.CDMANIFESTO,														   ");
+			sql.append("       PRO.CDPRODUTO,															   ");
+			sql.append("       PRO.CODIGO AS CODIGO_PRODUTO,											   ");
+			sql.append("       PRO.DESCRICAO AS DESCRICAO_PRODUTO, 										   ");
+			sql.append("       PCB.CDPRODUTOCODIGOBARRAS, 												   ");
+			sql.append("       PCB.CODIGO AS CODIGO_BARRAS,												   ");
+			sql.append("       NFS.CDNOTAFISCALSAIDA,													   ");
+			sql.append("       NFS.NUMEROPEDIDO AS NUMERO_PEDIDO,										   ");
+			sql.append("       NFP.QTDE                                                                    ");
+			sql.append("  FROM PRODUTOCODIGOBARRAS PCB                                                     ");
+			sql.append(" INNER JOIN PRODUTO PRO                                                            ");
+			sql.append("    ON PCB.CDPRODUTO = PRO.CDPRODUTO                                               ");
+			sql.append(" INNER JOIN NOTAFISCALSAIDAPRODUTO NFP                                             ");
+			sql.append("    ON NFP.CDPRODUTO = PRO.CDPRODUTO                                               ");
+			sql.append(" INNER JOIN NOTAFISCALSAIDA NFS                                                    ");
+			sql.append("    ON NFS.CDNOTAFISCALSAIDA = NFP.CDNOTAFISCALSAIDA                               ");
+			sql.append(" INNER JOIN MANIFESTONOTAFISCAL MNF                                                ");
+			sql.append("    ON MNF.CDNOTAFISCALSAIDA = NFS.CDNOTAFISCALSAIDA                               ");
+			sql.append(" INNER JOIN MANIFESTO MAN                                                          ");
+			sql.append("    ON MNF.CDMANIFESTO = MAN.CDMANIFESTO                                           ");
+			sql.append(" WHERE PRO.CDTIPOVENDA = NFS.CDTIPOVENDA                                           ");
+			sql.append("   AND NFS.CDTIPOVENDA = 2                                                         ");
+			sql.append("    AND NFS.CDTIPONF = 4                                                           ");
+			sql.append("    AND MAN.CDTIPOENTREGA <> 4                                                     ");
+			sql.append("   AND MNF.CDDEPOSITOTRANSBORDO IS NULL                                            ");
+			sql.append("   AND NFS.NRO_LOJA_RETIRADA = ?                                                   ");
+			sql.append("    AND MNF.CDMANIFESTO IN(SELECT MNX.CDMANIFESTO                                  ");
+			sql.append("                             FROM MANIFESTONOTAFISCAL MNX,                         ");
+			sql.append("                                  MANIFESTO MX ,                                   ");
+			sql.append("                                  NOTAFISCALSAIDA NFX,                             ");
+			sql.append("                                  NOTAFISCALSAIDAPRODUTO NFPX,                     ");
+			sql.append("                                  PRODUTOCODIGOBARRAS PBX                          ");
+			sql.append("                            WHERE MNX.CDMANIFESTO = MX.CDMANIFESTO                 ");
+			sql.append("                            AND   MNX.CDNOTAFISCALSAIDA = NFX.CDNOTAFISCALSAIDA    ");
+			sql.append("                            AND   NFX.CDNOTAFISCALSAIDA = NFPX.CDNOTAFISCALSAIDA   ");
+			sql.append("                            AND   NFPX.CDPRODUTO = PBX.CDPRODUTO                   ");
+			sql.append("                            AND   NFX.NRO_LOJA_RETIRADA = NFS.NRO_LOJA_RETIRADA    ");
+			sql.append("                            AND   NFX.CDNOTAFISCALSAIDA = NFS.CDNOTAFISCALSAIDA    ");
+			sql.append("                            AND   MX.CDMANIFESTOSTATUS NOT IN (1,2,3,11)           ");
+			sql.append("                            AND   PBX.CODIGO = ? )                        		   ");
 			
 			
+			args.add(deposito.getCodigoerp());		
+			args.add(codigoEan);		
+					
+					
 			@SuppressWarnings("unchecked")
-			List<RecebimentoLojaVO> montagens = (List<RecebimentoLojaVO>) getJdbcTemplate().query(sql.toString(), args.toArray(), new ResultSetExtractor() {
+			List<RecebimentoLojaVO> dados = (List<RecebimentoLojaVO>) getJdbcTemplate().query(sql.toString(), args.toArray(), new ResultSetExtractor() {
 				
 				@Override
 				public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -124,7 +174,7 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 			});
 
 
-			return montagens;
+			return dados;
 
 		} catch (Exception e) {
 			e.printStackTrace();

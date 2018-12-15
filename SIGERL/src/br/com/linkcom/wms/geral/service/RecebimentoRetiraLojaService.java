@@ -82,7 +82,7 @@ public class RecebimentoRetiraLojaService extends GenericService<RecebimentoReti
 			produtos = new ArrayList<RecebimentoRetiraLojaProduto>();
 			
 			for (RecebimentoLojaVO vo : registros) {
-				produtos.add(recebimentoRetiraLojaProdutoService.criaRecebimentoLojaProduto(vo));
+				produtos.add(recebimentoRetiraLojaProdutoService.criaRecebimentoLojaProduto(vo, recebimento));
 			}
 			
 			recebimento.setListaRecebimentoRetiraLojaProduto(new ListSet<RecebimentoRetiraLojaProduto>(RecebimentoRetiraLojaProduto.class, produtos));

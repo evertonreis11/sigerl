@@ -11,10 +11,12 @@
 			<jsp:include page="../../inputPage.jsp"></jsp:include>
 			<br />
 			
+			<t:property name="expedicaoImprimirTermo" type="hidden" mode="input"/>
+			
 			<c:if test="${not empty filtro.expedicaoRetiraLoja}">
 				<div class="row">
 				
-					<t:property name="expedicaoRetiraLoja" type="hidden" mode="input"/>
+					<t:property name="expedicaoRetiraLoja.cdExpedicaoRetiraLoja" type="hidden" mode="input"/>
 					<t:property name="expedicaoRetiraLoja.notaFiscalSaida.cdnotafiscalsaida" type="hidden" mode="input"/>
 					<t:property name="codigoBarras" type="hidden" mode="input"/>
 					
@@ -88,6 +90,15 @@
 
 
 <script type="text/javascript">
+	$(document).ready(function (){
+		if($("input[name='expedicaoImprimirTermo']").val() != '<null>' 
+			&& $("input[name='expedicaoImprimirTermo']").val() != ''){
+
+			$("input[name='expedicaoImprimirTermo']").val('<null>');
+			
+				
+		}
+	});
 	
 	function executarAcao(){
 		form.ACAO.value ='consultar';
