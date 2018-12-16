@@ -5,13 +5,21 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
+
+import br.com.linkcom.neo.report.IReport;
+import br.com.linkcom.neo.report.Report;
+import br.com.linkcom.neo.types.Cpf;
 import br.com.linkcom.neo.types.ListSet;
 import br.com.linkcom.wms.geral.bean.ExpedicaoRetiraLoja;
 import br.com.linkcom.wms.geral.bean.ExpedicaoRetiraLojaProduto;
 import br.com.linkcom.wms.geral.bean.ExpedicaoRetiraLojaStatus;
 import br.com.linkcom.wms.geral.bean.Notafiscalsaida;
 import br.com.linkcom.wms.geral.bean.vo.ExpedicaoLojaVO;
+import br.com.linkcom.wms.geral.bean.vo.TermoEntregaVO;
 import br.com.linkcom.wms.geral.dao.ExpedicaoRetiraLojaDAO;
+import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.WmsUtil;
 import br.com.linkcom.wms.util.neo.persistence.GenericService;
 
@@ -52,6 +60,7 @@ public class ExpedicaoRetiraLojaService extends GenericService<ExpedicaoRetiraLo
 			expedicao.setDtExpedicao(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 			expedicao.setExpedicaoRetiraLojaStatus(ExpedicaoRetiraLojaStatus.EM_CONFERENCIA);
 			expedicao.setUsuario(WmsUtil.getUsuarioLogado());
+			expedicao.setTermoImpresso(Boolean.FALSE);
 			
 			Notafiscalsaida nota = new Notafiscalsaida();
 			
@@ -94,6 +103,47 @@ public class ExpedicaoRetiraLojaService extends GenericService<ExpedicaoRetiraLo
 		expedicaoRetiraLoja.setExpedicaoRetiraLojaStatus(ExpedicaoRetiraLojaStatus.CONCLUIDO);
 		
 		saveOrUpdate(expedicaoRetiraLoja);
+	}
+
+	public IReport criarRelatorioTermoEntrega(String chaveNotaFiscal, Boolean impressaoFinalizarExpedicao) {
+		Report report = new Report("RelatorioTermoEntrega");
+		
+		ExpedicaoRetiraLoja expedicao = expedicaoRetiraLojaDAO.recuperaExpedicaoRetiraLojaPorChaveNota(chaveNotaFiscal);
+		
+		// se o termo ja foi impresso através da finalização de expedicao, não deixo imprimir novamente.
+		if (impressaoFinalizarExpedicao && expedicao.getTermoImpresso())
+			throw new WmsException("Não é permitido imprimir o relatório mais de uma vez ao finalizar expedicão.");
+		else
+			atualizarFlagImpressaoTermoExpedicao(expedicao.getCdExpedicaoRetiraLoja());
+		
+		report.addParameter("nomeCliente", expedicao.getNotaFiscalSaida().getCliente().getNome());
+		report.addParameter("filialEntrega", WmsUtil.getDeposito().getNome());
+		report.addParameter("cpfCliente", new Cpf(expedicao.getNotaFiscalSaida().getCliente().getDocumento()).toString());
+		report.addParameter("vendedor", WmsUtil.getUsuarioLogado().getNome());
+		
+		@SuppressWarnings("unchecked")
+		List<TermoEntregaVO> listaDataSource = (List<TermoEntregaVO>) CollectionUtils.collect(expedicao.getListaExpedicaoRetiraLojaProduto()
+				, new Transformer() {
+					@Override
+					public Object transform(Object input) {
+						ExpedicaoRetiraLojaProduto expedicaoProduto = (ExpedicaoRetiraLojaProduto) input;
+						TermoEntregaVO termoEntrega = new TermoEntregaVO();
+						
+						termoEntrega.setCodigoProduto(expedicaoProduto.getProduto().getCodigo());
+						termoEntrega.setDescricaoProduto(expedicaoProduto.getProduto().getDescricao());
+						
+						return termoEntrega;
+					}
+				});
+		
+		report.setDataSource(listaDataSource);
+		
+		return report;
+	}
+
+	private void atualizarFlagImpressaoTermoExpedicao(Integer cdExpedicaoRetiraLoja) {
+		expedicaoRetiraLojaDAO.atualizarFlagImpressaoTermoExpedicao(cdExpedicaoRetiraLoja);
+		
 	}
 
 }

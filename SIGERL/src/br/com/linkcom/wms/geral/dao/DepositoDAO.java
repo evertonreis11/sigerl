@@ -123,15 +123,12 @@ public class DepositoDAO extends GenericDAO<Deposito> {
 			.unique();
 	}
 
-	/**
-	 * Depositos ativos
-	 * @author Filipe Santos
-	 * @return Lista de Deposito
-	 */
 	public List<Deposito> findAtivos(){
 		return query()
 			.select("deposito.cddeposito,deposito.nome")
+			.join("deposito.tipodeposito tipodeposito")
 			.where("deposito.ativo=1")
+			.where("tipodeposito = ? ", Tipodeposito.LOJA)
 			.list();			
 	}
 

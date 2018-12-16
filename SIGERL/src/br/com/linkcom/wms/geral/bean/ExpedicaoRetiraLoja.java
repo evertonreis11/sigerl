@@ -31,6 +31,8 @@ public class ExpedicaoRetiraLoja {
 	
 	private ExpedicaoRetiraLojaStatus expedicaoRetiraLojaStatus;
 	
+	private Boolean termoImpresso;
+	
 	private List<ExpedicaoRetiraLojaProduto> listaExpedicaoRetiraLojaProduto= new ListSet<ExpedicaoRetiraLojaProduto>(ExpedicaoRetiraLojaProduto.class);
 	
 	@Id
@@ -92,6 +94,14 @@ public class ExpedicaoRetiraLoja {
 		this.expedicaoRetiraLojaStatus = expedicaoRetiraLojaStatus;
 	}
 	
+	public Boolean getTermoImpresso() {
+		return termoImpresso;
+	}
+
+	public void setTermoImpresso(Boolean termoImpresso) {
+		this.termoImpresso = termoImpresso;
+	}
+	
 	@OneToMany(mappedBy="expedicaoRetiraLoja")
 	public List<ExpedicaoRetiraLojaProduto> getListaExpedicaoRetiraLojaProduto() {
 		return listaExpedicaoRetiraLojaProduto;
@@ -100,5 +110,5 @@ public class ExpedicaoRetiraLoja {
 	public void setListaExpedicaoRetiraLojaProduto(List<ExpedicaoRetiraLojaProduto> listaExpedicaoRetiraLojaProduto) {
 		this.listaExpedicaoRetiraLojaProduto = listaExpedicaoRetiraLojaProduto;
 	}
-	
+
 }

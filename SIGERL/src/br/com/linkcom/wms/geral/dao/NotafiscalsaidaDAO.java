@@ -1,14 +1,24 @@
 package br.com.linkcom.wms.geral.dao;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 import br.com.linkcom.neo.persistence.QueryBuilder;
 import br.com.linkcom.neo.util.CollectionsUtil;
+import br.com.linkcom.wms.geral.bean.Deposito;
 import br.com.linkcom.wms.geral.bean.Notafiscalsaida;
+import br.com.linkcom.wms.geral.bean.vo.GestaoPedidoVO;
+import br.com.linkcom.wms.geral.bean.vo.RecebimentoLojaVO;
 import br.com.linkcom.wms.modulo.expedicao.controller.crud.filtro.ManifestoFiltro;
 import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.WmsUtil;
 import br.com.linkcom.wms.util.neo.persistence.GenericDAO;
+import br.com.ricardoeletro.sigerl.expedicao.process.filtro.GestaoPedidoFiltro;
 
 public class NotafiscalsaidaDAO extends GenericDAO<Notafiscalsaida>{
 
@@ -186,6 +196,95 @@ public class NotafiscalsaidaDAO extends GenericDAO<Notafiscalsaida>{
 		}else{
 			throw new WmsException("Não foi possivel rehabilitar as notas desse manifesto. Por favor, tente novamente.");
 		}
+	}
+
+	public List<GestaoPedidoVO> findForGestaoPedido(GestaoPedidoFiltro filtro) {
+		/*Deposito deposito = WmsUtil.getDeposito();
+		List<Object> args = new ArrayList<Object>();
+
+		try {
+			StringBuilder sql = new StringBuilder();
+			
+			sql.append(" SELECT DISTINCT NF.NUMERO NRO_NF,                                                           ");
+			sql.append("        NF.NUMEROPEDIDO PEDIDO,                                                              ");
+			sql.append("        NF.DTEMISSAO DT_EMISSAO_NF,                                                          ");
+			sql.append("        RL.DTRECEBIMENTO AS DT_RECEBIMENTO_LOJA,                                             ");
+			sql.append("        CL.NOME AS CLIENTE,                                                                  ");
+			sql.append("        CASE                                                                                 ");
+			sql.append("          WHEN ES.CDRECEBRETIRALOJASTATUS IS NOT NULL                                        ");
+			sql.append("             THEN ES.NOME                                                                    ");
+			sql.append("          WHEN RS.CDRECEBRETIRALOJASTATUS IS NOT NULL AND ES.CDRECEBRETIRALOJASTATUS IS NULL ");
+			sql.append("             THEN RS.NOME                                                                    ");
+			sql.append("          ELSE                                                                               ");
+			sql.append("           'EM TRANSFERENCIA PARA A LOJA'                                                    ");
+			sql.append("        END AS SITUACAO                                                                      ");
+			sql.append("   FROM NOTAFISCALSAIDA NF                                                                   ");
+			sql.append("   JOIN PESSOA CL                                                                            ");
+			sql.append("     ON CL.CDPESSOA = NF.CDCLIENTE                                                           ");
+			sql.append("   JOIN NOTAFISCALSAIDAPRODUTO NP                                                            ");
+			sql.append("     ON NP.CDNOTAFISCALSAIDA = NF.CDNOTAFISCALSAIDA                                          ");
+			sql.append("   JOIN PRODUTO PR                                                                           ");
+			sql.append("     ON PR.CDPRODUTO = NP.CDPRODUTO                                                          ");
+			sql.append("   LEFT JOIN RECEBRETIRALOJAPRODUTO RP                                                       ");
+			sql.append("     ON RP.CDNOTAFISCALSAIDA = NF.CDNOTAFISCALSAIDA                                          ");
+			sql.append("   LEFT JOIN RECEBIMENTORETIRALOJA RL                                                        ");
+			sql.append("     ON RL.CDRECEBIMENTORETIRALOJA = RP.CDRECEBIMENTORETIRALOJA                              ");
+			sql.append("   LEFT JOIN RECEBRETIRALOJASTATUS RS                                                        ");
+			sql.append("     ON RS.CDRECEBRETIRALOJASTATUS = RL.CDRECEBRETIRALOJASTATUS                              ");
+			sql.append("   LEFT JOIN EXPEDICAORETIRALOJA EL                                                          ");
+			sql.append("     ON EL.CDNOTAFISCALSAIDA = NF.CDNOTAFISCALSAIDA                                          ");
+			sql.append("   LEFT JOIN RECEBRETIRALOJASTATUS ES                                                        ");
+			sql.append("     ON ES.CDRECEBRETIRALOJASTATUS = EL.CDEXPEDICAORETLOJASTATUS                             ");
+			sql.append("  WHERE NF.NRO_LOJA_RETIRADA = 579                                                           ");
+			sql.append("    AND NF.NUMEROPEDIDO = ?                                                                  ");
+			sql.append("    AND NF.NUMERO = ?                                                                        ");
+			sql.append("    AND TRUNC(NF.DTEMISSAO) >= TO_DATE(?, 'DD/MM/YYYY')                                      ");
+			sql.append("    AND TRUNC(NF.DTEMISSAO) < TO_DATE(?, 'DD/MM/YYYY') + 1                                   ");
+			sql.append("    AND PR.CODIGO = ?                                                                        ");
+			sql.append("    AND CL.NOME LIKE '%%'                                                                    ");
+			
+			
+			args.add(deposito.getCodigoerp());		
+			args.add(codigoEan);		
+					
+					
+			@SuppressWarnings("unchecked")
+			List<RecebimentoLojaVO> dados = (List<RecebimentoLojaVO>) getJdbcTemplate().query(sql.toString(), args.toArray(), new ResultSetExtractor() {
+				
+				@Override
+				public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+					List<RecebimentoLojaVO> registros = new ArrayList<RecebimentoLojaVO>();
+
+					while (rs.next()) {
+						RecebimentoLojaVO vo = new RecebimentoLojaVO();
+						
+						vo.setCdManifesto(rs.getInt("CDMANIFESTO"));
+						vo.setCdProduto(rs.getInt("CDPRODUTO"));
+						vo.setCodigoProduto(rs.getString("CODIGO_PRODUTO"));
+						vo.setDescricaoProduto(rs.getString("DESCRICAO_PRODUTO"));
+						vo.setCdProdutoCodigoBarras(rs.getInt("CDPRODUTOCODIGOBARRAS"));
+						vo.setCodigoBarras(rs.getString("CODIGO_BARRAS"));
+						vo.setCdNotaFiscalSaida(rs.getInt("CDNOTAFISCALSAIDA"));
+						vo.setNumeroPedido(rs.getString("NUMERO_PEDIDO"));
+						vo.setQtde(rs.getInt("QTDE"));
+
+						registros.add(vo);
+					}
+
+					return registros;
+				}
+			});
+
+
+			return dados;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new WmsException("Erro ao recuperar produtos para recebimento. Erro: " + e.getMessage(), e.getCause());
+		}*/
+		
+		return null;
 	}
 	
 }

@@ -11,7 +11,7 @@
 			<jsp:include page="../../inputPage.jsp"></jsp:include>
 			<br />
 			
-			<t:property name="expedicaoImprimirTermo" type="hidden" mode="input"/>
+			<t:property name="chaveNotaImpressaoTermo" type="hidden" mode="input"/>
 			
 			<c:if test="${not empty filtro.expedicaoRetiraLoja}">
 				<div class="row">
@@ -45,7 +45,7 @@
 						<n:column header="Código">
 							<c:choose>
 								<c:when test="${expedicaoProduto.conferenciaExpedicaoRetiraLojaStatus.cdConferenciaExpedicaoRetiraLojaStatus eq 1}">
-									<t:property name="codigoBarrasConferencia" mode="input" class="form-control input-lg" 
+									<t:property name="codigoBarrasConferencia" mode="input" class="form-control input-sm" 
 											data-toggle="tooltip" title="Informe o EAN do produto para conferencia"  onchange="conferirProduto(this.value);"/>
 								</c:when>
 								<c:otherwise>
@@ -91,12 +91,11 @@
 
 <script type="text/javascript">
 	$(document).ready(function (){
-		if($("input[name='expedicaoImprimirTermo']").val() != '<null>' 
-			&& $("input[name='expedicaoImprimirTermo']").val() != ''){
+		var chaveNota = $("input[name='chaveNotaImpressaoTermo']").val();
 
-			$("input[name='expedicaoImprimirTermo']").val('<null>');
-			
-				
+		if(chaveNota != '<null>' && chaveNota != ''){
+			$("input[name='chaveNotaImpressaoTermo']").val('<null>');
+			gerarRelatorio(chaveNota);
 		}
 	});
 	
@@ -125,7 +124,12 @@
 		form.ACAO.value ='finalizar';
 		form.validate = 'false'; 
 		submitForm(); 
+	}
 
+	function gerarRelatorio(chaveNota){
+		form.action = '${ctx}/expedicao/report/termoentrega?ACAO=gerar&impressaoFinalizarExpedicao=true&chaveNotaFiscal='+chaveNota; 
+		form.validate = 'true'; 
+		submitForm();
 	}
 	
 </script>

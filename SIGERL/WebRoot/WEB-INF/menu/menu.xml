@@ -4,5 +4,6 @@
 	<menu title="Recebimento" url="/recebimento/process/recebimentoloja"/>
 	<menu title="Confirmar Entrega" url="/expedicao/process/expedicaoloja"/>
 	<menu title="Termo de Entrega" url="/expedicao/report/termoentrega"/>
+	<menu title="Gestão de Pedidos" url="/expedicao/process/gestaopedido"/>
 	<menu title="Sair" url="/logout.jsp" />
 </menugroup>

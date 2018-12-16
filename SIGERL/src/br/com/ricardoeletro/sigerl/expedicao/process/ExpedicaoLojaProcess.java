@@ -81,12 +81,12 @@ public class ExpedicaoLojaProcess extends GenericProcess<ExpedicaoLojaFiltro> {
 			request.addError("Não é permitido entrega parcial de produtos ao cliente. Gentileza realizar a conferência de todos os produtos");
 			return consultar(request, filtro);
 		}
-		Integer cdExpedicaoTermo = filtro.getExpedicaoRetiraLoja().getCdExpedicaoRetiraLoja();
+		String chaveNotaImpressaoTermo = filtro.getExpedicaoRetiraLoja().getNotaFiscalSaida().getChavenfe();
 			
 		expedicaoRetiraLojaService.finalizarExpedicao(filtro.getExpedicaoRetiraLoja());
 		filtro = new ExpedicaoLojaFiltro();
 		
-		filtro.setExpedicaoImprimirTermo(cdExpedicaoTermo);
+		filtro.setChaveNotaImpressaoTermo(chaveNotaImpressaoTermo);
 		request.addMessage("A expedição foi finalizada com sucesso. O sistema gerou um termo para confirmação de entrega para assinatura do cliente.");
 
 		return index(request, filtro);

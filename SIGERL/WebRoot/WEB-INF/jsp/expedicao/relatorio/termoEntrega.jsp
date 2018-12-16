@@ -9,13 +9,16 @@
 			<div class="row">
 				<div class="form-group col-md-12">
 					<div class="col-md-6 col-md-offset-3">
-				       <label for="valorInicial" style="margin-top: 1%; margin-left: 30%;">${filtro.labelDinamico}</label>  
-				       <t:property name="valorInicial" id="valorInicial" mode="input"
-				       				style="width: 100%;" class="form-control input-lg" onchange="executarAcao();"/>
+						<div class="input-group">
+					       <label for="valorInicial" style="margin-top: 1%; margin-left: 30%;">Informe a chave da nota fiscal:</label>  
+					       <t:property name="chaveNotaFiscal" id="cdExpedicaoLoja" mode="input"
+					       				style="width: 100%;" class="form-control input-lg" onchange="executarAcao();"/>
+					       
+					       <div class="input-group-btn" style="padding-top: 5.3%;padding-left: 1%;">
+					       		<button class="btn btn-success btn-lg" type="submit" id="buttonGerar" onclick="submitForm();">Gerar</button>
+					       </div>
+						</div>
 					</div>
-			       <div class="col-md-2" style="padding-top: 2.8%;">
-			       		<button class="btn btn-success btn-lg" type="submit" id="buttonGerar" onclick="submitForm();">Gerar</button>
-			       </div>
 				</div>
 			</div>
 		</t:janelaFiltro>
@@ -25,12 +28,12 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		$("#valorInicial").focus();
+		$("#cdExpedicaoLoja").focus();
 	});
 
 	function clearForm(){
-		$("#valorInicial").val('');
-		$("#valorInicial").focus();
+		$("#cdExpedicaoLoja").val('');
+		$("#cdExpedicaoLoja").focus();
 		clearMessages();
 	}
 
