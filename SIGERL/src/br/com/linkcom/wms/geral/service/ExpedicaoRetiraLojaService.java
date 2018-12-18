@@ -27,6 +27,7 @@ public class ExpedicaoRetiraLojaService extends GenericService<ExpedicaoRetiraLo
 	
 	private ExpedicaoRetiraLojaDAO expedicaoRetiraLojaDAO;
 	private ExpedicaoRetiraLojaProdutoService expedicaoRetiraLojaProdutoService;
+	private EstoqueProdutoLojaService estoqueProdutoLojaService;
 	
 	public void setExpedicaoRetiraLojaDAO(ExpedicaoRetiraLojaDAO expedicaoRetiraLojaDAO) {
 		this.expedicaoRetiraLojaDAO = expedicaoRetiraLojaDAO;
@@ -36,29 +37,36 @@ public class ExpedicaoRetiraLojaService extends GenericService<ExpedicaoRetiraLo
 		this.expedicaoRetiraLojaProdutoService = expedicaoRetiraLojaProdutoService;
 	}
 	
+	public void setEstoqueProdutoLojaService(EstoqueProdutoLojaService estoqueProdutoLojaService) {
+		this.estoqueProdutoLojaService = estoqueProdutoLojaService;
+	}
+	
 	public ExpedicaoRetiraLoja findExpedicaoLoja(String chaveNota) {
 		ExpedicaoRetiraLoja expedicao = null;
 		
-		expedicao = expedicaoRetiraLojaDAO.recuperaExpedicaoRetiraLojaPorChaveNota(chaveNota);
+		expedicao = expedicaoRetiraLojaDAO.recuperaExpedicaoRetiraLojaPorChaveNota(chaveNota, ExpedicaoRetiraLojaStatus.EM_PROCESSO_ENTREGA);
 		
 		if (expedicao == null){
-			criaExpedicaoRetiraLoja(expedicao, chaveNota);
+			expedicao = criaExpedicaoRetiraLoja(chaveNota);
 		}
 		
 		return expedicao;
 	}
 
-	private void criaExpedicaoRetiraLoja(ExpedicaoRetiraLoja expedicao, String chaveNota) {
-		expedicao = new ExpedicaoRetiraLoja();
+	private ExpedicaoRetiraLoja criaExpedicaoRetiraLoja(String chaveNota) {
+		ExpedicaoRetiraLoja expedicao = null;
 		
 		List<ExpedicaoLojaVO> registros = recuperarDadosPraCriacaoExpedicao(chaveNota);
 		
 		if(registros != null && !registros.isEmpty()){
+			
+			expedicao = new ExpedicaoRetiraLoja();
+			
 			List<ExpedicaoRetiraLojaProduto> expedicaoProdutos = new ArrayList<ExpedicaoRetiraLojaProduto>();
 			
 			expedicao.setDeposito(WmsUtil.getDeposito());
 			expedicao.setDtExpedicao(new Timestamp(Calendar.getInstance().getTimeInMillis()));
-			expedicao.setExpedicaoRetiraLojaStatus(ExpedicaoRetiraLojaStatus.EM_CONFERENCIA);
+			expedicao.setExpedicaoRetiraLojaStatus(ExpedicaoRetiraLojaStatus.EM_PROCESSO_ENTREGA);
 			expedicao.setUsuario(WmsUtil.getUsuarioLogado());
 			expedicao.setTermoImpresso(Boolean.FALSE);
 			
@@ -78,7 +86,10 @@ public class ExpedicaoRetiraLojaService extends GenericService<ExpedicaoRetiraLo
 			expedicao.setListaExpedicaoRetiraLojaProduto(new ListSet<ExpedicaoRetiraLojaProduto>(ExpedicaoRetiraLojaProduto.class, expedicaoProdutos));
 			
 			saveOrUpdate(expedicao);
+			
 		}
+		
+		return expedicao;
 		
 	}
 
@@ -100,7 +111,10 @@ public class ExpedicaoRetiraLojaService extends GenericService<ExpedicaoRetiraLo
 	public void finalizarExpedicao(ExpedicaoRetiraLoja expedicaoRetiraLoja) {
 		expedicaoRetiraLoja = loadForEntrada(expedicaoRetiraLoja);
 		
-		expedicaoRetiraLoja.setExpedicaoRetiraLojaStatus(ExpedicaoRetiraLojaStatus.CONCLUIDO);
+		estoqueProdutoLojaService.atualizarEstoqueLojaExpedicao(expedicaoRetiraLoja.getListaExpedicaoRetiraLojaProduto(),
+				WmsUtil.getDeposito().getCddeposito());
+		
+		expedicaoRetiraLoja.setExpedicaoRetiraLojaStatus(ExpedicaoRetiraLojaStatus.ENTREGUE);
 		
 		saveOrUpdate(expedicaoRetiraLoja);
 	}
@@ -108,7 +122,7 @@ public class ExpedicaoRetiraLojaService extends GenericService<ExpedicaoRetiraLo
 	public IReport criarRelatorioTermoEntrega(String chaveNotaFiscal, Boolean impressaoFinalizarExpedicao) {
 		Report report = new Report("RelatorioTermoEntrega");
 		
-		ExpedicaoRetiraLoja expedicao = expedicaoRetiraLojaDAO.recuperaExpedicaoRetiraLojaPorChaveNota(chaveNotaFiscal);
+		ExpedicaoRetiraLoja expedicao = expedicaoRetiraLojaDAO.recuperaExpedicaoRetiraLojaPorChaveNota(chaveNotaFiscal, null);
 		
 		// se o termo ja foi impresso através da finalização de expedicao, não deixo imprimir novamente.
 		if (impressaoFinalizarExpedicao && expedicao.getTermoImpresso())

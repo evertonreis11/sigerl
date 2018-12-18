@@ -11,9 +11,8 @@ public class ExpedicaoRetiraLojaStatus {
 	private Integer cdExpedicaoRetiraLojaStatus;
 	private String nome;
 	
-	public static ExpedicaoRetiraLojaStatus EM_CONFERENCIA = new ExpedicaoRetiraLojaStatus(1, "Em Conferência"); 
-	public static ExpedicaoRetiraLojaStatus CONCLUIDO = new ExpedicaoRetiraLojaStatus(2, "Concluído"); 
-	public static ExpedicaoRetiraLojaStatus CANCELADO = new ExpedicaoRetiraLojaStatus(3, "Cancelado"); 
+	public static ExpedicaoRetiraLojaStatus EM_PROCESSO_ENTREGA = new ExpedicaoRetiraLojaStatus(1, "Em Processo de Entrega"); 
+	public static ExpedicaoRetiraLojaStatus ENTREGUE = new ExpedicaoRetiraLojaStatus(2, "Entregue"); 
 	
 	// default Constructor
 	public ExpedicaoRetiraLojaStatus() {	}

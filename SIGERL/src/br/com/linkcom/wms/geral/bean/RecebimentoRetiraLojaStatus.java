@@ -11,8 +11,8 @@ public class RecebimentoRetiraLojaStatus {
 	private Integer cdRecebimentoRetiraLojaStatus;
 	private String nome;
 	
-	public static RecebimentoRetiraLojaStatus EM_CONFERENCIA = new RecebimentoRetiraLojaStatus(1, "Em Conferência"); 
-	public static RecebimentoRetiraLojaStatus CONCLUIDO = new RecebimentoRetiraLojaStatus(2, "Concluído"); 
+	public static RecebimentoRetiraLojaStatus EM_RECEBIMENTO = new RecebimentoRetiraLojaStatus(1, "Em Recebimento"); 
+	public static RecebimentoRetiraLojaStatus CONCLUIDO = new RecebimentoRetiraLojaStatus(2, "Recebimento Concluído"); 
 	public static RecebimentoRetiraLojaStatus CANCELADO = new RecebimentoRetiraLojaStatus(3, "Cancelado"); 
 	
 	// default Constructor

@@ -6,9 +6,11 @@ import java.util.List;
 
 import br.com.linkcom.wms.geral.bean.Deposito;
 import br.com.linkcom.wms.geral.bean.EstoqueProdutoLoja;
+import br.com.linkcom.wms.geral.bean.ExpedicaoRetiraLojaProduto;
 import br.com.linkcom.wms.geral.bean.RecebimentoRetiraLojaProduto;
 import br.com.linkcom.wms.geral.bean.TipoEstoque;
 import br.com.linkcom.wms.geral.dao.EstoqueProdutoLojaDAO;
+import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.neo.persistence.GenericService;
 
 public class EstoqueProdutoLojaService extends GenericService<EstoqueProdutoLoja> {
@@ -77,6 +79,35 @@ public class EstoqueProdutoLojaService extends GenericService<EstoqueProdutoLoja
 	public boolean validarEstoqueProduto(Integer cdproduto, Integer qtde) {
 		EstoqueProdutoLoja estoqueProdutoLoja = estoqueProdutoLojaDAO.recuperaEstoqueProdutoDepositoLogado(cdproduto);
 		return estoqueProdutoLoja != null && estoqueProdutoLoja.getQtde().equals(qtde);
+	}
+
+	/**
+	 * Atualizar estoque loja expedicao.
+	 *
+	 * @param registros the registros
+	 * @param cddeposito the cddeposito
+	 */
+	public void atualizarEstoqueLojaExpedicao(List<ExpedicaoRetiraLojaProduto> registros, Integer cddeposito) {
+		EstoqueProdutoLoja estoqueProdutoLoja = null;
+
+		for (ExpedicaoRetiraLojaProduto expedicaoProduto : registros) {
+			estoqueProdutoLoja = estoqueProdutoLojaDAO.recuperarEstoqueProduto(expedicaoProduto.getProduto().getCdproduto(), 
+					TipoEstoque.PERFEITO, cddeposito);
+
+			if (estoqueProdutoLoja == null){
+				throw new WmsException("Erro ao baixar estoque do produto" + expedicaoProduto.getProduto().getDescricao());
+			}else{
+				if (Math.subtractExact(estoqueProdutoLoja.getQtde(), expedicaoProduto.getQtde()) > 0 ){
+					estoqueProdutoLoja.setQtde(Math.subtractExact(estoqueProdutoLoja.getQtde(), expedicaoProduto.getQtde()));
+					estoqueProdutoLoja.setDtAlteracao(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+					saveOrUpdate(estoqueProdutoLoja);
+				}else{
+					delete(estoqueProdutoLoja);
+				}
+			}
+
+		}
+
 	}
 
 }

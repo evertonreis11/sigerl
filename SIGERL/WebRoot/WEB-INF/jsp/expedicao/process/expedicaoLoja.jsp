@@ -18,6 +18,7 @@
 				
 					<t:property name="expedicaoRetiraLoja.cdExpedicaoRetiraLoja" type="hidden" mode="input"/>
 					<t:property name="expedicaoRetiraLoja.notaFiscalSaida.cdnotafiscalsaida" type="hidden" mode="input"/>
+					<t:property name="expedicaoRetiraLoja.notaFiscalSaida.chavenfe" type="hidden" mode="input"/>
 					<t:property name="codigoBarras" type="hidden" mode="input"/>
 					
 					<div class="form-group col-md-12">
@@ -41,10 +42,10 @@
 			
 			 <div class="panel panel-default">
 				<div class="table-responsive">
-					<n:dataGrid itens="expedicaoRetiraLoja.listaExpedicaoRetiraLojaProduto" id="tabelaId" itemType="<%=ExpedicaoRetiraLojaProduto.class %>" var="expedicaoProduto" styleClass="table table-striped table-bordered">
+					<n:dataGrid itens="${REGISTROS}" id="tabelaId" itemType="<%=ExpedicaoRetiraLojaProduto.class %>" var="expedicaoProduto" styleClass="table table-striped table-bordered">
 						<n:column header="Código">
 							<c:choose>
-								<c:when test="${expedicaoProduto.conferenciaExpedicaoRetiraLojaStatus.cdConferenciaExpedicaoRetiraLojaStatus eq 1}">
+								<c:when test="${expedicaoProduto.conferenciaExpedicaoRetiraLojaStatus.cdConfExpedicaoRetLojaStatus eq 1}">
 									<t:property name="codigoBarrasConferencia" mode="input" class="form-control input-sm" 
 											data-toggle="tooltip" title="Informe o EAN do produto para conferencia"  onchange="conferirProduto(this.value);"/>
 								</c:when>
@@ -56,16 +57,16 @@
 					    
 						<t:property name="produto.descricao" label="Descrição" mode="output"/>
 						
-						<n:column header="Situação">
-						 	<t:property name="conferenciaExpedicaoRetiraLojaStatus.cdConferenciaExpedicaoRetiraLojaStatus" type="hidden" mode="input"/>
+						<n:column header="Situação" style="text-align: -webkit-center;">
+						 	<t:property name="conferenciaExpedicaoRetiraLojaStatus.cdConfExpedicaoRetLojaStatus" type="hidden" mode="input"/>
 							
-							<c:if test="${expedicaoProduto.conferenciaExpedicaoRetiraLojaStatus.cdConferenciaExpedicaoRetiraLojaStatus eq 1}">
+							<c:if test="${expedicaoProduto.conferenciaExpedicaoRetiraLojaStatus.cdConfExpedicaoRetLojaStatus eq 1}">
 								<button type="button" class="btn btn-warning" data-toggle="tooltip" title="Aguardando Conferência"> 
 					     			<span class="glyphicon glyphicon-glyphicon-exclamation-sign" aria-hidden="true" />
 					    		</button>
 							</c:if>
 						 	
-						  	<c:if test="${expedicaoProduto.conferenciaExpedicaoRetiraLojaStatus.cdConferenciaExpedicaoRetiraLojaStatus eq 2}">
+						  	<c:if test="${expedicaoProduto.conferenciaExpedicaoRetiraLojaStatus.cdConfExpedicaoRetLojaStatus eq 2}">
 							 	<button type="button" class="btn btn-success" data-toggle="tooltip" title="Conferido"> 
 				     				<span class="glyphicon glyphicon-glyphicon-ok-sign" aria-hidden="true"/>
 				    			</button>
@@ -78,7 +79,8 @@
 			<c:if test="${not empty filtro.expedicaoRetiraLoja}">
 				<div class="row">
 					<div class="form-group col-md-12">
-						<div class="col-md-2 col-md-offset-10">
+						<div class="col-md-4 col-md-offset-8">
+							<button class="btn btn-primary btn-lg" type="submit" id="buttonLimpar" onclick="clearForm();">Limpar</button>
 							<button class="btn btn-success btn-lg" type="submit" id="buttonConfirmar" data-toggle="confirmation" onclick="finalizarExpedicao()">Confirmar Entrega</button>
 						</div>
 					</div>

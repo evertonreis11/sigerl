@@ -76,7 +76,7 @@ public class RecebimentoRetiraLojaService extends GenericService<RecebimentoReti
 			recebimento.setDeposito(WmsUtil.getDeposito());
 			recebimento.setDtRecebimento(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 			recebimento.setUsuario(WmsUtil.getUsuarioLogado());
-			recebimento.setRecebimentoRetiraLojaStatus(RecebimentoRetiraLojaStatus.EM_CONFERENCIA);
+			recebimento.setRecebimentoRetiraLojaStatus(RecebimentoRetiraLojaStatus.EM_RECEBIMENTO);
 			recebimento.setManifesto(new Manifesto(registros.get(0).getCdManifesto()));
 			
 			produtos = new ArrayList<RecebimentoRetiraLojaProduto>();

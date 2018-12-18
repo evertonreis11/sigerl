@@ -12,6 +12,7 @@ import br.com.linkcom.neo.persistence.QueryBuilder;
 import br.com.linkcom.neo.persistence.SaveOrUpdateStrategy;
 import br.com.linkcom.wms.geral.bean.Deposito;
 import br.com.linkcom.wms.geral.bean.ExpedicaoRetiraLoja;
+import br.com.linkcom.wms.geral.bean.ExpedicaoRetiraLojaStatus;
 import br.com.linkcom.wms.geral.bean.vo.ExpedicaoLojaVO;
 import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.WmsUtil;
@@ -25,22 +26,25 @@ public class ExpedicaoRetiraLojaDAO extends GenericDAO<ExpedicaoRetiraLoja> {
 	 * @param chaveNota the chave nota
 	 * @return the expedicao retira loja
 	 */
-	public ExpedicaoRetiraLoja recuperaExpedicaoRetiraLojaPorChaveNota(String chaveNota) {
+	public ExpedicaoRetiraLoja recuperaExpedicaoRetiraLojaPorChaveNota(String chaveNota, ExpedicaoRetiraLojaStatus status) {
 		QueryBuilder<ExpedicaoRetiraLoja> qb = query();
 		
 		qb.select("expedicaoRetiraLoja.cdExpedicaoRetiraLoja, expedicaoRetiraLoja.termoImpresso, notaFiscalSaida.cdnotafiscalsaida, " + 
-				" notaFiscalSaida.numero, notaFiscalSaida.serie, notaFiscalSaida.chavenfe, notaFiscalSaida.dtemissao, cliente.cdpesssoa, " + 
+				" notaFiscalSaida.numero, notaFiscalSaida.serie, notaFiscalSaida.chavenfe, notaFiscalSaida.dtemissao, cliente.cdpessoa, " + 
 				" cliente.nome, cliente.documento, expedicaoRetiraLojaProduto.cdExpedicaoRetiraLojaProduto, produto.cdproduto, produto.codigo, " +
-				" produto.descricao");
+				" produto.descricao, conferenciaExpedicaoRetiraLojaStatus.cdConfExpedicaoRetLojaStatus, conferenciaExpedicaoRetiraLojaStatus.nome ");
 		
 		qb.join("expedicaoRetiraLoja.listaExpedicaoRetiraLojaProduto expedicaoRetiraLojaProduto")
 			.join("expedicaoRetiraLoja.notaFiscalSaida notaFiscalSaida")
+			.join("expedicaoRetiraLoja.expedicaoRetiraLojaStatus expedicaoRetiraLojaStatus")
 			.join("expedicaoRetiraLoja.deposito deposito")
 			.join("notaFiscalSaida.cliente cliente")
-			.join("expedicaoRetiraLojaProduto.produto produto");
+			.join("expedicaoRetiraLojaProduto.produto produto")
+			.join("expedicaoRetiraLojaProduto.conferenciaExpedicaoRetiraLojaStatus conferenciaExpedicaoRetiraLojaStatus");
 		
 		qb.where("notaFiscalSaida.chavenfe = ?", chaveNota)
-			.where("deposito = ? ", WmsUtil.getDeposito());
+			.where("deposito = ? ", WmsUtil.getDeposito())
+			.where("expedicaoRetiraLojaStatus = ?", status);
 		
 		return qb.unique();
 	}
@@ -80,8 +84,11 @@ public class ExpedicaoRetiraLojaDAO extends GenericDAO<ExpedicaoRetiraLoja> {
 			sql.append("  AND MAN.CDMANIFESTOSTATUS NOT IN (1,2,3,11)                                                                              ");
 			sql.append("  AND RRL.CDRECEBRETIRALOJASTATUS = 2                                                                                      ");
 			sql.append("  AND RLP.CDTIPOESTOQUE = 1                                                                                                ");
+			sql.append("  AND NOT EXISTS (SELECT 1 																								   ");
+			sql.append("            		FROM EXPEDICAORETIRALOJA ERL																		   ");
+			sql.append("          		   WHERE ERL.CDNOTAFISCALSAIDA = NFS.CDNOTAFISCALSAIDA )												   ");
 			sql.append("  AND NFS.CHAVENFE = ?                                                                                                     ");
-			sql.append("  AND DEP.CDDEPOSITO = ?;                                                                                                  ");
+			sql.append("  AND DEP.CDDEPOSITO = ?                                                                                                   ");
 
 			args.add(chaveNota);		
 			args.add(deposito.getCddeposito());		
@@ -137,7 +144,9 @@ public class ExpedicaoRetiraLojaDAO extends GenericDAO<ExpedicaoRetiraLoja> {
 		query.joinFetch("expedicaoRetiraLoja.notaFiscalSaida notaFiscalSaida")
 		.joinFetch("expedicaoRetiraLoja.deposito deposito")
 		.joinFetch("expedicaoRetiraLoja.usuario usuario")
-		.joinFetch("expedicaoRetiraLoja.expedicaoRetiraLojaStatus expedicaoRetiraLojaStatus");
+		.joinFetch("expedicaoRetiraLoja.expedicaoRetiraLojaStatus expedicaoRetiraLojaStatus")
+		.joinFetch("expedicaoRetiraLoja.listaExpedicaoRetiraLojaProduto expedicaoRetiraLojaProduto")
+		.joinFetch("expedicaoRetiraLojaProduto.produto produto");
 	}
 	
 	/**
@@ -146,7 +155,7 @@ public class ExpedicaoRetiraLojaDAO extends GenericDAO<ExpedicaoRetiraLoja> {
 	 * @param cdExpedicaoRetiraLoja the cd expedicao retira loja
 	 */
 	public void atualizarFlagImpressaoTermoExpedicao(Integer cdExpedicaoRetiraLoja) {
-		getHibernateTemplate().bulkUpdate("update expedicaoRetiraLoja set termoImpresso = ? where cdExpedicaoRetiraLoja = ? ", new Object[]{Boolean.TRUE, cdExpedicaoRetiraLoja});		
+		getHibernateTemplate().bulkUpdate("update ExpedicaoRetiraLoja set termoImpresso = ? where cdExpedicaoRetiraLoja = ? ", new Object[]{Boolean.TRUE, cdExpedicaoRetiraLoja});		
 	}
 
 

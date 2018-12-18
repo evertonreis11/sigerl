@@ -35,11 +35,8 @@ public class RecebimentoRetiraLojaProdutoService extends GenericService<Recebime
 		RecebimentoRetiraLojaProduto recebimentoRetiraLojaProduto = (RecebimentoRetiraLojaProduto) CollectionUtils.find(listaRecebimentoRetiraLojaProduto,
 				new BeanPropertyValueEqualsPredicate("produto.cdproduto", produto.getCdproduto()));
 		
-		if (TipoEstoque.EXTRAVIADO.equals(recebimentoRetiraLojaProduto.getTipoEstoque())
-				|| TipoEstoque.AVARIADO.equals(tipoEstoque)){
 			recebimentoRetiraLojaProduto.setTipoEstoque(tipoEstoque);
 			saveOrUpdate(recebimentoRetiraLojaProduto);
-		}
 	}
 
 

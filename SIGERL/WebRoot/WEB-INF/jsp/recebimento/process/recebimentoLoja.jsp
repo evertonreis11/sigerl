@@ -27,11 +27,11 @@
 			<br />
 			<div class="panel panel-default">
 				<div class="table-responsive">
-					<n:dataGrid itens="recebimentoRetiraLoja.listaRecebimentoRetiraLojaProduto" id="tabelaId" itemType="<%=RecebimentoRetiraLojaProduto.class %>" var="recebimentoProduto" styleClass="table table-striped table-bordered">
+					<n:dataGrid itens="${REGISTROS}" id="tabelaId" itemType="<%=RecebimentoRetiraLojaProduto.class %>" var="recebimentoProduto" styleClass="table table-striped table-bordered">
 						<t:property name="produto.codigo" label="Código" mode="output"/>
 						<t:property name="produto.descricao" label="Produto" mode="output"/>
 						<t:property name="notaFiscalSaida.numeropedido" label="Pedido" mode="output"/>
-						<n:column header="Situação">
+						<n:column header="Situação" style="text-align: -webkit-center;">
 						 	<t:property name="tipoEstoque.cdTipoEstoque" type="hidden" mode="input"/>
 						 	
 						  	<c:if test="${recebimentoProduto.tipoEstoque.cdTipoEstoque eq 1}">
@@ -78,6 +78,12 @@
 			  title:'Finalizar Recebimento:',
 			  content: 'Alguns produtos ainda não foram confirmados, ao finalizar estes produtos serão considerados extraviados, deseja continuar?'
 			});
+
+		if ($("input[name='avaria']").val() == "true"){
+			$("#buttonAvaria").css("color", "black");
+		}else{
+			$("#buttonAvaria").css("color", "white");
+		}
 	});
 
 	function executarAcao(){

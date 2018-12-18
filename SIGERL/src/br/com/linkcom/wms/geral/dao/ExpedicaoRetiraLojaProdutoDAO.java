@@ -26,14 +26,16 @@ public class ExpedicaoRetiraLojaProdutoDAO extends GenericDAO<ExpedicaoRetiraLoj
 		QueryBuilder<ExpedicaoRetiraLojaProduto> qb = query();
 
 		qb.select("expedicaoRetiraLojaProduto.cdExpedicaoRetiraLojaProduto, expedicaoRetiraLojaProduto.qtde, " +
-				 "conferenciaExpedicaoRetiraLojaStatus.cdConferenciaExpedicaoRetiraLojaStatus, conferenciaExpedicaoRetiraLojaStatus.nome, "+
+				 "conferenciaExpedicaoRetiraLojaStatus.cdConfExpedicaoRetLojaStatus, conferenciaExpedicaoRetiraLojaStatus.nome, "+
 				 "expedicaoRetiraLoja.cdExpedicaoRetiraLoja, notaFiscalSaida.cdnotafiscalsaida, notaFiscalSaida.chavenfe, "+
-				 "produto.cdProduto, produto.codigo, produto.descricao, produtoCodigoBarras.cdprodutocodigobarras,produtoCodigoBarras.codigo");
+				 "produto.cdproduto, produto.codigo, produto.descricao, produtoCodigoBarras.cdprodutocodigobarras, " + 
+				 "produtoCodigoBarras.codigo, notaFiscalSaidaProduto.cdnotafiscalsaidaproduto");
 		
 		qb.join("expedicaoRetiraLojaProduto.expedicaoRetiraLoja expedicaoRetiraLoja")
 		  .join("expedicaoRetiraLoja.notaFiscalSaida notaFiscalSaida")
 		  .join("expedicaoRetiraLojaProduto.conferenciaExpedicaoRetiraLojaStatus conferenciaExpedicaoRetiraLojaStatus")
 		  .join("expedicaoRetiraLojaProduto.produto produto")
+		  .join("expedicaoRetiraLojaProduto.notaFiscalSaidaProduto notaFiscalSaidaProduto")
 		  .join("produto.listaProdutoCodigoDeBarras produtoCodigoBarras");
 		
 		return qb;

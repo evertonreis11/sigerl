@@ -20,7 +20,7 @@
 		
 		<link href="${ctx}/css/${tema_wms}/bootstrap.min.css" rel="stylesheet" media="screen"/>
 		<link rel="stylesheet"      href="${ctx}/css/${tema_wms}/jquery-ui.css">	
-		<link rel="StyleSheet"        href="${ctx}/css/${tema_wms}/base.css" type="text/css">		
+		<link rel="StyleSheet"        href="${ctx}/css/${tema_wms}/base.css" type="text/css">	
 		
 		
 	<%-- 	<link rel="StyleSheet"        href="${ctx}/css/${tema_wms}/app.css" type="text/css">

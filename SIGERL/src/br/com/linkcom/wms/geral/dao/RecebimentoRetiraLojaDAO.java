@@ -30,9 +30,9 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 				.join("recebimentoRetiraLojaProduto.produto produto")
 				.join("produto.listaProdutoCodigoDeBarras produtoCodigoDeBarras")
 				.join("recebimentoRetiraLoja.deposito deposito")
-				.where("produtoCodigoDeBarras.codigo = ?", codigoEan)
-				.where("recebimentoRetiraLojaStatus = ?", RecebimentoRetiraLojaStatus.EM_CONFERENCIA)
-				.where("deposito = ?", WmsUtil.getDeposito());
+				.where("produtoCodigoDeBarras.codigo = ".concat(codigoEan))
+				.where("recebimentoRetiraLojaStatus.cdRecebimentoRetiraLojaStatus = ".concat(RecebimentoRetiraLojaStatus.EM_RECEBIMENTO.getCdRecebimentoRetiraLojaStatus().toString()))
+				.where("deposito.cddeposito = ".concat(WmsUtil.getDeposito().getCddeposito().toString()));
 		
 		
 		QueryBuilder<RecebimentoRetiraLoja> qb = criaConsultaRecebimentoRetiraLoja();
@@ -53,8 +53,8 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 		qb.select("recebimentoRetiraLoja.cdRecebimentoRetiraLoja, recebimentoRetiraLoja.dtRecebimento, " +
 				  "usuario.cdpessoa, usuario.nome, usuario.login, deposito.cddeposito, manifesto.cdmanifesto, " +
 				  "recebimentoRetiraLojaStatus.cdRecebimentoRetiraLojaStatus, recebimentoRetiraLojaStatus.nome, " +
-				  "recebimentoRetiraLojaProduto.cdRecebimentoRetiraLojaProduto, recebimentoRetiraLojaProduto.qtde, " +
-				  "produto.cdproduto, produto.codigo, produto.descricao,notaFiscalSaida.cdnotafiscalsaida, "+
+				  "recebimentoRetiraLojaProduto.cdRecebimentoRetiraLojaProduto, recebimentoRetiraLojaProduto.qtde, recebimentoRetiraLoja2.cdRecebimentoRetiraLoja," +
+				  "produto.cdproduto, produto.codigo, produto.descricao, notaFiscalSaida.cdnotafiscalsaida, notaFiscalSaida.numeropedido, "+
 				  "produtoCodigoDeBarras.cdprodutocodigobarras,produtoCodigoDeBarras.codigo, tipoEstoque.cdTipoEstoque, tipoEstoque.descricao ")
 			.join("recebimentoRetiraLoja.listaRecebimentoRetiraLojaProduto recebimentoRetiraLojaProduto")
 			.join("recebimentoRetiraLoja.recebimentoRetiraLojaStatus recebimentoRetiraLojaStatus")
@@ -62,6 +62,7 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 			.join("recebimentoRetiraLoja.usuario usuario")
 			.join("recebimentoRetiraLoja.deposito deposito")
 		 	.join("recebimentoRetiraLojaProduto.produto produto")
+		 	.join("recebimentoRetiraLojaProduto.recebimentoRetiraLoja recebimentoRetiraLoja2")
 		 	.join("produto.listaProdutoCodigoDeBarras produtoCodigoDeBarras")
 		 	.join("recebimentoRetiraLojaProduto.notaFiscalSaida notaFiscalSaida")
 		 	.join("recebimentoRetiraLojaProduto.tipoEstoque tipoEstoque");
@@ -80,8 +81,8 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 		
 		QueryBuilder<RecebimentoRetiraLoja> qb = criaConsultaRecebimentoRetiraLoja();
 		
-		qb.where("recebimentoRetiraLoja.cdRecebimentoRetiraLoja = ", cdRecebimentoRetiraLoja)
-		.where("recebimentoRetiraLojaStatus = ?", RecebimentoRetiraLojaStatus.EM_CONFERENCIA);
+		qb.where("recebimentoRetiraLoja.cdRecebimentoRetiraLoja = ?", cdRecebimentoRetiraLoja)
+		.where("recebimentoRetiraLojaStatus = ?", RecebimentoRetiraLojaStatus.EM_RECEBIMENTO);
 		
 		return qb.unique();
 	}
@@ -138,6 +139,11 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 			sql.append("                            AND   NFX.NRO_LOJA_RETIRADA = NFS.NRO_LOJA_RETIRADA    ");
 			sql.append("                            AND   NFX.CDNOTAFISCALSAIDA = NFS.CDNOTAFISCALSAIDA    ");
 			sql.append("                            AND   MX.CDMANIFESTOSTATUS NOT IN (1,2,3,11)           ");
+			sql.append("							AND   NOT EXISTS (SELECT RLP.CDNOTAFISCALSAIDA 		   ");
+			sql.append("        										FROM RECEBRETIRALOJAPRODUTO RLP    ");
+			sql.append(" 												JOIN RECEBIMENTORETIRALOJA RRL     ");
+			sql.append("											      ON RLP.CDRECEBIMENTORETIRALOJA = RRL.CDRECEBIMENTORETIRALOJA ");
+			sql.append(" 											   WHERE RLP.CDNOTAFISCALSAIDA = NFX.CDNOTAFISCALSAIDA)		");	
 			sql.append("                            AND   PBX.CODIGO = ? )                        		   ");
 			
 			

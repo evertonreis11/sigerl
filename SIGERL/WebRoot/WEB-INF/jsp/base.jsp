@@ -8,12 +8,13 @@
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-	<head>
-		<n:head searchJsDir="false" searchCssDir="false" includeDefaultCss="false" includeThemeCss="false" includeAutocomplete="true"/> 
+	<n:head searchJsDir="false" searchCssDir="false" includeDefaultCss="false" includeThemeCss="false" includeAutocomplete="true"/> 
 		
 		<script language="JavaScript" src="${ctx}/js/jquery.js"></script>	
 		<script type="text/javascript" src="${ctx}/js/bootstrap.min.js"></script>
-		<script src="${ctx}/js/bootstrap-confirmation.min.js"></script>
+		<script type="text/javascript" src="${ctx}/js/bootstrap-confirmation.min.js"></script>
+		<script type="text/javascript" src="${ctx}/js/wms.js"></script>
+		<script type="text/javascript" src="${ctx}/js/jquery.serialize.js"></script>
 		
 		</script>
 		<%-- <script  src="${ctx}/js/jquery-ui.js"></script> --%>
@@ -36,8 +37,7 @@
 
 		<title><fmt:message key="aplicacao.titulo"/> - Módulo <%=WmsUtil.getNomeModulo()%></title>
 		<script type="text/javascript" src="${ctx}/js/tabela.js"></script>
-		<script type="text/javascript" src="${ctx}/js/wms.js"></script>
-		<script type="text/javascript" src="${ctx}/js/jquery.serialize.js"></script>
+		
 		<script type="text/javascript" src="${ctx}/js/jquery.blockUI.js"></script>
 		<script type="text/javascript" src="${ctx}/js/jquery-ui-1.7.3.custom.min.js"></script>
 		<script type="text/javascript" src="${ctx}/js/jqBarGraph.js"></script> 
@@ -58,10 +58,18 @@
 			
 			        return false;
 			    });
+
+			    $(document).ready(function(){
+				    $('[data-toggle="tooltip"]').tooltip();   
+				});
 			});
 		</script>
-
 		
+		<style type="text/css">
+			input, .table > tbody{
+				text-transform:uppercase !important;	
+			}
+		</style>
 	</head>
 	<body>
 		<nav class="navbar navbar-default">
@@ -91,7 +99,7 @@
 				</div>
 			</div>
 		</div>
-		
+		<br />
 		<footer style="background-color: rgb(243,247,129); color: #f91700;" id="footer">
 			<div class="container">
 				<div class="row">
@@ -134,18 +142,3 @@
 		</div> --%>
 	</body>
 </html>
-<script type="text/javascript">
-	$(document).ready(function(){
-	    $('[data-toggle="tooltip"]').tooltip();   
-	});
-
-	/* var plus = {help : {}};
-	
-	$.getScript("http://suporte.linkcom.com.br/image.php?plus=1", function(){
-  		if (typeof plus_ajuda_status != 'undefined' && plus_ajuda_status){
-  			document.getElementById("suporteImage").src = "${ctx}/imagens/icone/ico_chat_on.png";
-  		}else{
-  			document.getElementById("suporteImage").src = "${ctx}/imagens/icone/ico_chat_off.png";
-  		}
-	}); */
-</script>

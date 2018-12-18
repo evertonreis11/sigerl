@@ -51,11 +51,13 @@ public class RecebimentoLojaProcess extends GenericProcess<RecebimentoLojaFiltro
 		recebimentoRetiraLoja = recebimentoRetiraLojaService.findRecebimentoLoja(filtro.getValorInicial(), cdRecebimentoRetiraLoja);
 		
 		if (recebimentoRetiraLoja == null){
+			filtro.setValorInicial(null);
 			request.addError("O produto informado não pertence ao recebimento destinado a esta filial.");
 		}else{
 			TipoEstoque tipoEstoque = null;
 			
-			if (filtro.getAvaria())
+			if (filtro.getAvaria() != null &&  
+					filtro.getAvaria())
 				tipoEstoque = TipoEstoque.AVARIADO;
 			else
 				tipoEstoque = TipoEstoque.PERFEITO;
@@ -64,6 +66,8 @@ public class RecebimentoLojaProcess extends GenericProcess<RecebimentoLojaFiltro
 					recebimentoRetiraLoja.getListaRecebimentoRetiraLojaProduto(), tipoEstoque);
 			
 			filtro.setRecebimentoRetiraLoja(recebimentoRetiraLoja);
+			
+			request.setAttribute("REGISTROS",filtro.getRecebimentoRetiraLoja().getListaRecebimentoRetiraLojaProduto());  
 			
 			request.addMessage("Produto conferido com sucesso!!!");
 		}

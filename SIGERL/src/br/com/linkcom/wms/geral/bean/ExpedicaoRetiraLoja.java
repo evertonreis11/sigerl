@@ -85,7 +85,7 @@ public class ExpedicaoRetiraLoja {
 	}
 	
 	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="cdexpedicaoretiralojastatus")
+	@JoinColumn(name="cdexpedicaoretlojastatus")
 	public ExpedicaoRetiraLojaStatus getExpedicaoRetiraLojaStatus() {
 		return expedicaoRetiraLojaStatus;
 	}

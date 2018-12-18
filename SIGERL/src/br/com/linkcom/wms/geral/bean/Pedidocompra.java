@@ -14,8 +14,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.Formula;
-
 import br.com.linkcom.neo.bean.annotation.DescriptionProperty;
 import br.com.linkcom.neo.bean.annotation.DisplayName;
 import br.com.linkcom.neo.types.ListSet;

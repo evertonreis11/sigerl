@@ -1,5 +1,6 @@
 package br.com.linkcom.wms.geral.bean;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -38,6 +39,7 @@ public class ExpedicaoRetiraLojaProduto {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO, generator="sq_expretiralojaproduto")
+	@Column(name="CDEXPRETIRALOJAPRODUTO")
 	public Integer getCdExpedicaoRetiraLojaProduto() {
 		return cdExpedicaoRetiraLojaProduto;
 	}

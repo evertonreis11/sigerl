@@ -2,9 +2,12 @@ package br.com.linkcom.wms.geral.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -13,7 +16,6 @@ import br.com.linkcom.neo.util.CollectionsUtil;
 import br.com.linkcom.wms.geral.bean.Deposito;
 import br.com.linkcom.wms.geral.bean.Notafiscalsaida;
 import br.com.linkcom.wms.geral.bean.vo.GestaoPedidoVO;
-import br.com.linkcom.wms.geral.bean.vo.RecebimentoLojaVO;
 import br.com.linkcom.wms.modulo.expedicao.controller.crud.filtro.ManifestoFiltro;
 import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.WmsUtil;
@@ -199,7 +201,8 @@ public class NotafiscalsaidaDAO extends GenericDAO<Notafiscalsaida>{
 	}
 
 	public List<GestaoPedidoVO> findForGestaoPedido(GestaoPedidoFiltro filtro) {
-		/*Deposito deposito = WmsUtil.getDeposito();
+		final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", new Locale("pt", "BR"));
+		Deposito deposito = WmsUtil.getDeposito();
 		List<Object> args = new ArrayList<Object>();
 
 		try {
@@ -211,9 +214,9 @@ public class NotafiscalsaidaDAO extends GenericDAO<Notafiscalsaida>{
 			sql.append("        RL.DTRECEBIMENTO AS DT_RECEBIMENTO_LOJA,                                             ");
 			sql.append("        CL.NOME AS CLIENTE,                                                                  ");
 			sql.append("        CASE                                                                                 ");
-			sql.append("          WHEN ES.CDRECEBRETIRALOJASTATUS IS NOT NULL                                        ");
+			sql.append("          WHEN ES.CDEXPEDICAORETLOJASTATUS IS NOT NULL                                        ");
 			sql.append("             THEN ES.NOME                                                                    ");
-			sql.append("          WHEN RS.CDRECEBRETIRALOJASTATUS IS NOT NULL AND ES.CDRECEBRETIRALOJASTATUS IS NULL ");
+			sql.append("          WHEN RS.CDRECEBRETIRALOJASTATUS IS NOT NULL AND ES.CDEXPEDICAORETLOJASTATUS IS NULL ");
 			sql.append("             THEN RS.NOME                                                                    ");
 			sql.append("          ELSE                                                                               ");
 			sql.append("           'EM TRANSFERENCIA PARA A LOJA'                                                    ");
@@ -233,41 +236,62 @@ public class NotafiscalsaidaDAO extends GenericDAO<Notafiscalsaida>{
 			sql.append("     ON RS.CDRECEBRETIRALOJASTATUS = RL.CDRECEBRETIRALOJASTATUS                              ");
 			sql.append("   LEFT JOIN EXPEDICAORETIRALOJA EL                                                          ");
 			sql.append("     ON EL.CDNOTAFISCALSAIDA = NF.CDNOTAFISCALSAIDA                                          ");
-			sql.append("   LEFT JOIN RECEBRETIRALOJASTATUS ES                                                        ");
-			sql.append("     ON ES.CDRECEBRETIRALOJASTATUS = EL.CDEXPEDICAORETLOJASTATUS                             ");
-			sql.append("  WHERE NF.NRO_LOJA_RETIRADA = 579                                                           ");
-			sql.append("    AND NF.NUMEROPEDIDO = ?                                                                  ");
-			sql.append("    AND NF.NUMERO = ?                                                                        ");
-			sql.append("    AND TRUNC(NF.DTEMISSAO) >= TO_DATE(?, 'DD/MM/YYYY')                                      ");
-			sql.append("    AND TRUNC(NF.DTEMISSAO) < TO_DATE(?, 'DD/MM/YYYY') + 1                                   ");
-			sql.append("    AND PR.CODIGO = ?                                                                        ");
-			sql.append("    AND CL.NOME LIKE '%%'                                                                    ");
-			
+			sql.append("   LEFT JOIN EXPEDICAORETLOJASTATUS ES                                                       ");
+			sql.append("     ON ES.CDEXPEDICAORETLOJASTATUS = EL.CDEXPEDICAORETLOJASTATUS                            ");
+			sql.append("  WHERE NF.CDTIPONF = 4																	     ");
+			sql.append("    AND NF.CDTIPOVENDA = 2																	 ");
+			sql.append("    AND NF.NRO_LOJA_RETIRADA = ? 															 ");
 			
 			args.add(deposito.getCodigoerp());		
-			args.add(codigoEan);		
-					
-					
+			
+			if (StringUtils.isNotBlank(filtro.getNumeroPedido())){
+				sql.append("    AND NF.NUMEROPEDIDO = ? ");
+				args.add(filtro.getNumeroPedido());
+			}
+			
+			if (StringUtils.isNotBlank(filtro.getNumeroNota())){
+				sql.append("    AND NF.NUMERO = ? ");
+				args.add(filtro.getNumeroNota());
+			}
+			
+			if (filtro.getDtChegadaInicial() != null){
+				sql.append("    AND TRUNC(NF.DTEMISSAO) >= TO_DATE(?, 'DD/MM/YYYY')");
+				args.add(sdf.format(filtro.getDtChegadaInicial()));
+			}
+			
+			if (filtro.getDtChegadaFinal() != null){
+				sql.append("    AND TRUNC(NF.DTEMISSAO) < TO_DATE(?, 'DD/MM/YYYY') + 1 ");
+				args.add(sdf.format(filtro.getDtChegadaFinal()));
+			}
+			
+			if (StringUtils.isNotBlank(filtro.getCodigoProduto())){
+				sql.append("    AND PR.CODIGO = ? ");
+				args.add(filtro.getCodigoProduto().toUpperCase());
+			}
+			
+			if (StringUtils.isNotBlank(filtro.getNomeCliente())){
+				sql.append("    AND CL.NOME LIKE ? ");
+				args.add("%".concat(filtro.getNomeCliente().toUpperCase()).concat("%"));
+			}
+			
+			
 			@SuppressWarnings("unchecked")
-			List<RecebimentoLojaVO> dados = (List<RecebimentoLojaVO>) getJdbcTemplate().query(sql.toString(), args.toArray(), new ResultSetExtractor() {
+			List<GestaoPedidoVO> dados = (List<GestaoPedidoVO>) getJdbcTemplate().query(sql.toString(), args.toArray(), new ResultSetExtractor() {
 				
 				@Override
 				public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
 
-					List<RecebimentoLojaVO> registros = new ArrayList<RecebimentoLojaVO>();
+					List<GestaoPedidoVO> registros = new ArrayList<GestaoPedidoVO>();
 
 					while (rs.next()) {
-						RecebimentoLojaVO vo = new RecebimentoLojaVO();
+						GestaoPedidoVO vo = new GestaoPedidoVO();
 						
-						vo.setCdManifesto(rs.getInt("CDMANIFESTO"));
-						vo.setCdProduto(rs.getInt("CDPRODUTO"));
-						vo.setCodigoProduto(rs.getString("CODIGO_PRODUTO"));
-						vo.setDescricaoProduto(rs.getString("DESCRICAO_PRODUTO"));
-						vo.setCdProdutoCodigoBarras(rs.getInt("CDPRODUTOCODIGOBARRAS"));
-						vo.setCodigoBarras(rs.getString("CODIGO_BARRAS"));
-						vo.setCdNotaFiscalSaida(rs.getInt("CDNOTAFISCALSAIDA"));
-						vo.setNumeroPedido(rs.getString("NUMERO_PEDIDO"));
-						vo.setQtde(rs.getInt("QTDE"));
+						vo.setNumeroNota(rs.getString("NRO_NF"));
+						vo.setNumeroPedido(rs.getString("PEDIDO"));
+						vo.setDataPedido(rs.getTimestamp("DT_EMISSAO_NF"));
+						vo.setDataChegada(rs.getTimestamp("DT_RECEBIMENTO_LOJA"));
+						vo.setCliente(rs.getString("CLIENTE"));
+						vo.setSituacao(rs.getString("SITUACAO"));
 
 						registros.add(vo);
 					}
@@ -281,10 +305,8 @@ public class NotafiscalsaidaDAO extends GenericDAO<Notafiscalsaida>{
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new WmsException("Erro ao recuperar produtos para recebimento. Erro: " + e.getMessage(), e.getCause());
-		}*/
-		
-		return null;
+			throw new WmsException("Erro ao recuperar dados para a gestão de pedidos. Erro: " + e.getMessage(), e.getCause());
+		}
 	}
 	
 }

@@ -44,8 +44,12 @@ public class ExpedicaoLojaProcess extends GenericProcess<ExpedicaoLojaFiltro> {
 	protected void consultarItem(WebRequestContext request, ExpedicaoLojaFiltro filtro) {
 		filtro.setExpedicaoRetiraLoja(expedicaoRetiraLojaService.findExpedicaoLoja(filtro.getValorInicial()));
 		
-		if (filtro.getExpedicaoRetiraLoja() == null)
+		if (filtro.getExpedicaoRetiraLoja() == null){
+			filtro = new ExpedicaoLojaFiltro();
 			request.addError("A Nota informada não está disponível na filial para realizar entrega.");
+		}else{
+			request.setAttribute("REGISTROS", filtro.getExpedicaoRetiraLoja().getListaExpedicaoRetiraLojaProduto());
+		}
 	}
 	
 	@Action("limpar")
@@ -77,7 +81,7 @@ public class ExpedicaoLojaProcess extends GenericProcess<ExpedicaoLojaFiltro> {
 		List<ExpedicaoRetiraLojaProduto> produtos = expedicaoRetiraLojaProdutoService.recuperaProdutosSemConferenciaPorExpedicao(filtro.getExpedicaoRetiraLoja().getCdExpedicaoRetiraLoja());
 		
 		
-		if (produtos != null && produtos.isEmpty()){
+		if (produtos != null && !produtos.isEmpty()){
 			request.addError("Não é permitido entrega parcial de produtos ao cliente. Gentileza realizar a conferência de todos os produtos");
 			return consultar(request, filtro);
 		}

@@ -1,7 +1,7 @@
 function WmsUtil(){}
 
 /*
- * Função que permite digitar apenas números
+ * Funï¿½ï¿½o que permite digitar apenas nï¿½meros
  */
 WmsUtil.prototype.permiteNumeros = function(e) {
 	// IE
@@ -30,7 +30,7 @@ WmsUtil.prototype.permiteNumeros = function(e) {
 } 
 
 /**
-* Função responsável por remover letras da string.
+* Funï¿½ï¿½o responsï¿½vel por remover letras da string.
 **/
 WmsUtil.prototype.removeCaracteres = function (str){
 	str = new String(str);
@@ -83,7 +83,7 @@ WmsUtil.prototype.hideAlertMessage = function (){
 }
 
 /**
- * Função responsável por verificar os e-mails
+ * Funï¿½ï¿½o responsï¿½vel por verificar os e-mails
  */
 WmsUtil.prototype.checkMail = function (mail){	
     var er = new RegExp(/^[A-Za-z0-9_\-\.]+@[A-Za-z0-9_\-\.]{2,}\.[A-Za-z0-9]{2,}(\.[A-Za-z0-9])?/);
@@ -112,7 +112,7 @@ WmsUtil.prototype.getElementValue = function (field){
 }
 
 /**
- * Retira a seleção de um componete select ao pressionar a tecla DELETE.
+ * Retira a seleï¿½ï¿½o de um componete select ao pressionar a tecla DELETE.
  */
 WmsUtil.prototype.limpaCombo = function (evento,select){
     tecla = evento.keyCode;
@@ -124,7 +124,7 @@ WmsUtil.prototype.limpaCombo = function (evento,select){
 }
 
 /**
- * Verifica se a string é um número
+ * Verifica se a string ï¿½ um nï¿½mero
  */
 WmsUtil.prototype.isNumber = function (numExp){
 	if (numExp != ""){
@@ -138,11 +138,11 @@ WmsUtil.prototype.isNumber = function (numExp){
 var ca
 
 /**
- * Verifica se a string é composta apenas de letras
+ * Verifica se a string ï¿½ composta apenas de letras
  */
 WmsUtil.prototype.isString = function (stringExp){
 	var re = new RegExp;
-	re = /^(([a-zA-ZÀ-ú -])+)$/;
+	re = /^(([a-zA-Zï¿½-ï¿½ -])+)$/;
 	if (stringExp != ""){
 	  var arr = re.exec(stringExp);
 	  if (arr == null){
@@ -153,7 +153,7 @@ WmsUtil.prototype.isString = function (stringExp){
 }
 
 /**
- * Verifica se a string é composta por números, espaço e hífen
+ * Verifica se a string ï¿½ composta por nï¿½meros, espaï¿½o e hï¿½fen
  */
 WmsUtil.prototype.isStringNumber = function (stringExp){
 	var er = new RegExp(/([^0-9\- ]+)/);
@@ -198,7 +198,7 @@ WmsUtil.prototype.clearForm = function(name){
 }
 
 /**
-* retira os espaços em branco da esquerda e da direita
+* retira os espaï¿½os em branco da esquerda e da direita
 */ 
 WmsUtil.prototype.trim = function(s){
 	if(!s)
@@ -216,14 +216,14 @@ WmsUtil.prototype.trim = function(s){
 }
 	
 /**
-* Faz a validação do código de barras
+* Faz a validaï¿½ï¿½o do cï¿½digo de barras
 */ 
 WmsUtil.prototype.validaCodigoDeBarras = function (elemento){
 	var numero = trim(elemento.value);
 	var numlen = numero.length;
 	$w.validaTipo(numlen,elemento);
 	if ((numlen != 13) && (numlen != 14)){
-		alert("O número deve possuir 13 (EAN/UCC-13) ou 14 (DUN-14) dígitos");
+		alert("O nï¿½mero deve possuir 13 (EAN/UCC-13) ou 14 (DUN-14) dï¿½gitos");
 		return;
 	}
 	fator = 3;
@@ -234,12 +234,12 @@ WmsUtil.prototype.validaCodigoDeBarras = function (elemento){
   	}
 	var dv = ((1000 - soma) % 10);
 	if((numero.substring(numlen-1,numlen)) != dv){
-		alert("Código de barras inválido.");
+		alert("Cï¿½digo de barras invï¿½lido.");
 	}
 	$(elemento).val(numero);
 }
 
-//Valida se o codigo de barras é ean ou dun
+//Valida se o codigo de barras ï¿½ ean ou dun
 WmsUtil.prototype.validaTipo = function(numlen,elemento){
 	var posicao = $w.getPosicao(elemento);
 	if(numlen == 13){
@@ -273,7 +273,7 @@ WmsUtil.prototype.openPopup = function(url,width,height){
 }
 
 /**
- * Cria uma requisição ajax retornando json
+ * Cria uma requisiï¿½ï¿½o ajax retornando json
  */
  WmsUtil.prototype.getJSON = function(url,data,callback){ 		
 	 $.ajax({
@@ -291,7 +291,7 @@ WmsUtil.prototype.openPopup = function(url,width,height){
 }
  
 /**
- * Cria uma requisição ajax retornando json
+ * Cria uma requisiï¿½ï¿½o ajax retornando json
  */
  WmsUtil.prototype.getJSONSync = function(url,data,callback){ 		
 	 $.ajax({
@@ -302,7 +302,9 @@ WmsUtil.prototype.openPopup = function(url,width,height){
 			contentType:"application/x-www-form-urlencoded; charset=UTF-8",
 			success: function(data){
 					if (data != ""){
-						data = eval("(" +data + ")");
+						// comentado por incompatibilidade com a novo modelo
+						// Everton Reis - 17/12/2018
+						//data = eval("(" +data + ")");
 						callback(data);
 					}
 				}
@@ -324,7 +326,7 @@ WmsUtil.prototype.validaHora = function (campo){
 			if(ponto != ':') {
 				situacao = 0;
 				if(situacao==0) {
-					//alert('Hora inválida! Exemplo de hora válida: 09:30');
+					//alert('Hora invï¿½lida! Exemplo de hora vï¿½lida: 09:30');
 					hour.value='';
 					retorno = false;
 				}
@@ -338,7 +340,7 @@ WmsUtil.prototype.validaHora = function (campo){
 	}
 	
 	if(!retorno && situacao == 0){
-		alert("Hora inválida.")
+		alert("Hora invï¿½lida.")
 		setTimeout(function(){campo.focus()},50);
 		campo.value = '';
 		return false;
@@ -347,7 +349,7 @@ WmsUtil.prototype.validaHora = function (campo){
 }
 
 /*
- * Valida se é uma data válida
+ * Valida se ï¿½ uma data vï¿½lida
  */
 WmsUtil.prototype.validaData = function (campo){
 	var data = campo.value;
@@ -370,13 +372,13 @@ WmsUtil.prototype.validaData = function (campo){
 		else {
 			dia = (data.substring(0,2));
 
-			// Verifica se o dia é válido para cada mês, exceto fevereiro.
+			// Verifica se o dia ï¿½ vï¿½lido para cada mï¿½s, exceto fevereiro.
 			if (dia < 1 || dia > 31 || (dia > 30 && (mes == 4 || mes == 6 || mes == 9 || mes == 11))) {
 				situacao = 'falsa';
 			}
 			
 			ano = (data.substring(6,10));
-			// Verifica se o dia é válido para o mês de fevereiro.
+			// Verifica se o dia ï¿½ vï¿½lido para o mï¿½s de fevereiro.
 			if (mes == 2 && (dia < 1 || dia > 29 || (dia > 28 && (ano%4 != 0)))) {
 				situacao = 'falsa';
 			}
@@ -384,7 +386,7 @@ WmsUtil.prototype.validaData = function (campo){
 	}
 
 	if(incomplete == 'true' || situacao == 'falsa'){
-		alert("Data inválida.")
+		alert("Data invï¿½lida.")
 		setTimeout(function(){campo.focus()},50);
 		campo.value = '';
 		return false;
@@ -471,7 +473,7 @@ WmsUtil.prototype.comparaHora = function (hora1, hora2) {
 	}
 }
 
-/*Elimina os zeros contidos à esquerda de um número*/
+/*Elimina os zeros contidos ï¿½ esquerda de um nï¿½mero*/
 WmsUtil.prototype.eliminaZerosEsquerda = function (numero){
 	
 	if($(numero).val() != ''){
@@ -556,7 +558,7 @@ WmsUtil.prototype.debug = function(message, showMessage) {
 }
 
 /**
- * Obtém o id do valor selecionado no combo
+ * Obtï¿½m o id do valor selecionado no combo
  */
 WmsUtil.prototype.getComboIdSelected = function(combo){
 	var value = combo.options[combo.selectedIndex].value;
@@ -613,7 +615,7 @@ WmsUtil.prototype.removeScape = function(description){
 
 /**
 *	Valida periodo de datas.
-*	Verifica se a data inicial é menor que a data final.
+*	Verifica se a data inicial ï¿½ menor que a data final.
 */
 WmsUtil.prototype.periodoValido = function(datainicio,datafim){
 	if( datainicio != "" && datafim != ""){
@@ -661,12 +663,12 @@ WmsUtil.prototype.toFloat = function (valor) {
 				return false;
 			}
 
-			var key = String.fromCharCode(k);  // Valor para o código da Chave
+			var key = String.fromCharCode(k);  // Valor para o cï¿½digo da Chave
 			input.val($w.maskValue(input.val() + key, settings));
 		}		
 	}	
 	
-	// máscara para formatar campo float
+	// mï¿½scara para formatar campo float
 	WmsUtil.prototype.maskFloat = function(elem, settings, e) {		
 		return $(elem).each(function(){
 			var input = $(this);			
@@ -676,7 +678,7 @@ WmsUtil.prototype.toFloat = function (valor) {
 	}
 	
 	/* Metodo que verifica qual o evento que foi acionado e qual tecla que foi precionada para aplicar 
-	 * a máscara de float
+	 * a mï¿½scara de float
 	 */
 	WmsUtil.prototype.formatMask = function(input, settings, e) {
 		e = e || window.event;
@@ -695,12 +697,12 @@ WmsUtil.prototype.toFloat = function (valor) {
 			return true;
 		}
 		
-		var key = String.fromCharCode(k);  // Valor para o código da Chave
+		var key = String.fromCharCode(k);  // Valor para o cï¿½digo da Chave
 		$w.preventDefault(e);
 		input.val($w.maskValue(input.val() + key, settings));
 	}
 	
-	/* Método que cancela a propagacao de eventos */
+	/* Mï¿½todo que cancela a propagacao de eventos */
 	WmsUtil.prototype.preventDefault = function(e) {
 		if (e.preventDefault) { //standart browsers
 			e.preventDefault()
@@ -860,7 +862,7 @@ WmsUtil.prototype.toFloat = function (valor) {
 
 	
 /**
-*	Verifica se um CNPJ é válido.
+*	Verifica se um CNPJ ï¿½ vï¿½lido.
 */
 WmsUtil.prototype.validationCNPJ = function(cnpjString){
 	var numeros, digitos, soma, i, resultado, pos, tamanho, digitos_iguais;

@@ -5,7 +5,7 @@ import br.com.linkcom.neo.controller.crud.FiltroListagem;
 public class TermoEntregaFiltro extends FiltroListagem {
 	
 	private String chaveNotaFiscal;
-	private Boolean impressaoFinalizarExpedicao;
+	private Boolean impressaoFinalizarExpedicao = Boolean.FALSE;
 
 	public String getChaveNotaFiscal() {
 		return chaveNotaFiscal;
