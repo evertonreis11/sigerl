@@ -9,6 +9,11 @@ public class RecebimentoLojaFiltro extends GenericFilter{
 	
 	private Boolean avaria;
 	
+	private Integer cdTipoEstoque;
+	
+	private Integer cdRecebimentoRetiraLojaProduto;
+	
+	
 	public RecebimentoRetiraLoja getRecebimentoRetiraLoja() {
 		return recebimentoRetiraLoja;
 	}
@@ -23,6 +28,22 @@ public class RecebimentoLojaFiltro extends GenericFilter{
 
 	public void setAvaria(Boolean avaria) {
 		this.avaria = avaria;
+	}
+
+	public Integer getCdTipoEstoque() {
+		return cdTipoEstoque;
+	}
+
+	public void setCdTipoEstoque(Integer cdTipoEstoque) {
+		this.cdTipoEstoque = cdTipoEstoque;
+	}
+
+	public Integer getCdRecebimentoRetiraLojaProduto() {
+		return cdRecebimentoRetiraLojaProduto;
+	}
+
+	public void setCdRecebimentoRetiraLojaProduto(Integer cdRecebimentoRetiraLojaProduto) {
+		this.cdRecebimentoRetiraLojaProduto = cdRecebimentoRetiraLojaProduto;
 	}
 	
 	

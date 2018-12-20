@@ -235,7 +235,7 @@ fieldset{
 	border: 1px solid #ddd !important;
 	margin: 0;
 	xmin-width: 0;
-	padding: 10px;       
+	padding: 5px;       
 	position: relative;
 	border-radius:4px;
 	background-color:#f5f5f5;
@@ -251,4 +251,27 @@ legend{
 	border-radius: 4px; 
 	padding: 5px 5px 5px 10px; 
 	background-color: #ffffff;
+}
+
+#fc{
+	width: 15%;
+}
+
+.glyphicon-ok:before{
+	font-family: 'Glyphicons Halflings'; 
+	content:"\e013";
+}
+
+.glyphicon-remove:before{
+	font-family: 'Glyphicons Halflings'; 
+	content:"\e014";
+}
+
+.glyphicon-remove:before{
+	font-family: 'Glyphicons Halflings'; 
+	content:"\e014";
+}
+.glyphicon-alert:before{
+	font-family: 'Glyphicons Halflings'; 
+	content:"\e209";
 }

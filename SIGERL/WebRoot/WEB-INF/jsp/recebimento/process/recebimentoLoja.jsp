@@ -10,15 +10,24 @@
 		<n:bean name="filtro" valueType="<%=RecebimentoLojaFiltro.class%>">
 			<jsp:include page="../../inputPage.jsp"></jsp:include>
 			<br />
+			
+			<div class="row">
+				<div class="col-md-3 col-md-offset-4 corpo-pagina" style="background-color: #f5f5f5; text-align:center;" >
+					<label for="avaria" style="padding-right: 1%;">Produto:</label>
+					<label class="radio-inline"><input type="radio" name="avaria" value="false" checked>Bom</label>
+					<label class="radio-inline"><input type="radio" name="avaria" value="true">Avariado</label>
+				</div>
+			</div>	
+			
 			<c:if test="${not empty filtro.recebimentoRetiraLoja}">
 				<div class="row">
 					<div class="form-group col-md-12">
 						<t:property name="recebimentoRetiraLoja.cdRecebimentoRetiraLoja" type="hidden" mode="input"/>
-						<t:property name="avaria" type="hidden" mode="input"/>
+						<t:property name="cdTipoEstoque" type="hidden" mode="input"/>
+						<t:property name="cdRecebimentoRetiraLojaProduto" type="hidden" mode="input"/>
 							
 						<div class="col-md-3 col-md-offset-9">
 							<button class="btn btn-primary btn-md" type="submit" id="buttonLimpar" onclick="clearForm();">Limpar</button>
-							<button class="btn btn-warning btn-md" type="button" id="buttonAvaria" onclick="setAvaria();">Avaria</button>
 							<button class="btn btn-success btn-md" type="button" id="buttonFinalizar" onclick="finalizarRecebimento();" data-toggle="confirmation">Finalizar</button>
 						</div>
 					</div>
@@ -35,20 +44,33 @@
 						 	<t:property name="tipoEstoque.cdTipoEstoque" type="hidden" mode="input"/>
 						 	
 						  	<c:if test="${recebimentoProduto.tipoEstoque.cdTipoEstoque eq 1}">
-							 	<button type="button" class="btn btn-success" data-toggle="tooltip" title="Conferido"> 
+				     			<span class="glyphicon glyphicon-ok" aria-hidden="true" 
+				     					data-toggle="tooltip" title="Conferido" style="font-size: 20px; color: #488c48;"/>
+							</c:if>
+							<c:if test="${recebimentoProduto.tipoEstoque.cdTipoEstoque eq 2}">
+					     		<span class="glyphicon glyphicon-alert" aria-hidden="true" 
+					     			  data-toggle="tooltip" title="Avariado" style="font-size: 20px; color: #f0ad4e;"/>
+							</c:if>
+							<c:if test="${recebimentoProduto.tipoEstoque.cdTipoEstoque eq 3}">
+						     	 <span class="glyphicon glyphicon-remove" aria-hidden="true" 
+						     	 		data-toggle="tooltip" title="Extraviado" style="font-size: 20px; color: #f91700;"/>
+	                        </c:if>
+						</n:column>
+						
+						<n:column header="Ação" style="text-align: -webkit-center;">
+							<c:if test="${recebimentoProduto.tipoEstoque.cdTipoEstoque eq 1}">
+								<button type="button" class="btn btn-warning" data-toggle="tooltip"  title="Mudar situação para Avariado"
+										onclick="mudarSituacao(${recebimentoProduto.cdRecebimentoRetiraLojaProduto}, ${recebimentoProduto.tipoEstoque.cdTipoEstoque})"> 
+					     			<span class="glyphicon glyphicon-glyphicon-exclamation-sign" aria-hidden="true"/>
+					    		</button>
+							</c:if>
+							
+						  	<c:if test="${recebimentoProduto.tipoEstoque.cdTipoEstoque eq 2}">
+							 	<button type="button" class="btn btn-success" data-toggle="tooltip" title="Mudar situação para Bom" 
+							 			onclick="mudarSituacao(${recebimentoProduto.cdRecebimentoRetiraLojaProduto}, ${recebimentoProduto.tipoEstoque.cdTipoEstoque})"> 
 				     				<span class="glyphicon glyphicon-glyphicon-ok-sign" aria-hidden="true"/>
 				    			</button>
 							</c:if>
-							<c:if test="${recebimentoProduto.tipoEstoque.cdTipoEstoque eq 2}">
-								<button type="button" class="btn btn-warning" data-toggle="tooltip"  title="Avariado"> 
-					     			<span class="glyphicon glyphicon-glyphicon-exclamation-sign" aria-hidden="true" />
-					    		</button>
-							</c:if>
-							<c:if test="${recebimentoProduto.tipoEstoque.cdTipoEstoque eq 3}">
-								<button type="button" class="btn btn-danger" data-toggle="tooltip" title="Extraviado"> 
-						     		 <span class="glyphicon glyphicon-glyphicon-remove-sign" aria-hidden="true"/>
-						    	</button>
-	                        </c:if>
 						</n:column>
 				 	</n:dataGrid>
 				</div>
@@ -131,6 +153,16 @@
 		form.ACAO.value ='limpar';
 		form.validate = 'false'; 
 		submitForm(); 
+	}
+
+	function mudarSituacao(cdRecebimentoRetiraLojaProduto, cdTipoEstoque){
+
+		$("input[name=cdRecebimentoRetiraLojaProduto]").val(cdRecebimentoRetiraLojaProduto);
+		$("input[name=cdTipoEstoque]").val(cdTipoEstoque);
+
+		form.ACAO.value ='alterarSituacaoProduto';
+		form.validate = 'false'; 
+		submitForm();
 	}
 
 </script>

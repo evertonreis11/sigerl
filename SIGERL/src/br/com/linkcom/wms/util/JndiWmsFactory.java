@@ -17,10 +17,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jndi.JndiTemplate;
 
-import br.com.linkcom.neo.core.web.NeoWeb;
-import br.com.linkcom.neo.exception.NotInNeoContextException;
 import br.com.linkcom.wms.geral.bean.Empresa;
-import br.com.linkcom.wms.modulo.logistica.controller.process.FinalizarInventarioThread;
 
 /**
  * Classe para gerenciar a conexão com o banco de acordo url.
@@ -43,22 +40,7 @@ public class JndiWmsFactory implements FactoryBean {
 	}
 
 	private String getJndiName() {
-		try {
-			if (Thread.currentThread().getName().startsWith("Connection")) {
-				return "java:/sigerl_OracleDS";
-			}else if(Thread.currentThread() instanceof FinalizarInventarioThread){
-				String n = Thread.currentThread().getName();//refatorar, colocar regexp
-				return n.substring( n.indexOf("_")+1, n.lastIndexOf("_") );
-			}
-			else {
-				String databaseName = NeoWeb.getRequestContext().getServletRequest().getContextPath().replaceAll("/", "");
-				return databaseName.equals("") ? "java:/sigerl_OracleDS" : "java:/" + databaseName + "_OracleDS";
-			}
-		}
-		catch (NotInNeoContextException e) {
-			log.info("Não está em contexto NEO. Utilizando jndi wms_OracleDS");
-			return "java:/sigerl_OracleDS";
-		}
+		return "java:/wmsre_OracleDS";
 	}
 
 	public Object getObject() throws Exception {

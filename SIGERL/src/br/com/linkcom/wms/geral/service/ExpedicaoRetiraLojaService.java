@@ -7,11 +7,13 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.lang.StringUtils;
 
 import br.com.linkcom.neo.report.IReport;
 import br.com.linkcom.neo.report.Report;
 import br.com.linkcom.neo.types.Cpf;
 import br.com.linkcom.neo.types.ListSet;
+import br.com.linkcom.wms.geral.bean.Cliente;
 import br.com.linkcom.wms.geral.bean.ExpedicaoRetiraLoja;
 import br.com.linkcom.wms.geral.bean.ExpedicaoRetiraLojaProduto;
 import br.com.linkcom.wms.geral.bean.ExpedicaoRetiraLojaStatus;
@@ -77,6 +79,14 @@ public class ExpedicaoRetiraLojaService extends GenericService<ExpedicaoRetiraLo
 			nota.setSerie(registros.get(0).getSerieNota());
 			nota.setChavenfe(registros.get(0).getChaveNotaFiscal());
 			
+			Cliente cliente = new Cliente();
+			
+			cliente.setCdpessoa(registros.get(0).getCdPessoa());
+			cliente.setNome(registros.get(0).getNomePessoa());
+			cliente.setDocumento(registros.get(0).getDocumentoPessoa());
+			
+			nota.setCliente(cliente);
+			
 			expedicao.setNotaFiscalSaida(nota);
 			
 			for (ExpedicaoLojaVO vo : registros) {
@@ -130,9 +140,14 @@ public class ExpedicaoRetiraLojaService extends GenericService<ExpedicaoRetiraLo
 		else
 			atualizarFlagImpressaoTermoExpedicao(expedicao.getCdExpedicaoRetiraLoja());
 		
+		String cpfStr = expedicao.getNotaFiscalSaida().getCliente().getDocumento();
+		
+		if (cpfStr.length() < 11)
+			cpfStr = StringUtils.leftPad(cpfStr, 11, "0"); 
+
 		report.addParameter("nomeCliente", expedicao.getNotaFiscalSaida().getCliente().getNome());
 		report.addParameter("filialEntrega", WmsUtil.getDeposito().getNome());
-		report.addParameter("cpfCliente", new Cpf(expedicao.getNotaFiscalSaida().getCliente().getDocumento()).toString());
+		report.addParameter("cpfCliente", new Cpf(cpfStr).toString());
 		report.addParameter("vendedor", WmsUtil.getUsuarioLogado().getNome());
 		
 		@SuppressWarnings("unchecked")

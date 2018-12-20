@@ -1,5 +1,6 @@
 package br.com.ricardoeletro.sigerl.recebimento.process;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 
 import br.com.linkcom.neo.authorization.process.ProcessAuthorizationModule;
@@ -62,14 +63,18 @@ public class RecebimentoLojaProcess extends GenericProcess<RecebimentoLojaFiltro
 			else
 				tipoEstoque = TipoEstoque.PERFEITO;
 			
-			recebimentoRetiraLojaProdutoService.confirmarProdutoRecebido(filtro.getValorInicial(), 
+			String msg = recebimentoRetiraLojaProdutoService.confirmarProdutoRecebido(filtro.getValorInicial(), 
 					recebimentoRetiraLoja.getListaRecebimentoRetiraLojaProduto(), tipoEstoque);
 			
 			filtro.setRecebimentoRetiraLoja(recebimentoRetiraLoja);
 			
 			request.setAttribute("REGISTROS",filtro.getRecebimentoRetiraLoja().getListaRecebimentoRetiraLojaProduto());  
 			
-			request.addMessage("Produto conferido com sucesso!!!");
+			if (StringUtils.isNotBlank(msg)){
+				request.addError(msg);
+			}else{
+				request.addMessage("Produto conferido com sucesso!!!");
+			}
 		}
 	}
 	
@@ -91,6 +96,25 @@ public class RecebimentoLojaProcess extends GenericProcess<RecebimentoLojaFiltro
 	@Action("limpar")
 	public ModelAndView limparFiltro(WebRequestContext request,  RecebimentoLojaFiltro filtro){
 		filtro = new RecebimentoLojaFiltro();		
+		return index(request, filtro);
+	}
+	
+	public ModelAndView alterarSituacaoProduto(WebRequestContext request, RecebimentoLojaFiltro filtro){
+		
+		recebimentoRetiraLojaProdutoService.alterarSituacaoProduto(filtro.getCdRecebimentoRetiraLojaProduto(), 
+						filtro.getCdTipoEstoque());
+		
+		
+		RecebimentoRetiraLoja recebimentoRetiraLoja = recebimentoRetiraLojaService.findRecebimentoLoja(filtro.getValorInicial(),
+				filtro.getRecebimentoRetiraLoja().getCdRecebimentoRetiraLoja());
+		
+		filtro.setRecebimentoRetiraLoja(recebimentoRetiraLoja);
+		
+		request.setAttribute("REGISTROS",filtro.getRecebimentoRetiraLoja().getListaRecebimentoRetiraLojaProduto());  
+		
+		filtro.setCdRecebimentoRetiraLojaProduto(null);
+		filtro.setCdTipoEstoque(null);
+		
 		return index(request, filtro);
 	}
 

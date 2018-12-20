@@ -1,7 +1,14 @@
 package br.com.linkcom.wms.geral.bean;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
+import org.apache.commons.collections.CollectionUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -19,6 +26,7 @@ public class TipoEstoque {
 	/** The permite expedicao. */
 	private Boolean permiteExpedicao;
 	
+	
 	/** The perfeito. */
 	public static TipoEstoque PERFEITO = new TipoEstoque(1, "PERFEITO", Boolean.TRUE);
 	
@@ -27,6 +35,9 @@ public class TipoEstoque {
 	
 	/** The extraviado. */
 	public static TipoEstoque EXTRAVIADO = new TipoEstoque(3, "EXTRAVIADO", Boolean.FALSE);
+	
+	
+	private static List<TipoEstoque> VALORES = new ArrayList<TipoEstoque>(Arrays.asList(PERFEITO, AVARIADO, EXTRAVIADO)); 
 	
 	/**
 	 * Instantiates a new tipo estoque.
@@ -115,6 +126,10 @@ public class TipoEstoque {
 			}
 		}
 		return false;
+	}
+	
+	public static TipoEstoque getTipoEstoque(Integer cdTipoEstoque){
+		return (TipoEstoque) CollectionUtils.find(VALORES, new BeanPropertyValueEqualsPredicate("cdTipoEstoque", cdTipoEstoque));
 	}
 	
 }

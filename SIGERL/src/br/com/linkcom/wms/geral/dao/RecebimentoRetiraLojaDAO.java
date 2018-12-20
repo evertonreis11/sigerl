@@ -73,6 +73,7 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 	
 	/**
 	 * Find recebimento loja.
+	 * @param codigoEan 
 	 *
 	 * @param cdRecebimentoRetiraLoja the cd recebimento retira loja
 	 * @return the recebimento retira loja
@@ -137,7 +138,6 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 			sql.append("                            AND   NFX.CDNOTAFISCALSAIDA = NFPX.CDNOTAFISCALSAIDA   ");
 			sql.append("                            AND   NFPX.CDPRODUTO = PBX.CDPRODUTO                   ");
 			sql.append("                            AND   NFX.NRO_LOJA_RETIRADA = NFS.NRO_LOJA_RETIRADA    ");
-			sql.append("                            AND   NFX.CDNOTAFISCALSAIDA = NFS.CDNOTAFISCALSAIDA    ");
 			sql.append("                            AND   MX.CDMANIFESTOSTATUS NOT IN (1,2,3,11)           ");
 			sql.append("							AND   NOT EXISTS (SELECT RLP.CDNOTAFISCALSAIDA 		   ");
 			sql.append("        										FROM RECEBRETIRALOJAPRODUTO RLP    ");

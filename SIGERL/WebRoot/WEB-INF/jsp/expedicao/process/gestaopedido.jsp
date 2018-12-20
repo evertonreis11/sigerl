@@ -5,7 +5,7 @@
 <%@ taglib prefix="t" uri="template"%>
 <%@ taglib prefix="w" uri="wms"%>
 <div class="container corpo-pagina">
-	<h3 class="titulo-pagina">Confirmação de Entrega</h3>
+	<h3 class="titulo-pagina">Gestão de pedidos</h3>
 	<n:form method="post" action="${Ttela.formAction}" validateFunction="validarFormulario">
 		<n:input name="resetCurrentPage" type="hidden" write="false"/>
 		
@@ -54,27 +54,20 @@
  	</n:form>
  	
  	<br />
+
 	
-	<div class="row">
-		<div class="col-md-2 col-md-offset-10">
-			<button class="btn btn-primary btn-md" type="button" id="buttonLimpar" onclick="limparFiltros();">Limpar</button>
-			<button class="btn btn-success btn-md" type="button" id="buttonFiltrar" onclick="doFilter();resetPage();">Filtrar</button>
-		</div>
-	</div>
-	
-	<div class="panel panel-default" style="border: 0px;">
+	<div class="panel panel-default" style="border: 0px;" >
 		<div class="panel-body">
-            <fieldset class="col-md-3">    	
-				<legend style="width: 35%;">Ações</legend>
-				<div class="panel panel-default">
-					<div class="panel-body">
-						<a href="#" style="font-size: large; color: #f91700">
-							<span class="glyphicon glyphicon-remove-circle" style="padding-right: 1%"></span>Informar um problema
-						</a>
-					</div>
-				</div>
-			</fieldset>				
-			<div class="clearfix" />
+           <div class="col-md-3 panel corpo-pagina" style="background-color: #f5f5f5;" align="center">
+	           <a href="#" style="font-size: large ; color: #f91700">
+					<span class="glyphicon glyphicon-remove-circle" style="padding-right: 2%"></span>Informar um problema
+				</a>
+           </div>
+					
+			<div class="col-md-2 col-md-offset-7">
+				<button class="btn btn-primary btn-md" type="button" id="buttonLimpar" onclick="limparFiltros();">Limpar</button>
+				<button class="btn btn-success btn-md" type="button" id="buttonFiltrar" onclick="doFilter();resetPage();">Filtrar</button>
+			</div>		
            </div>
 	</div>
 	
