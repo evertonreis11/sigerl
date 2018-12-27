@@ -15,11 +15,12 @@ import br.com.linkcom.neo.persistence.QueryBuilder;
 import br.com.linkcom.neo.util.CollectionsUtil;
 import br.com.linkcom.wms.geral.bean.Deposito;
 import br.com.linkcom.wms.geral.bean.Notafiscalsaida;
+import br.com.linkcom.wms.geral.bean.Tipovenda;
 import br.com.linkcom.wms.geral.bean.vo.GestaoPedidoVO;
-import br.com.linkcom.wms.modulo.expedicao.controller.crud.filtro.ManifestoFiltro;
 import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.WmsUtil;
 import br.com.linkcom.wms.util.neo.persistence.GenericDAO;
+import br.com.ricardoeletro.sigerl.expedicao.crud.filtro.ManifestoFiltro;
 import br.com.ricardoeletro.sigerl.expedicao.process.filtro.GestaoPedidoFiltro;
 
 public class NotafiscalsaidaDAO extends GenericDAO<Notafiscalsaida>{
@@ -307,6 +308,23 @@ public class NotafiscalsaidaDAO extends GenericDAO<Notafiscalsaida>{
 			e.printStackTrace();
 			throw new WmsException("Erro ao recuperar dados para a gestão de pedidos. Erro: " + e.getMessage(), e.getCause());
 		}
+	}
+	
+	
+
+	/**
+	 * Recupera nota saida do site por numero.
+	 *
+	 * @param numeroNota the numero nota
+	 * @return the notafiscalsaida
+	 */
+	public Notafiscalsaida recuperaNotaSaidaPorNumero(String numeroNota) {
+		return query().select("max(cdnotafiscalsaida)")
+			.join("notafiscalsaida.tipovenda tipovenda")
+			.where("numeronota = ?", numeroNota)
+			.where("numeroLojaRetirada = ? ", WmsUtil.getDeposito().getCodigoerp())
+			.where("tipovenda = ?", Tipovenda.SITE)
+			.unique();
 	}
 	
 }

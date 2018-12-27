@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -49,6 +50,8 @@ public class Notafiscalsaida {
     private Cliente filialfaturamento;
     private Pessoaendereco pessoaendereco;
     private Cep cep;
+    private Integer numeroLojaRetirada; 
+    private Tipovenda tipovenda;
     
     //Transient's
 	private Rota rota = null;
@@ -163,7 +166,16 @@ public class Notafiscalsaida {
 	public Cep getCep() {
 		return cep;
 	}
-    
+	@Column(name="NRO_LOJA_RETIRADA")
+	public Integer getNumeroLojaRetirada() {
+		return numeroLojaRetirada;
+	}
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "cdtipovenda")
+	public Tipovenda getTipovenda() {
+		return tipovenda;
+	}
+	
 	
 	//Set's
 	public void setCdcargaerp(String cdcargaerp) {
@@ -244,6 +256,12 @@ public class Notafiscalsaida {
 	public void setCep(Cep cep) {
 		this.cep = cep;
 	}
+	public void setNumeroLojaRetirada(Integer numeroLojaRetirada) {
+		this.numeroLojaRetirada = numeroLojaRetirada;
+	}
+	public void setTipovenda(Tipovenda tipovenda) {
+		this.tipovenda = tipovenda;
+	}
 	
 	
 	@Override
@@ -271,5 +289,4 @@ public class Notafiscalsaida {
 	public void setRota(Rota rota) {
 		this.rota = rota;
 	}
-	
 }

@@ -10,10 +10,10 @@ import br.com.linkcom.wms.geral.bean.Deposito;
 import br.com.linkcom.wms.geral.bean.Notafiscalsaida;
 import br.com.linkcom.wms.geral.bean.vo.GestaoPedidoVO;
 import br.com.linkcom.wms.geral.dao.NotafiscalsaidaDAO;
-import br.com.linkcom.wms.modulo.expedicao.controller.crud.filtro.ManifestoFiltro;
 import br.com.linkcom.wms.sincronizador.IntegradorSqlUtil;
 import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.neo.persistence.GenericService;
+import br.com.ricardoeletro.sigerl.expedicao.crud.filtro.ManifestoFiltro;
 import br.com.ricardoeletro.sigerl.expedicao.process.filtro.GestaoPedidoFiltro;
 
 public class NotafiscalsaidaService extends GenericService<Notafiscalsaida>{
@@ -133,6 +133,10 @@ public class NotafiscalsaidaService extends GenericService<Notafiscalsaida>{
 
 	public List<GestaoPedidoVO> findForGestaoPedido(GestaoPedidoFiltro filtro) {
 		return notafiscalsaidaDAO.findForGestaoPedido(filtro);
+	}
+
+	public Notafiscalsaida recuperaNotaSaidaPorNumero(String numeroNota) {
+		return notafiscalsaidaDAO.recuperaNotaSaidaPorNumero(numeroNota);
 	}
 
 }

@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.linkcom.wms.geral.bean.view.Vcupomfiscal;
-import br.com.linkcom.wms.modulo.expedicao.controller.crud.filtro.ManifestoFiltro;
 import br.com.linkcom.wms.util.DateUtil;
 import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.neo.persistence.GenericDAO;
+import br.com.ricardoeletro.sigerl.expedicao.crud.filtro.ManifestoFiltro;
 
 public class VcupomfiscalDAO extends GenericDAO<Vcupomfiscal>{
 	

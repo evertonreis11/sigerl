@@ -110,4 +110,8 @@ public class RecebimentoRetiraLojaProdutoService extends GenericService<Recebime
 			recebimentoRetiraLojaProdutoDAO.alterarSituacaoProduto(cdRecebimentoRetiraLojaProduto, tipoEstoque);
 	}
 
+	public List<RecebimentoRetiraLojaProduto> recuperaProdutosRecebimentoPorNota(Integer cdnotafiscalsaida) {
+		return recebimentoRetiraLojaProdutoDAO.recuperaProdutosRecebimentoPorNota(cdnotafiscalsaida);
+	}
+
 }

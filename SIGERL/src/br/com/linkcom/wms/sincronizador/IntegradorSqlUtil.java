@@ -7,7 +7,6 @@ import java.sql.SQLException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import br.com.linkcom.wms.util.WmsException;
@@ -54,9 +53,6 @@ public class IntegradorSqlUtil {
 	}
 	
 	public static Connection getNewConnection(){
-		//	String realPath = event.getServletContext().getRealPath("/");
-		//String[] vetorString = realPath.replaceAll("/", "\\\\").split("\\\\");
-		//	String servletContext = vetorString[vetorString.length-1].split("\\.")[0];
 	    String servletContext = "wmsre";
 		String jndiBD = "java:/" + servletContext + "_OracleDS";
 		Connection connection = null;

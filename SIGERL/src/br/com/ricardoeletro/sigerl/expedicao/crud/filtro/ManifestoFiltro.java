@@ -1,4 +1,4 @@
-package br.com.linkcom.wms.modulo.expedicao.controller.crud.filtro;
+package br.com.ricardoeletro.sigerl.expedicao.crud.filtro;
 
 import java.sql.Date;
 
@@ -157,7 +157,8 @@ public class ManifestoFiltro extends FiltroListagem{
 	public String getCuponsSelecionados() {
 		return cuponsSelecionados;
 	}
-
+	
+	
 	
 	//Set's
 	public void setNumeroCupom(String numeroCupom) {
@@ -259,5 +260,5 @@ public class ManifestoFiltro extends FiltroListagem{
 	public void setCuponsSelecionados(String cuponsSelecionados) {
 		this.cuponsSelecionados = cuponsSelecionados;
 	}
-	
+
 }

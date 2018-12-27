@@ -1,3 +1,4 @@
+<%@page import="br.com.linkcom.wms.geral.bean.ProblemaPedidoLoja"%>
 <%@page import="br.com.linkcom.wms.geral.bean.PedidoPontoControle"%>
 <%@page import="br.com.linkcom.wms.geral.bean.vo.GestaoPedidoVO"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -8,6 +9,7 @@
 	<h3 class="titulo-pagina">Gestão de pedidos</h3>
 	<n:form method="post" action="${Ttela.formAction}" validateFunction="validarFormulario">
 		<n:input name="resetCurrentPage" type="hidden" write="false"/>
+		<n:input name="notasInfoProblema" type="hidden" write="false"/>
 		
 		<t:janelaFiltro>
 			<div class="row">
@@ -50,6 +52,28 @@
 					</div>
 				</div>
 			</div>
+			
+		   <div class="modal fade" id="infoModal" role="dialog">
+		     <div class="modal-dialog">
+		       <div class="modal-content">
+		        <div class="modal-header">
+		          	<button type="button" class="close" data-dismiss="modal">&times;</button>
+		          	<h4 class="modal-title">Informar Problema</h4>
+		        </div>
+		        <div class="modal-body">
+		        	<c:forEach items="${filtro.problemasPedido}" var="problemaPedido" >
+		        		<div class="radio">
+						  <label><input type="radio" name="cdProblemaPedidoLoja" value="${problemaPedido.cdProblemaPedidoLoja}">${problemaPedido.descricao}</label>
+						</div>
+		        	</c:forEach>
+		        </div>
+		        <div class="modal-footer">
+			        <button type="button" class="btn btn-success" data-dismiss="modal" onclick="executarInformacaoProblema();">Finalizar</button>
+			    </div>
+		      </div>
+		    </div>
+		  </div>
+		  
 		</t:janelaFiltro>
  	</n:form>
  	
@@ -59,7 +83,7 @@
 	<div class="panel panel-default" style="border: 0px;" >
 		<div class="panel-body">
            <div class="col-md-3 panel corpo-pagina" style="background-color: #f5f5f5;" align="center">
-	           <a href="#" style="font-size: large ; color: #f91700">
+	           <a href="javascript:informarProblema();" style="font-size: large ; color: #f91700">
 					<span class="glyphicon glyphicon-remove-circle" style="padding-right: 2%"></span>Informar um problema
 				</a>
            </div>
@@ -75,13 +99,13 @@
 	<div class="panel panel-default" style="border: 0px !important;">
 		<div class="panel-body">
 			<div class="table-responsive" >
-				<n:dataGrid name="registros" id="registrosId" itens="${lista}" itemType="<%=GestaoPedidoVO.class%>" var="registro" styleClass="table table-striped table-bordered">
+				<n:dataGrid name="registros" id="tabelaResultados" itens="${lista}" itemType="<%=GestaoPedidoVO.class%>" var="registro" styleClass="table table-striped table-bordered">
 					<n:column>
 						<n:header>
 							<input type="checkbox" class="checkBoxClass" name="selectAll" id="selectAll" onclick="javascript:$dg.changeCheckState();"/>
 						</n:header>
 						<n:body>
-							<input class="checkBoxClass" type="checkbox" name="selecteditens" value="${registro.numeroPedido}">
+							<input class="checkBoxClass" type="checkbox" name="selecteditens" value="${registro.numeroNota}">
 						</n:body>
 					</n:column>
 					<t:property name="numeroNota" label="Num. Nota" mode="output"/>
@@ -174,5 +198,23 @@
 	
 		return row;
 				
+	}
+
+	function informarProblema(){
+		if($dg.getSelectedValues() != ""){
+			$('input[name=notasInfoProblema]').val($dg.getSelectedValues());
+			$("#infoModal").modal();
+			
+		
+		}else{
+			alert("É obrigatório selecionar ao menos 1 pedido antes de prosseguir com a essa ação");
+		}
+	}
+
+	function executarInformacaoProblema(){
+		form['ACAO'].value ='informarProblemaPedido';
+		form.action = '${ctx}/expedicao/crud/Pedidovendaproduto';
+		form.validate = 'false';
+		submitForm();
 	}
 </script>

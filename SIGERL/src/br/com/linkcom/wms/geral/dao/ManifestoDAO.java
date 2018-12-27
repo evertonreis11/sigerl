@@ -21,7 +21,6 @@ import br.com.linkcom.wms.geral.bean.Usuario;
 import br.com.linkcom.wms.geral.bean.vo.DescargaprodutoVO;
 import br.com.linkcom.wms.geral.bean.vo.ManifestoVO;
 import br.com.linkcom.wms.geral.bean.vo.PedidosmanifestoVO;
-import br.com.linkcom.wms.modulo.expedicao.controller.crud.filtro.ManifestoFiltro;
 import br.com.linkcom.wms.modulo.expedicao.controller.process.filtro.BorderoFiltro;
 import br.com.linkcom.wms.modulo.expedicao.controller.process.filtro.ManifestoPlanilhaFiltro;
 import br.com.linkcom.wms.modulo.expedicao.controller.process.filtro.ManifestoPlanilhaFiltro.TipoRelatorio;
@@ -30,6 +29,7 @@ import br.com.linkcom.wms.modulo.expedicao.controller.report.filtro.Emitirdescar
 import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.WmsUtil;
 import br.com.linkcom.wms.util.neo.persistence.GenericDAO;
+import br.com.ricardoeletro.sigerl.expedicao.crud.filtro.ManifestoFiltro;
 
 public class ManifestoDAO extends GenericDAO<Manifesto>{
 

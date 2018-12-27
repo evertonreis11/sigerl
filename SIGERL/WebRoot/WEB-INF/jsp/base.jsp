@@ -15,8 +15,8 @@
 		<script type="text/javascript" src="${ctx}/js/bootstrap-confirmation.min.js"></script>
 		<script type="text/javascript" src="${ctx}/js/wms.js"></script>
 		<script type="text/javascript" src="${ctx}/js/jquery.serialize.js"></script>
+		<script type="text/javascript" src="${ctx}/js/tabela.js"></script>
 		
-		</script>
 		<%-- <script  src="${ctx}/js/jquery-ui.js"></script> --%>
 		<%-- <script language="JavaScript" src="${ctx}/js/wz_tooltip.js"></script> --%>
 		
@@ -36,7 +36,7 @@
 		<link rel="stylesheet" 		  href="${ctx}/css/jquery-ui-1.7.3.custom.css" type="text/css"/>
 
 		<title><fmt:message key="aplicacao.titulo"/> - Módulo <%=WmsUtil.getNomeModulo()%></title>
-		<script type="text/javascript" src="${ctx}/js/tabela.js"></script>
+		
 		
 		<script type="text/javascript" src="${ctx}/js/jquery.blockUI.js"></script>
 		<script type="text/javascript" src="${ctx}/js/jquery-ui-1.7.3.custom.min.js"></script>

@@ -12,10 +12,10 @@ import javax.sql.DataSource;
 import br.com.linkcom.wms.geral.bean.Notafiscalsaida;
 import br.com.linkcom.wms.geral.bean.view.Vcupomfiscal;
 import br.com.linkcom.wms.geral.dao.VcupomfiscalDAO;
-import br.com.linkcom.wms.modulo.expedicao.controller.crud.filtro.ManifestoFiltro;
 import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.WmsUtil;
 import br.com.linkcom.wms.util.neo.persistence.GenericService;
+import br.com.ricardoeletro.sigerl.expedicao.crud.filtro.ManifestoFiltro;
 
 public class VcupomfiscalService extends GenericService<Vcupomfiscal> {
 	

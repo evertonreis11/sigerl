@@ -11,6 +11,7 @@ import br.com.linkcom.wms.geral.bean.RecebimentoRetiraLojaProduto;
 import br.com.linkcom.wms.geral.bean.TipoEstoque;
 import br.com.linkcom.wms.geral.dao.EstoqueProdutoLojaDAO;
 import br.com.linkcom.wms.util.WmsException;
+import br.com.linkcom.wms.util.WmsUtil;
 import br.com.linkcom.wms.util.neo.persistence.GenericService;
 
 public class EstoqueProdutoLojaService extends GenericService<EstoqueProdutoLoja> {
@@ -108,6 +109,33 @@ public class EstoqueProdutoLojaService extends GenericService<EstoqueProdutoLoja
 
 		}
 
+	}
+
+	/**
+	 * Alterar tipo estoque produto.
+	 *
+	 * @param produtoRecebido the produto recebido
+	 * @param tipoEstoque the tipo estoque
+	 */
+	public void alterarTipoEstoqueProduto(RecebimentoRetiraLojaProduto produtoRecebido, TipoEstoque tipoEstoque) {
+		EstoqueProdutoLoja estoqueProdutoLoja = estoqueProdutoLojaDAO.recuperarEstoqueProduto(produtoRecebido.getProduto().getCdproduto(), 
+				produtoRecebido.getTipoEstoque(), WmsUtil.getDeposito().getCddeposito());
+		
+		if (estoqueProdutoLoja != null){
+			if (Math.subtractExact(estoqueProdutoLoja.getQtde(), produtoRecebido.getQtde()) > 0 ){
+				estoqueProdutoLoja.setQtde(Math.subtractExact(estoqueProdutoLoja.getQtde(), produtoRecebido.getQtde()));
+				estoqueProdutoLoja.setDtAlteracao(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+				saveOrUpdate(estoqueProdutoLoja);
+				
+				produtoRecebido.setTipoEstoque(tipoEstoque);
+				EstoqueProdutoLoja novoEstoqueProduto =  gerarEstoqueProdutoLoja(produtoRecebido, WmsUtil.getDeposito().getCddeposito());
+				saveOrUpdate(novoEstoqueProduto);
+			}else{
+				estoqueProdutoLoja.setTipoEstoque(tipoEstoque);
+				saveOrUpdate(estoqueProdutoLoja);
+			}
+		}
+		
 	}
 
 }

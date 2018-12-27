@@ -19,6 +19,7 @@ import br.com.linkcom.wms.geral.bean.vo.GestaoPedidoVO;
 import br.com.linkcom.wms.geral.service.DepositoService;
 import br.com.linkcom.wms.geral.service.NotafiscalsaidaService;
 import br.com.linkcom.wms.geral.service.PedidoPontoControleService;
+import br.com.linkcom.wms.geral.service.ProblemaPedidoLojaService;
 import br.com.linkcom.wms.util.WmsUtil;
 import br.com.ricardoeletro.sigerl.expedicao.process.filtro.GestaoPedidoFiltro;
 
@@ -28,6 +29,7 @@ public class GestaoPedidoProcess extends MultiActionController{
 	private DepositoService depositoService;
 	private NotafiscalsaidaService notaFiscalSaidaService;
 	private PedidoPontoControleService pedidoPontoControleService;
+	private ProblemaPedidoLojaService problemaPedidoLojaService;
 	
 	public void setDepositoService(DepositoService depositoService) {
 		this.depositoService = depositoService;
@@ -39,6 +41,10 @@ public class GestaoPedidoProcess extends MultiActionController{
 	
 	public void setPedidoPontoControleService(PedidoPontoControleService pedidoPontoControleService) {
 		this.pedidoPontoControleService = pedidoPontoControleService;
+	}
+	
+	public void setProblemaPedidoLojaService(ProblemaPedidoLojaService problemaPedidoLojaService) {
+		this.problemaPedidoLojaService = problemaPedidoLojaService;
 	}
 	
 	
@@ -72,6 +78,8 @@ public class GestaoPedidoProcess extends MultiActionController{
 		
 		request.setAttribute("lista",lista);
 		
+		filtro.setProblemasPedido(problemaPedidoLojaService.findAll());
+		
 		return new ModelAndView("/process/gestaopedido","filtro",filtro);
 		
 	}
@@ -84,6 +92,23 @@ public class GestaoPedidoProcess extends MultiActionController{
 		}
 		
 		return new JsonModelAndView().addObject("listaLog", registros);
+		
+	}
+	
+	public ModelAndView informarProblemaPedido(WebRequestContext request, GestaoPedidoFiltro filtro){
+		
+		if (filtro.getCdProblemaPedidoLoja() == null 
+				|| StringUtils.isBlank(filtro.getNotasInfoProblema())){
+			request.addError("A seleção do problema e dos pedidos são obrigatórias para executar essa operação");
+		}else{
+			request.addMessage("As modficações na nota foram executadas com sucesso.");
+			problemaPedidoLojaService.informarProblemaPedido(filtro);
+		}
+		
+		filtro.setCdProblemaPedidoLoja(null);
+		filtro.setNotasInfoProblema(null);
+		
+		return getListagem(request, filtro);
 		
 	}
 }

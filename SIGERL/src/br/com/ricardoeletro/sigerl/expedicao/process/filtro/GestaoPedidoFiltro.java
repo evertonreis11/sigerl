@@ -1,10 +1,12 @@
 package br.com.ricardoeletro.sigerl.expedicao.process.filtro;
 
 import java.sql.Date;
+import java.util.List;
 
 import br.com.linkcom.neo.bean.annotation.DisplayName;
 import br.com.linkcom.neo.controller.crud.FiltroListagem;
 import br.com.linkcom.wms.geral.bean.Deposito;
+import br.com.linkcom.wms.geral.bean.ProblemaPedidoLoja;
 
 public class GestaoPedidoFiltro extends FiltroListagem{
 	
@@ -21,6 +23,12 @@ public class GestaoPedidoFiltro extends FiltroListagem{
 	private String codigoProduto;
 	
 	private String nomeCliente;
+	
+	private List<ProblemaPedidoLoja> problemasPedido;
+	
+	private String notasInfoProblema;
+	
+	private Integer cdProblemaPedidoLoja;
 	
 	@DisplayName("Loja")
 	public Deposito getLoja() {
@@ -81,6 +89,30 @@ public class GestaoPedidoFiltro extends FiltroListagem{
 	
 	public void setNomeCliente(String nomeCliente) {
 		this.nomeCliente = nomeCliente;
+	}
+
+	public List<ProblemaPedidoLoja> getProblemasPedido() {
+		return problemasPedido;
+	}
+
+	public void setProblemasPedido(List<ProblemaPedidoLoja> problemasPedido) {
+		this.problemasPedido = problemasPedido;
+	}
+
+	public String getNotasInfoProblema() {
+		return notasInfoProblema;
+	}
+
+	public void setNotasInfoProblema(String notasInfoProblema) {
+		this.notasInfoProblema = notasInfoProblema;
+	}
+
+	public Integer getCdProblemaPedidoLoja() {
+		return cdProblemaPedidoLoja;
+	}
+
+	public void setCdProblemaPedidoLoja(Integer cdProblemaPedidoLoja) {
+		this.cdProblemaPedidoLoja = cdProblemaPedidoLoja;
 	}
 	
 }
