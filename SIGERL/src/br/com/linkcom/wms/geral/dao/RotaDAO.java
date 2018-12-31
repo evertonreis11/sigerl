@@ -17,6 +17,7 @@ import br.com.linkcom.neo.controller.crud.FiltroListagem;
 import br.com.linkcom.neo.persistence.DefaultOrderBy;
 import br.com.linkcom.neo.persistence.QueryBuilder;
 import br.com.linkcom.neo.persistence.SaveOrUpdateStrategy;
+import br.com.linkcom.wms.geral.bean.Praca;
 import br.com.linkcom.wms.geral.bean.Rota;
 import br.com.linkcom.wms.geral.bean.vo.RotaOcupacaoVO;
 import br.com.linkcom.wms.modulo.expedicao.controller.crud.filtro.RotaFiltro;
@@ -224,6 +225,25 @@ public class RotaDAO extends GenericDAO<Rota> {
 				.where("rota.deposito = ?",WmsUtil.getDeposito(), WmsUtil.isFiltraDeposito());
 		
 		return query.list();
+		
+	}
+	
+	/**
+	 * Recupera uma rota por praça
+	 * 
+	 * @param param
+	 * @return
+	 */
+	public Rota recuperaRotaPorPracaParaValidacaoTransbordo(Praca praca){
+		
+		QueryBuilder<Rota> query = query()
+				.select("rota.cdrota, rota.temDepositoTransbordo, depositotransbordo.cddeposito")
+				.join("rota.listaRotapraca listaRotapraca")
+				.join("listaRotapraca.praca praca")
+				.leftOuterJoin("rota.depositotransbordo depositotransbordo")
+				.where("praca = ?", praca);
+		
+		return query.unique();
 		
 	}
 

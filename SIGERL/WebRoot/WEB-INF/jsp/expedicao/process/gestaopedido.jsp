@@ -213,7 +213,7 @@
 
 	function executarInformacaoProblema(){
 		form['ACAO'].value ='informarProblemaPedido';
-		form.action = '${ctx}/expedicao/crud/Pedidovendaproduto';
+		form.action = '${ctx}/expedicao/process/gestaopedido';
 		form.validate = 'false';
 		submitForm();
 	}

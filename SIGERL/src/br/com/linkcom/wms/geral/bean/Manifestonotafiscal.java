@@ -1,6 +1,7 @@
 package br.com.linkcom.wms.geral.bean;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Transient;
 
 import br.com.linkcom.neo.bean.annotation.DisplayName;
 import br.com.linkcom.neo.types.Money;
@@ -32,10 +34,20 @@ public class Manifestonotafiscal {
     private Money valorentrega;
     private List<Manifestoentrega> listaManifestoentrega;
     private Statusconfirmacaoentrega statusconfirmacaoentrega;
-    private Date dataentrega;
+    private Timestamp dataentrega;
     private Motivoretornoentrega motivoretornoentrega;
     private Boolean temDepositoTransbordo;
     private Deposito depositotransbordo;
+    private Money valorprevisao;
+    private Integer token;
+    
+    //Transient's
+    private Boolean existeFreteClienteNota = Boolean.TRUE;
+    private Integer senhaAutorizacao;
+    private Integer cdnotafiscalsaidareferencia = null;
+    private Boolean temFretePago = Boolean.FALSE;
+    private List<Statusconfirmacaoentrega> statusForCombo;
+    
     
     
     @Id
@@ -49,7 +61,7 @@ public class Manifestonotafiscal {
 	public Manifesto getManifesto() {
 		return manifesto;
 	}
-    @DisplayName("Manifesto")
+    @DisplayName("Nota Fiscal Saída")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "cdnotafiscalsaida")    
 	public Notafiscalsaida getNotafiscalsaida() {
@@ -97,7 +109,7 @@ public class Manifestonotafiscal {
 	public Statusconfirmacaoentrega getStatusconfirmacaoentrega() {
 		return statusconfirmacaoentrega;
 	}
-	public Date getDataentrega() {
+	public Timestamp getDataentrega() {
 		return dataentrega;
 	}
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -113,7 +125,12 @@ public class Manifestonotafiscal {
 	public Deposito getDepositotransbordo() {
 		return depositotransbordo;
 	}
-	
+	public Money getValorprevisao() {
+		return valorprevisao;
+	}
+	public Integer getToken() {
+		return token;
+	}
 	
 	//Set's
 	public void setCdmanifestonotafiscal(Integer cdmanifestonotafiscal) {
@@ -152,7 +169,7 @@ public class Manifestonotafiscal {
 	public void setStatusconfirmacaoentrega(Statusconfirmacaoentrega statusconfirmacaoentrega) {
 		this.statusconfirmacaoentrega = statusconfirmacaoentrega;
 	}
-	public void setDataentrega(Date dataentrega) {
+	public void setDataentrega(Timestamp dataentrega) {
 		this.dataentrega = dataentrega;
 	}
 	public void setMotivoretornoentrega(Motivoretornoentrega motivoretornoentrega) {
@@ -163,6 +180,50 @@ public class Manifestonotafiscal {
 	}
 	public void setDepositotransbordo(Deposito depositotransbordo) {
 		this.depositotransbordo = depositotransbordo;
+	}
+	public void setValorprevisao(Money valorprevisao) {
+		this.valorprevisao = valorprevisao;
+	}
+	public void setToken(Integer token) {
+		this.token = token;
+	}
+	
+	@Transient
+	public Boolean getExisteFreteClienteNota() {
+		return existeFreteClienteNota;
+	}
+	@Transient
+	public Integer getSenhaAutorizacao() {
+		return senhaAutorizacao;
+	}
+	public void setSenhaAutorizacao(Integer senhaAutorizacao) {
+		this.senhaAutorizacao = senhaAutorizacao;
+	}
+	public void setExisteFreteClienteNota(Boolean existeFreteClienteNota) {
+		this.existeFreteClienteNota = existeFreteClienteNota;
+	}
+	
+	
+	@Transient
+	public Integer getCdnotafiscalsaidareferencia() {
+		return cdnotafiscalsaidareferencia;
+	}
+	public void setCdnotafiscalsaidareferencia(Integer cdnotafiscalsaidareferencia) {
+		this.cdnotafiscalsaidareferencia = cdnotafiscalsaidareferencia;
+	}
+	@Transient
+	public Boolean getTemFretePago() {
+		return temFretePago;
+	}
+	public void setTemFretePago(Boolean temFretePago) {
+		this.temFretePago = temFretePago;
+	}
+	@Transient
+	public List<Statusconfirmacaoentrega> getStatusForCombo() {
+		return statusForCombo;
+	}
+	public void setStatusForCombo(List<Statusconfirmacaoentrega> statusForCombo) {
+		this.statusForCombo = statusForCombo;
 	}
 	
 }

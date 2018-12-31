@@ -3,8 +3,12 @@ package br.com.linkcom.wms.geral.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
@@ -12,11 +16,17 @@ import br.com.linkcom.neo.controller.crud.FiltroListagem;
 import br.com.linkcom.neo.persistence.QueryBuilder;
 import br.com.linkcom.neo.persistence.SaveOrUpdateStrategy;
 import br.com.linkcom.neo.util.CollectionsUtil;
+//import br.com.linkcom.wms.geral.bean.Custoextrafrete;
 import br.com.linkcom.wms.geral.bean.Deposito;
 import br.com.linkcom.wms.geral.bean.Manifesto;
 import br.com.linkcom.wms.geral.bean.Manifestostatus;
 import br.com.linkcom.wms.geral.bean.Notafiscalsaida;
 import br.com.linkcom.wms.geral.bean.Notafiscaltipo;
+import br.com.linkcom.wms.geral.bean.Recebimento;
+import br.com.linkcom.wms.geral.bean.Statusconfirmacaoentrega;
+import br.com.linkcom.wms.geral.bean.Tipoentrega;
+import br.com.linkcom.wms.geral.bean.Tipovenda;
+import br.com.linkcom.wms.geral.bean.Transportador;
 import br.com.linkcom.wms.geral.bean.Usuario;
 import br.com.linkcom.wms.geral.bean.vo.DescargaprodutoVO;
 import br.com.linkcom.wms.geral.bean.vo.ManifestoVO;
@@ -74,6 +84,8 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 	@Override
 	public void updateEntradaQuery(QueryBuilder<Manifesto> query) {
 		makeQuery(query);
+		query.select(query.getSelect().getValue() + " ,rotagerenciadora.cdrotagerenciadora,rotagerenciadora.descricao  ");
+		query.leftOuterJoin("manifesto.rotagerenciadora rotagerenciadora");
 	}
 	
 	@Override
@@ -91,7 +103,12 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 					"usuarioemissor.nome, usuarioemissor.login, transportador.cdpessoa, transportador.nome, motorista.cdmotorista, motorista.nome, " +
 					"veiculo.cdveiculo, veiculo.placa, conferenteExpedicao.cdpessoa, conferenteExpedicao.nome, conferenteInspetoria.cdpessoa, " +
 					"conferenteInspetoria.nome, tipoentrega.cdtipoentrega, tipoentrega.nome, box.cdbox, box.nome, manifesto.cdae, " +
-					"manifesto.datainicio,manifesto.horainicio, rotagerenciadora.cdrotagerenciadora,rotagerenciadora.descricao,  " +
+					"manifesto.datainicio,manifesto.horainicio, " + 
+					
+					// Comentado devido a duplicidade na query de listagem de registros
+					// Everton Reis - 31/10/2016
+					// "rotagerenciadora.cdrotagerenciadora,rotagerenciadora.descricao,  " +
+					
 					"filialreferencia.cdfilial, filialreferencia.nome, manifestopai.cdmanifesto ")
 			.join("manifesto.manifestostatus manifestostatus ")
 			.join("manifesto.deposito deposito")
@@ -103,7 +120,10 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 			.leftOuterJoin("manifesto.conferenteInspetoria conferenteInspetoria")
 			.leftOuterJoin("manifesto.tipoentrega tipoentrega")
 			.leftOuterJoin("manifesto.box box")
-			.leftOuterJoin("manifesto.rotagerenciadora rotagerenciadora")
+			
+			// Comentado devido a duplicidade na query de listagem de registros
+			// Everton Reis - 31/10/2016
+			//.leftOuterJoin("manifesto.rotagerenciadora rotagerenciadora")
 			.leftOuterJoin("manifesto.filialreferencia filialreferencia")
 			.leftOuterJoin("manifesto.manifestopai manifestopai");
 		
@@ -135,6 +155,24 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		
 		return query.list();
 	}
+	
+	/**
+	 * Find manifesto status by manifesto.
+	 *
+	 * @param cdmanifesto the cdmanifesto
+	 * @return the manifesto
+	 */
+	public Manifesto findManifestoStatusByManifesto(Integer cdmanifesto){
+
+		QueryBuilder<Manifesto> query = query();
+
+		query
+		.select("manifesto.cdmanifesto, manifestostatus.cdmanifestostatus, manifestostatus.nome")
+		.leftOuterJoin("manifesto.manifestostatus manifestostatus")
+		.where("manifesto.cdmanifesto = ? ", cdmanifesto);
+
+		return query.unique();
+	}
 
 	/**
 	 * 
@@ -145,11 +183,11 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		
 		StringBuilder sql = new StringBuilder();
 		
-			sql.append(" update manifesto m set m.cdmanifestostatus = ");
+			sql.append(" update Manifesto m set m.manifestostatus.cdmanifestostatus = ");
 			sql.append(manifestostatus.getCdmanifestostatus());
 			sql.append("where m.cdmanifesto in ( ").append(manifesto.getCdmanifesto()).append(" ) "); 
 		
-		getJdbcTemplate().execute(sql.toString());
+		getHibernateTemplate().bulkUpdate(sql.toString());
 				
 	}
 	
@@ -170,7 +208,8 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		sql.append("			trim(pc.nome) as clientenome, pec.logradouro||', '||pec.numero as enderecocliente, nfs.numero as nronota, mo.cpf as cpf, ");
 		sql.append("			(select count(*) from manifestonotafiscal mnf2 where mnf2.cdmanifesto = m.cdmanifesto) as qtde, ");
 		sql.append("			nft.cdnotafiscaltipo as cdnotafiscaltipo, nft.nome as notafiscaltipo, mnf.ind_avulso as notaavulsa, m.dtemissao as datahora, ");
-		sql.append(" 			tv.nome as tipoveiculo, m.lacretraseiro, m.lacrelateral, m.observacao, te.nome as tipoentrega, NVL(bx.nome,' ') as box ");
+		sql.append(" 			tv.nome as tipoveiculo, m.lacretraseiro, m.lacrelateral, m.observacao, te.nome as tipoentrega, NVL(bx.nome,' ') as box, ");
+		sql.append("			m.cdae as codigoAe");
 		sql.append(" 	from manifesto m	");
 		sql.append(" 	left join box bx on bx.cdbox = m.cdbox ");
 		sql.append(" 	join tipoentrega te on te.cdtipoentrega = m.cdtipoentrega ");
@@ -191,7 +230,7 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		sql.append(" 	and mcb.ativo = 1 ");
 		sql.append(" 	group by pt.nome, mo.nome, v.placa, pu.nome, m.dtemissao, m.cdmanifesto, mcb.codigo, pc.nome, bx.nome, d.nome, nfs.lojapedido, ");
 		sql.append("			pec.logradouro || ', ' || pec.numero, nfs.numero, mo.cpf, nfs.qtdeitens, mnf.cdmanifestonotafiscal,rownum,  ");
-		sql.append("			nft.cdnotafiscaltipo, nft.nome, mnf.ind_avulso, tv.nome, m.lacretraseiro, m.lacrelateral, m.observacao, te.nome ");
+		sql.append("			nft.cdnotafiscaltipo, nft.nome, mnf.ind_avulso, tv.nome, m.lacretraseiro, m.lacrelateral, m.observacao, te.nome, m.cdae ");
 		sql.append(" 	order by trim(pc.nome)");
 		sql.append(" ) ta order by rownum");
 		
@@ -225,6 +264,107 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 					manifestoVO.setObservacao(rs.getString("observacao") == null ? " " : rs.getString("observacao"));
 					manifestoVO.setTipoentrega(rs.getString("tipoentrega") == null ? " " : rs.getString("tipoentrega"));
 					manifestoVO.setBox(rs.getString("box") == null ? " " : rs.getString("box"));
+					manifestoVO.setCodigoAe(rs.getString("codigoAe") == null ? " " : rs.getString("codigoAe"));
+				return manifestoVO;
+			}
+		});
+		
+	}
+	/**
+	 * 
+	 * @param manifesto
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ManifestoVO> findForReportConsolidacao(Manifesto manifesto) {
+		
+		StringBuilder sql = new StringBuilder();
+		List<Object> args = new ArrayList<Object>();
+		
+		
+		sql.append(" SELECT TA.*, ROWNUM AS CONTADOR ");
+		sql.append(" FROM ( ");
+		sql.append("       SELECT DISTINCT D.NOME AS FILIAL, PT.NOME AS TRANSPORTADOR, MO.NOME AS MOTORISTA, V.PLACA AS PLACA, PU.NOME AS USUARIO,  ");
+		sql.append("              M.CDMANIFESTO AS MANIFESTO, MCB.CODIGO AS CODIGO, TV.NOME AS TIPOVEICULO, M.LACRELATERAL, M.LACRETRASEIRO, ");
+		sql.append("              M.OBSERVACAO, TE.NOME AS TIPOENTREGA, M.DTEMISSAO AS DATAHORA, MO.CPF AS CPF, M.CDAE AS CODIGOAE, NVL(BX.NOME,' ') AS BOXNAME, ");
+		sql.append("              F.UF AS UF_ORIGEM, ");
+		sql.append("              EC.UF AS UF_DESTINO, ");
+		sql.append("              SUM(NFP.QTDE) AS QTDE_VOLUMES, ");
+		sql.append("              COUNT(DISTINCT NFS.CDNOTAFISCALSAIDA) AS QTDE_NOTAS, ");
+		sql.append("        	  ( ");
+		sql.append("                 SELECT SUM(COUNT(DISTINCT NFS2.CDNOTAFISCALSAIDA))  ");
+		sql.append("                 FROM MANIFESTO M2, MANIFESTONOTAFISCAL MN2, NOTAFISCALSAIDA NFS2 ");
+		sql.append("                 WHERE   ");
+		sql.append("                   M2.CDMANIFESTO = MN2.CDMANIFESTO ");
+		sql.append("                   AND   MN2.CDNOTAFISCALSAIDA = NFS2.CDNOTAFISCALSAIDA ");
+		sql.append("                   AND   M2.CDMANIFESTO  = ").append(manifesto.getCdmanifesto());
+		sql.append("                   AND   M2.CDTIPOENTREGA = 4 ");
+		sql.append("                 GROUP BY NFS2.CDNOTAFISCALSAIDA ");
+		sql.append("              ) AS QTDE   		 ");
+		sql.append("       FROM   MANIFESTO M, ");
+		sql.append("              MANIFESTONOTAFISCAL MN, "); 
+		sql.append("              NOTAFISCALSAIDA NFS,  ");
+		sql.append("              DEPOSITO D, ");
+		sql.append("              FILIAL F,  ");
+		sql.append("              PESSOAENDERECO EC, "); 
+		sql.append("              NOTAFISCALSAIDAPRODUTO NFP, ");
+		sql.append("              PESSOA PT, ");
+		sql.append("              MOTORISTA MO, ");
+		sql.append("              VEICULO V, ");
+		sql.append("              PESSOA PU, ");
+		sql.append("              MANIFESTOCODIGOBARRAS MCB, ");
+		sql.append("              TIPOVEICULO TV, ");
+		sql.append("              TIPOENTREGA TE, ");
+		sql.append("              BOX BX ");
+		sql.append("       WHERE D.CDDEPOSITO = M.CDDEPOSITO ");
+		sql.append("             AND   D.CNPJ = F.CNPJ ");
+		sql.append("             AND   D.CDEMPRESA = F.CDEMPRESA ");
+		sql.append("             AND   MN.CDNOTAFISCALSAIDA = NFS.CDNOTAFISCALSAIDA ");
+		sql.append("             AND   NFS.CDPESSOAENDERECO = EC.CDPESSOAENDERECO ");
+		sql.append("             AND   M.CDMANIFESTO = MN.CDMANIFESTO ");
+		sql.append("             AND   NFS.CDNOTAFISCALSAIDA = NFP.CDNOTAFISCALSAIDA ");
+		sql.append("             AND   M.CDMANIFESTO  = ").append(manifesto.getCdmanifesto());
+		sql.append("             AND   M.CDTIPOENTREGA = 4 ");
+		sql.append("             AND   TE.CDTIPOENTREGA = 4 ");
+		sql.append("             AND   PT.CDPESSOA =  M.CDTRANSPORTADOR ");
+		sql.append("             AND   MO.CDMOTORISTA = M.CDMOTORISTA ");
+		sql.append("             AND   V.CDVEICULO = M.CDVEICULO ");
+		sql.append("             AND   PU.CDPESSOA = M.CDUSUARIOEMISSOR ");
+		sql.append("             AND   MCB.CDMANIFESTO = M.CDMANIFESTO ");
+		sql.append("             AND   MCB.ATIVO = 1 ");
+		sql.append("             AND   TV.CDTIPOVEICULO = V.CDTIPOVEICULO ");
+		sql.append("             AND   BX.CDBOX (+)= M.CDBOX ");
+		sql.append("             AND   TE.CDTIPOENTREGA = M.CDTIPOENTREGA ");
+		sql.append("       GROUP BY  D.NOME,PT.NOME,MO.NOME,V.PLACA,PU.NOME,M.CDMANIFESTO,MCB.CODIGO,TV.NOME, "); 
+		sql.append("                 M.LACRELATERAL,M.LACRETRASEIRO,M.OBSERVACAO,TE.NOME,M.DTEMISSAO,MO.CPF,M.CDAE,BX.NOME,F.UF,EC.UF "); 
+		sql.append(" ) TA ORDER BY ROWNUM ");  	
+		
+		
+		return getJdbcTemplate().query(sql.toString(), args.toArray(), new RowMapper(){
+			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+				ManifestoVO manifestoVO = new ManifestoVO();
+				manifestoVO.setFilial(rs.getString("FILIAL") == null ? " " : rs.getString("FILIAL"));
+				manifestoVO.setUfOrigem(rs.getString("UF_ORIGEM") == null ? " " : rs.getString("UF_ORIGEM"));
+				manifestoVO.setUfDestino(rs.getString("UF_DESTINO") == null ? " " : rs.getString("UF_DESTINO"));
+				manifestoVO.setTransportador(rs.getString("TRANSPORTADOR") == null ? " " : rs.getString("TRANSPORTADOR"));
+				manifestoVO.setMotorista(rs.getString("MOTORISTA") == null ? " " : rs.getString("MOTORISTA"));
+				manifestoVO.setPlaca(rs.getString("PLACA") == null ? " " : rs.getString("PLACA"));
+				manifestoVO.setUsuario(rs.getString("USUARIO") == null ? " " : rs.getString("USUARIO"));
+				manifestoVO.setDatahora(rs.getString("DATAHORA") == null ? " " : WmsUtil.stringToDefaulDateFormat(rs.getString("DATAHORA"),"yyyy-MM-dd hh:mm:ss"));
+				manifestoVO.setManifesto(rs.getString("MANIFESTO") == null ? " " : rs.getString("MANIFESTO"));
+				manifestoVO.setCodigo(rs.getString("CODIGO") == null ? " " : rs.getString("CODIGO"));
+				manifestoVO.setQtde(rs.getString("QTDE") == null ? " " : rs.getString("QTDE"));
+				manifestoVO.setQtdeVol(rs.getInt("QTDE_VOLUMES"));
+				manifestoVO.setQdteNotas(rs.getString("QTDE_NOTAS"));
+				manifestoVO.setContador(rs.getInt("CONTADOR"));		
+				manifestoVO.setCpf(rs.getString("CPF") == null ? " " : rs.getString("CPF"));
+				manifestoVO.setTipoveiculo(rs.getString("TIPOVEICULO") == null ? " " : rs.getString("TIPOVEICULO"));
+				manifestoVO.setLacrelateral(rs.getString("LACRELATERAL") == null ? " " : rs.getString("LACRELATERAL"));
+				manifestoVO.setLacretraseiro(rs.getString("LACRETRASEIRO") == null ? " " : rs.getString("LACRETRASEIRO"));
+				manifestoVO.setObservacao(rs.getString("OBSERVACAO") == null ? " " : rs.getString("OBSERVACAO"));
+				manifestoVO.setTipoentrega(rs.getString("TIPOENTREGA") == null ? " " : rs.getString("TIPOENTREGA"));
+				manifestoVO.setCodigoAe(rs.getString("CODIGOAE") == null ? " " : rs.getString("CODIGOAE"));
+				manifestoVO.setBox(rs.getString("BOXNAME") == null ? " " : rs.getString("BOXNAME"));
 				return manifestoVO;
 			}
 		});
@@ -233,10 +373,11 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 	
 	/**
 	 * 
+	 * @param isBuscaPorNumeroManifesto 
 	 * @param numeroManifesto
 	 * @return
 	 */
-	public Manifesto findByCodigoBarras(String codigo, Deposito deposito, Manifestostatus manifestostatus) {
+	public Manifesto findByCodigoBarrasForEntrada(String codigo, Deposito deposito, Boolean isBuscaPorNumeroManifesto) {
 		
 		QueryBuilder<Manifesto> query = query();
 			
@@ -245,17 +386,23 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 						 "motorista.nome, veiculo.placa, manifesto.lacrelateral, manifesto.lacretraseiro, manifesto.dtemissao, " +
 						 "tipoentrega.cdtipoentrega, tipoentrega.nome, motorista.cdmotorista, transportador.cdpessoa, veiculo.cdveiculo, " +
 						 "manifesto.kminicial, manifesto.kmfinal");
-
 			query.join("manifesto.listaManifestocodigobarra manifestocodigobarras");
 			query.join("manifesto.manifestostatus manifestostatus");
 			query.join("manifesto.transportador transportador");
 			query.join("manifesto.deposito deposito");
 			query.join("manifesto.tipoentrega tipoentrega");
+			query.join("manifesto.listaManifestonotafiscal listaManifestonotafiscal");
+			query.leftOuterJoin("listaManifestonotafiscal.depositotransbordo depositotransbordo");
 			query.leftOuterJoin("manifesto.veiculo veiculo");
 			query.leftOuterJoin("manifesto.motorista motorista");
-			query.where("manifestocodigobarras.codigo = ?", codigo);
-			query.where("manifestocodigobarras.ativo = 1");
-			query.where("manifestostatus = ?",manifestostatus);
+			
+			montaQueryBuscaPorNumeroManifesto(codigo, isBuscaPorNumeroManifesto, query);
+			
+			query.openParentheses();
+				query.where("manifestostatus = ?",Manifestostatus.ENTREGA_EM_ANDAMENTO);
+				query.or();
+				query.where("manifestostatus = ?",Manifestostatus.EM_PROCESSAMENTO_CDA);
+			query.closeParentheses();
 			query.where("deposito = ?",deposito);
 			
 		return query.unique();
@@ -264,10 +411,65 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 
 	/**
 	 * 
-	 * @param codigo
+	 * @param isBuscaPorNumeroManifesto 
+	 * @param status 
+	 * @param numeroManifesto
 	 * @return
 	 */
-	public Manifesto findByPrestacaoConta(String codigo, Manifesto manifesto) {
+	public Manifesto findByCodigoBarrasForEntrega(String codigo, Deposito deposito, Boolean isBuscaPorNumeroManifesto, List<Manifestostatus> status) {
+		
+		QueryBuilder<Manifesto> query = query();
+			
+			query.select("manifestocodigobarras.cdmanifestocodigobarras, manifestocodigobarras.codigo, manifestocodigobarras.ativo, " +
+						 "manifestocodigobarras.dt_inclusao, manifestocodigobarras.dt_alteracao, manifesto.cdmanifesto, transportador.nome, " +
+						 "motorista.nome, veiculo.placa, manifesto.lacrelateral, manifesto.lacretraseiro, manifesto.dtemissao, " +
+						 "tipoentrega.cdtipoentrega, tipoentrega.nome, motorista.cdmotorista, transportador.cdpessoa, veiculo.cdveiculo, " +
+						 "manifesto.kminicial, manifesto.kmfinal, manifesto.vrtotalmanifesto");
+			query.join("manifesto.listaManifestocodigobarra manifestocodigobarras");
+			query.join("manifesto.manifestostatus manifestostatus");
+			query.join("manifesto.transportador transportador");
+			query.join("manifesto.deposito deposito");
+			query.join("manifesto.tipoentrega tipoentrega");
+			query.join("manifesto.listaManifestonotafiscal listaManifestonotafiscal");
+			query.leftOuterJoin("listaManifestonotafiscal.depositotransbordo depositotransbordo");
+			query.leftOuterJoin("manifesto.veiculo veiculo");
+			query.leftOuterJoin("manifesto.motorista motorista");
+			
+			montaQueryBuscaPorNumeroManifesto(codigo, isBuscaPorNumeroManifesto, query);
+			
+			query.whereIn("manifestostatus", WmsUtil.concatenateWithLimit(status, "cdmanifestostatus", status.size()));
+			query.where("deposito = ?",deposito);
+			
+		return query.unique();
+		
+	}
+	/**
+	 * 
+	 * @param numeroManifesto
+	 * @return
+	 */
+	public Manifesto findByStatusImpressoOuSuperior(Integer codigo, Deposito deposito) {
+		
+		QueryBuilder<Manifesto> query = query();
+		
+		query.select("manifesto.cdmanifesto");
+		query.join("manifesto.manifestostatus manifestostatus");
+		query.join("manifesto.deposito deposito");
+		query.where("manifesto.cdmanifesto = ?", codigo);
+		query.where("manifestostatus = ?",Manifestostatus.IMPRESSO);
+		query.where("deposito = ?",deposito);
+		
+		return query.unique();
+		
+	}
+	
+	/**
+	 * 
+	 * @param codigo
+	 * @param isBuscaPorNumeroManifesto 
+	 * @return
+	 */
+	public Manifesto findByPrestacaoConta(String codigo, Manifesto manifesto, Boolean isBuscaPorNumeroManifesto) {
 		
 		QueryBuilder<Manifesto> query = query();
 			
@@ -277,11 +479,13 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 						 "motorista.nome, transportador.cdpessoa, transportador.nome, manifesto.dtfinalizacao, conferenteInspetoria.cdpessoa," +
 						 "conferenteInspetoria.nome, manifestostatus.cdmanifestostatus, manifestostatus.nome, usuarioliberador.cdpessoa," +
 						 "usuarioliberador.nome, usuariofinalizador.cdpessoa, usuariofinalizador.nome, manifesto.dtsaidaveiculo," +
-						 "manifesto.cubagem, tipoentrega.cdtipoentrega, tipoentrega.nome, manifestopai.cdmanifesto ");
+						 "manifesto.cubagem, tipoentrega.cdtipoentrega, tipoentrega.nome, manifestopai.cdmanifesto, " + 
+						 "filialreferencia.cdfilial, filialreferencia.nome, filialreferencia.cep");
 			query.join("manifesto.listaManifestocodigobarra manifestocodigobarras");
 			query.join("manifesto.manifestostatus manifestostatus");
 			query.join("manifesto.transportador transportador");
 			query.join("manifesto.deposito deposito");
+			query.join("deposito.listaUsuarioDeposito usuariodeposito");
 			query.join("manifesto.tipoentrega tipoentrega");
 			query.leftOuterJoin("manifesto.veiculo veiculo");
 			query.leftOuterJoin("manifesto.motorista motorista");
@@ -289,15 +493,20 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 			query.leftOuterJoin("manifesto.usuarioliberador usuarioliberador");
 			query.leftOuterJoin("manifesto.usuariofinalizador usuariofinalizador");
 			query.leftOuterJoin("manifesto.manifestopai manifestopai");
-			query.where("manifestocodigobarras.codigo = ?", codigo);
+			query.leftOuterJoin("manifesto.filialreferencia filialreferencia");
+			
+			montaQueryBuscaPorNumeroManifesto(codigo, isBuscaPorNumeroManifesto, query);
+			
 			query.where("manifesto = ?", manifesto);
-			query.where("manifestocodigobarras.ativo = 1");
+			query.where("usuariodeposito.usuario = ?", WmsUtil.getUsuarioLogado());
 			query.openParentheses();
 				query.where("manifestostatus = ?",Manifestostatus.AGUARANDO_PRESTACAO);
 				query.or();
 				query.where("manifestostatus = ?",Manifestostatus.IMPRESSO);
 				query.or();
 				query.where("manifestostatus = ?",Manifestostatus.ENTREGA_EM_ANDAMENTO);
+				query.or();
+				query.where("manifestostatus = ?",Manifestostatus.EM_PROCESSAMENTO_CDA);				
 			query.closeParentheses();
 			
 		return query.unique();
@@ -316,7 +525,7 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		sql.append(" update Manifesto m set m.kminicial = ").append(kminicial);
 		sql.append(" where m.cdmanifesto = ").append(manifesto.getCdmanifesto()); 
 	
-		getJdbcTemplate().execute(sql.toString());
+		getHibernateTemplate().bulkUpdate(sql.toString());
 	}
 
 	/**
@@ -353,35 +562,77 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 	 * @param codigo
 	 * @return
 	 */
-	public Manifesto findForFechamentoFinanceiro(String codigo, Manifesto manifesto) {
-		
+	public Manifesto findForFechamentoFinanceiro(String codigo, Manifesto manifesto, Boolean isBuscaPorNumeroManifesto) {
+
 		List<Manifestostatus> listaStatus = new ArrayList<Manifestostatus>();
-			listaStatus.add(Manifestostatus.PRESTACAO_CONTAS_FINALIZADO);
-			listaStatus.add(Manifestostatus.FINALIZADO);
-		
+		listaStatus.add(Manifestostatus.PRESTACAO_CONTAS_FINALIZADO);
+		listaStatus.add(Manifestostatus.FINALIZADO);
+
 		QueryBuilder<Manifesto> query = query();
+
+		query.select("manifesto.cdmanifesto, manifestostatus.cdmanifestostatus, manifestostatus.nome, tipoentrega.cdtipoentrega, " +
+				"tipoentrega.nome, transportador.cdpessoa, transportador.nome, veiculo.cdveiculo, veiculo.placa, motorista.cdmotorista, " +
+				"motorista.nome, manifesto.dtsaidaveiculo, manifesto.dtfinalizacao, manifesto.dtretornoveiculo, "+
+				"usuariofinalizador.cdpessoa, usuariofinalizador.nome, manifestopai.cdmanifesto," +
+				"filialreferencia.cdfilial, filialreferencia.nome, filialreferencia.cep ")
+		.join("manifesto.manifestostatus manifestostatus")
+		.join("manifesto.tipoentrega tipoentrega")
+		.join("manifesto.deposito deposito")
+		.join("deposito.listaUsuarioDeposito usuariodeposito")
+		.leftOuterJoin("manifesto.transportador transportador")
+		.leftOuterJoin("manifesto.veiculo veiculo")
+		.leftOuterJoin("manifesto.motorista motorista")
+		.leftOuterJoin("manifesto.usuariofinalizador usuariofinalizador")
+		.leftOuterJoin("manifesto.listaManifestocodigobarra manifestocodigobarras")
+		.leftOuterJoin("manifesto.manifestopai manifestopai")
+		.leftOuterJoin("manifesto.filialreferencia filialreferencia")
+		.openParentheses()
+		.where("manifestostatus = ?",Manifestostatus.PRESTACAO_CONTAS_FINALIZADO)
+		.or()
+		.where("manifestostatus = ?",Manifestostatus.FINALIZADO)
+		.or()
+		.where("manifestostatus = ?",Manifestostatus.FATURADO)	
+		.closeParentheses();
 		
-			query.select("manifesto.cdmanifesto, manifestostatus.cdmanifestostatus, manifestostatus.nome, tipoentrega.cdtipoentrega, " +
-						"tipoentrega.nome, transportador.cdpessoa, transportador.nome, veiculo.cdveiculo, veiculo.placa, motorista.cdmotorista, " +
-						"motorista.nome, manifesto.dtsaidaveiculo, manifesto.dtfinalizacao, manifesto.dtretornoveiculo, "+
-						"usuariofinalizador.cdpessoa, usuariofinalizador.nome, manifestopai.cdmanifesto ")
-				.join("manifesto.manifestostatus manifestostatus")
-				.join("manifesto.tipoentrega tipoentrega")
-				.leftOuterJoin("manifesto.transportador transportador")
-				.leftOuterJoin("manifesto.veiculo veiculo")
-				.leftOuterJoin("manifesto.motorista motorista")
-				.leftOuterJoin("manifesto.usuariofinalizador usuariofinalizador")
-				.leftOuterJoin("manifesto.listaManifestocodigobarra manifestocodigobarras")
-				.leftOuterJoin("manifesto.manifestopai manifestopai")
-				.openParentheses()
-					.where("manifestostatus = ?",Manifestostatus.PRESTACAO_CONTAS_FINALIZADO)
-					.or()
-					.where("manifestostatus = ?",Manifestostatus.FINALIZADO)
-				.closeParentheses()
-				.where("manifestocodigobarras.ativo = 1 and manifestocodigobarras.codigo = ?",codigo)
-				.where("manifesto = ?",manifesto);
+		montaQueryBuscaPorNumeroManifesto(codigo, isBuscaPorNumeroManifesto, query);
 		
+		query.where("manifesto = ?",manifesto)
+		     .where("usuariodeposito.usuario = ?", WmsUtil.getUsuarioLogado());
+
 		return query.unique();
+	}
+	
+
+	/**
+	 * Monta query busca por numero manifesto.
+	 *
+	 * @param codigo the codigo
+	 * @param isBuscaPorNumeroManifesto the is busca por numero manifesto
+	 * @param query the query
+	 */
+	public static void montaQueryBuscaPorNumeroManifesto(String codigo, Boolean isBuscaPorNumeroManifesto,
+			@SuppressWarnings("rawtypes") QueryBuilder query) {
+		
+		if (isBuscaPorNumeroManifesto){
+			query.openParentheses();
+			
+			query.openParentheses()
+			.where(" manifestocodigobarras.ativo = 1 ")
+			.where(" manifestocodigobarras.codigo = ?",codigo)
+			.closeParentheses();
+			
+			Integer codigoBarrasInt = NumberUtils.toInt(codigo, NumberUtils.INTEGER_ZERO);
+			
+			if (codigoBarrasInt > 0) {
+				query.or()
+				.where("manifesto.cdmanifesto = ?",codigoBarrasInt);
+			}
+			query.closeParentheses();
+		} else {
+			query.where(" manifestocodigobarras.ativo = 1 ")
+				.where(" manifestocodigobarras.codigo = ?",codigo);
+			
+		}
 	}
 
 	/**
@@ -393,8 +644,8 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		
 		QueryBuilder<Manifesto> query = query();
 			
-			query.select("distinct manifesto.cdmanifesto, manifesto.vrtotalmanifesto, veiculo.cdveiculo, veiculo.placa, " +
-						 "transportador.cdpessoa, transportador.nome, motorista.cdmotorista, motorista.nome, " +
+			query.select("distinct manifesto.cdmanifesto, manifesto.vrtotalmanifesto,manifesto.cteValidado, veiculo.cdveiculo, veiculo.placa, " +
+						 "transportador.cdpessoa, transportador.cteValidado, transportador.nome, transportador.integraordemcompra, motorista.cdmotorista, motorista.nome, " +
 						 "tipoentrega.cdtipoentrega, tipoentrega.nome, manifestofinanceiro.total ");
 			query.join("manifesto.manifestostatus manifestostatus");
 			query.join("manifesto.manifestofinanceiro manifestofinanceiro");
@@ -430,7 +681,7 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		
 		QueryBuilder<Manifesto> query = query();
 		
-			query.select("manifesto.cdmanifesto, transportador.cdpessoa");
+			query.select("manifesto.cdmanifesto, transportador.cdpessoa, manifesto.cteValidado, transportador.cteValidado");
 			query.join("manifesto.transportador transportador");
 			query.join("manifesto.manifestostatus manifestostatus");
 			query.where("manifestostatus = ?",Manifestostatus.FINALIZADO);
@@ -591,10 +842,10 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		
 		StringBuilder sql = new StringBuilder();
 		
-			sql.append(" update Manifesto m set m.dtsaidaveiculo = sysdate, m.cdusuarioliberador = ").append(usuario.getCdpessoa());
+			sql.append(" update Manifesto m set m.dtsaidaveiculo = sysdate, m.usuarioliberador.cdpessoa = ").append(usuario.getCdpessoa());
 			sql.append(" where m.cdmanifesto =  ").append(manifesto.getCdmanifesto());
 		
-		getJdbcTemplate().execute(sql.toString());
+		getHibernateTemplate().bulkUpdate(sql.toString());
 	}
 
 	/**
@@ -615,21 +866,22 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 	/**
 	 * 
 	 * @param codigo
+	 * @param isBuscaPorNumeroManifesto 
 	 * @return
 	 */
-	public Manifesto findStatusForReimpressaoByCodigobarras(String codigo) {
+	public Manifesto findStatusForReimpressaoByCodigobarras(String codigo, Boolean isBuscaPorNumeroManifesto) {
 		
 		String statusvalidos = "4,6,7";
 		
 		QueryBuilder<Manifesto> query = query();
 		
 			query.select("manifesto.cdmanifesto, manifestostatus.cdmanifestostatus");
-			query.join("manifesto.listaManifestocodigobarra manifestocodigobarra");
+			query.join("manifesto.listaManifestocodigobarra manifestocodigobarras");
 			query.join("manifesto.manifestostatus manifestostatus");
 			query.whereIn("manifestostatus",statusvalidos);
-			query.where("manifestocodigobarra.codigo = ?",codigo);
-			query.where("manifestocodigobarra.ativo = 1");
-	
+			
+			montaQueryBuscaPorNumeroManifesto(codigo, isBuscaPorNumeroManifesto, query);
+			
 		return query.unique();
 	}
 
@@ -659,13 +911,14 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 	 * @param filtro
 	 * @return
 	 */
-	public SqlRowSet getDadosListagem(ManifestoPlanilhaFiltro filtro) {
+/*	public SqlRowSet getDadosListagem(ManifestoPlanilhaFiltro filtro, List<Custoextrafrete> listaCustoExtra, Boolean isCustoExtraFreteHabilitado) {
 		
 		StringBuilder sql = new StringBuilder();
 		
 		sql.append(" select relatorio.*, NVL((relatorio.acrescimo-relatorio.desconto+relatorio.valor_frete),0) as valor_total from ( ");
 		sql.append(" 	select distinct ma.cdmanifesto as manifesto, ");
 		sql.append(" 			ma.dtemissao as emisssao, ");
+		sql.append(" 			d.nome as deposito, ");
 		sql.append("			sta.nome as status, ");
 		sql.append("			tpe.nome as tipo_manifesto, ");
 		sql.append("			pt.nome as transportadora, ");
@@ -676,6 +929,14 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		sql.append("			ma.dtfinalizacao as Dt_Fechamento_Financeiro, ");
 		sql.append("			b.dtbordero as Dt_Bordero, ");
 		sql.append("			b.cdbordero as Nro_Bordero, ");
+		sql.append("			b.numOrdemCompra as Nro_Ordem_Compra, ");
+		sql.append("			(select NVL(round(sum(nfm2.valorprevisao)/100,2),0) ");
+		sql.append("				from manifestonotafiscal nfm2, notafiscalsaida nfs2, rotapraca rp2, rota ro2 ");
+		sql.append("				where nfs2.cdnotafiscalsaida = nfm2.cdnotafiscalsaida ");
+		sql.append("				and nfm2.cdmanifesto = ma.cdmanifesto ");
+		sql.append("				and nfs2.cdpraca = rp2.cdpraca ");
+		sql.append("				and ro2.cdrota = rp2.cdrota ");
+		sql.append("				and ro2.cdrota = ro.cdrota)  as Previsao_Frete_Por_Entrega, ");
 		sql.append("			(select count(distinct nfs2.cdpessoaendereco) ");
 		sql.append("				from manifestonotafiscal nfm2, notafiscalsaida nfs2, rotapraca rp2, rota ro2 ");
 		sql.append("				where nfs2.cdnotafiscalsaida = nfm2.cdnotafiscalsaida ");
@@ -723,19 +984,22 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		sql.append("				and ro2.cdrota = rp2.cdrota ");
 		sql.append("				and ro2.cdrota = ro.cdrota) as Valor_notas, ");
 		sql.append("			BUSCAR_ACRESCIMO(ma.cdmanifesto) as Acrescimo, ");
+		sql.append("			BUSCAR_USUARIO_ACRESCIMO(ma.cdmanifesto) as Usuario_Acrescimo, ");
 		sql.append("			BUSCAR_DESCONTO(ma.cdmanifesto) as Desconto, ");
-		sql.append("			 (select SUBSTR(motivo,INSTR(motivo,':',1)+1) ");
+		sql.append("			BUSCAR_USUARIO_DESCONTO (ma.cdmanifesto) as Usuario_Desconto, ");
+		sql.append("			(select SUBSTR(motivo,INSTR(motivo,':',1)+1) ");
 		sql.append("				from (select max(mh.motivo) as motivo, mh.cdmanifesto as cdmanifesto ");
 		sql.append("						from manifestohistorico mh ");
 		sql.append("						where mh.cdtipomanifestohistorico = 2 ");
 		sql.append("						group by mh.cdmanifesto) ");
 		sql.append("			 	where cdmanifesto = ma.cdmanifesto and rownum = 1) as MOTIVO_ACRESCIMO, ");
-		sql.append("			 (select SUBSTR(motivo,INSTR(motivo,':',1)+1) ");
+		sql.append("			(select SUBSTR(motivo,INSTR(motivo,':',1)+1) ");
 		sql.append("				from (select max(mh.motivo) as motivo, mh.cdmanifesto as cdmanifesto ");
 		sql.append("						from manifestohistorico mh ");
 		sql.append("						where mh.cdtipomanifestohistorico = 3 ");
 		sql.append("						group by mh.cdmanifesto) ");
 		sql.append("				 where cdmanifesto = ma.cdmanifesto and rownum = 1) as MOTIVO_DESCONTO ");	
+		sql.append(				getCustosExtrasFreteForPlanilhaByManifesto(listaCustoExtra, isCustoExtraFreteHabilitado) );
 		sql.append(" 	from manifesto ma ");
 		sql.append(" 	left join manifestofinanceiro mf on mf.cdmanifesto = ma.cdmanifesto ");
 		sql.append(" 	join manifestostatus sta on sta.cdmanifestostatus = ma.cdmanifestostatus ");
@@ -744,11 +1008,12 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		sql.append(" 	join veiculo ve on ve.cdveiculo = ma.cdveiculo ");
 		sql.append(" 	join motorista mo on mo.cdmotorista = ma.cdmotorista ");
 		sql.append(" 	join notafiscalsaida nfs on nfs.cdnotafiscalsaida = mnf.cdnotafiscalsaida ");
-		sql.append(" 	join rotapraca rp on rp.cdpraca = nfs.cdpraca ");
-		sql.append(" 	join rota ro on ro.cdrota = rp.cdrota ");
+		sql.append(" 	left join rotapraca rp on rp.cdpraca = nfs.cdpraca ");
+		sql.append(" 	left join rota ro on ro.cdrota = rp.cdrota ");
 		sql.append(" 	join tipoentrega tpe on tpe.cdtipoentrega = ma.cdtipoentrega ");
+		sql.append(" 	join deposito d on d.cddeposito = ma.cddeposito ");
 		sql.append(" 	left join manifestobordero mb on mb.cdmanifesto = ma.cdmanifesto ");
-		sql.append(" 	left join bordero b on b.cdbordero = mb.cdbordero ");
+		sql.append(" 	left join bordero b on b.cdbordero = mb.cdbordero ");		
 		sql.append(" 	where TRUNC(ma.dtemissao) >= TO_DATE('").append(filtro.getDtemissaoInicio().toString().trim()).append("', 'yyyy-MM-dd')");
 		sql.append(" 	and TRUNC(ma.dtemissao) <= TO_DATE('").append(filtro.getDtemissaoFim().toString().trim()).append("', 'yyyy-MM-dd')");
 		
@@ -758,20 +1023,59 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		if(filtro.getMotorista()!=null && filtro.getMotorista().getCdmotorista()!=null){
 			sql.append(" and ma.cdmotorista = ").append(filtro.getMotorista().getCdmotorista());
 		}
-		if(filtro.getDeposito()!=null && filtro.getDeposito().getCddeposito()!=null){
-			sql.append(" and ma.cddeposito = ").append(filtro.getDeposito().getCddeposito());
+		if(filtro.getDepositos()!=null && !filtro.getDepositos().isEmpty()){
+			sql.append(" and ma.cddeposito in (").append(filtro.getDepositos()).append(") ");
 		}
 		if(filtro.getTipoentrega()!=null && filtro.getTipoentrega().getCdtipoentrega()!=null){
 			sql.append(" and ma.cdtipoentrega = ").append(filtro.getTipoentrega().getCdtipoentrega());
 		}
 		
 		sql.append(" 	group by ro.nome, ma.cdmanifesto, ma.dtemissao, sta.nome, tpe.nome, pt.nome, mo.nome, ve.placa, mnf.valorentrega, ");
-		sql.append(" 			 ro.cdrota, ma.dtprestacaocontas, ma.dtfinalizacao, b.dtbordero, b.cdbordero ");
+		sql.append(" 			 ro.cdrota, ma.dtprestacaocontas, ma.dtfinalizacao, b.dtbordero, b.cdbordero, mf.valorprevisaofrete, d.nome, ");
+		sql.append(" 			 b.numOrdemCompra  ");
 		
 		sql.append(" ) relatorio ");
 		
 		return getJdbcTemplate().queryForRowSet(sql.toString());
-	}
+		
+	}*/
+	
+	/**
+	 * 
+	 * @param listaCustoExtra
+	 * @param isCustoExtraFreteHabilitado
+	 * @return
+	 */
+/*	private String getCustosExtrasFreteForPlanilhaByManifesto(List<Custoextrafrete> listaCustoExtra, Boolean isCustoExtraFreteHabilitado) {
+		
+		StringUtils stringUtils = new StringUtils();
+		StringBuilder sql = new StringBuilder();
+		
+		if(isCustoExtraFreteHabilitado && listaCustoExtra != null && !listaCustoExtra.isEmpty()){
+			// acrescenta virgula ao ultimo campo da clausula select.
+			sql.append(",");
+			
+			for (Custoextrafrete custoextrafrete : listaCustoExtra) {
+				
+				String apelido = custoextrafrete.getDescricaoabreviada().replace(" ", "_");
+				apelido = stringUtils.tiraAcento(apelido);
+				
+				sql.append("	BUSCAR_SOLICITACAO_ACRESCIMO(MA.CDMANIFESTO,");
+				sql.append(custoextrafrete.getCdcustoextrafrete()); 
+				sql.append(") as \"").append(apelido).append("\" ");
+				
+				if(listaCustoExtra.lastIndexOf(custoextrafrete) != listaCustoExtra.size()-1)
+					sql.append("").append(",");
+				
+				sql.append("  ");
+				
+			}
+			
+		}
+		
+		return sql.toString();
+		
+	}*/
 	
 	/**
 	 * 
@@ -967,6 +1271,9 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 	}
 
 	/**
+	 * Atualiza o status do manifesto de acordo com os seus respectivos tipos de entrega.
+	 * Caso o manifesto seja do tipo: Entrega Cliente, o fluxo seguirá normal. O usuário ainda deverá Prestar contas.
+	 * Caso o manifesto seja do tipo: Transferência, independente de seu status atual, ele será confirmado e faturado nesse método. 
 	 * 
 	 * @param manifesto
 	 * @param manifestostatus
@@ -977,16 +1284,24 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 		
 		StringBuilder sqlEntregaCliente = new StringBuilder();
 		
-			sqlEntregaCliente.append(" update Manifesto m set m.dtsaidaveiculo = sysdate, m.cdmanifestostatus = 5, m.cdusuarioliberador = ");
-			sqlEntregaCliente.append(usuario.getCdpessoa()).append(" where m.cdtipoentrega = 2 and m.cdmanifestopai = ").append(manifesto.getCdmanifesto());
+			sqlEntregaCliente.append(" update Manifesto m set m.dtsaidaveiculo = sysdate ");
+			sqlEntregaCliente.append(" ,m.manifestostatus.cdmanifestostatus = ").append(Manifestostatus.ENTREGA_EM_ANDAMENTO.getCdmanifestostatus());
+			sqlEntregaCliente.append(" ,m.usuarioliberador.cdpessoa = ").append(usuario.getCdpessoa());
+			sqlEntregaCliente.append(" where m.tipoentrega.cdtipoentrega = ").append(Tipoentrega.ENTREGA_CLIENTE.getCdtipoentrega());
+			sqlEntregaCliente.append(" and m.manifestostatus.cdmanifestostatus = ").append(Manifestostatus.IMPRESSO.getCdmanifestostatus());
+			sqlEntregaCliente.append(" and m.manifestopai.cdmanifesto = ").append(manifesto.getCdmanifesto());
 
 		StringBuilder sqlTransferencia = new StringBuilder();
 
-			sqlTransferencia.append(" update Manifesto m set m.dtsaidaveiculo = sysdate, m.cdmanifestostatus = 7, m.cdusuarioliberador = ");
-			sqlTransferencia.append(usuario.getCdpessoa()).append(" where m.cdtipoentrega = 1 and m.cdmanifestopai = ").append(manifesto.getCdmanifesto());
+			sqlTransferencia.append(" update Manifesto m set m.dtsaidaveiculo = sysdate ");
+			sqlTransferencia.append(" ,m.manifestostatus.cdmanifestostatus = ").append(Manifestostatus.FATURADO.getCdmanifestostatus());
+			sqlTransferencia.append(" ,m.usuarioliberador.cdpessoa = ").append(usuario.getCdpessoa());
+			sqlTransferencia.append(" where m.tipoentrega.cdtipoentrega = ").append(Tipoentrega.TRANSFERENCIA.getCdtipoentrega());
+			sqlTransferencia.append(" and m.manifestopai.cdmanifesto = ").append(manifesto.getCdmanifesto());
 			
-		getJdbcTemplate().execute(sqlEntregaCliente.toString());
-		getJdbcTemplate().execute(sqlTransferencia.toString());
+		getHibernateTemplate().bulkUpdate(sqlEntregaCliente.toString());
+		getHibernateTemplate().bulkUpdate(sqlTransferencia.toString());
+		
 	}
 
 	/**
@@ -1029,15 +1344,26 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 	 */
 	public List<Manifesto> validarNotasVinculadas(String whereIn, Integer cdmanifesto){
 		
-		QueryBuilder<Manifesto> query = query();
+QueryBuilder<Manifesto> query = query();
+		
+		List<Statusconfirmacaoentrega> status = new ArrayList<Statusconfirmacaoentrega>(Arrays.asList(Statusconfirmacaoentrega.RETORNO_DE_ENTREGA, 
+																			   Statusconfirmacaoentrega.EXCLUSAO));
 			
 			query.select("manifesto.cdmanifesto");
 			query.join("manifesto.listaManifestonotafiscal manifestonotafiscal");
 			query.join("manifesto.manifestostatus manifestostatus");
 			query.join("manifestonotafiscal.notafiscalsaida notafiscalsaida");
+			query.join("notafiscalsaida.notafiscaltipo notafiscaltipo");
 			query.whereIn("notafiscalsaida.cdnotafiscalsaida",whereIn);
 			query.where("manifesto.cdmanifesto <> ?",cdmanifesto);
 			query.where("manifestostatus <> ?",Manifestostatus.CANCELADO);
+			query.where("notafiscalsaida.vinculado = ?", Boolean.TRUE);
+			query.openParentheses();
+			query.where("notafiscaltipo.remanifestavel = ?", Boolean.FALSE);
+			query.or();
+			query.where("notafiscaltipo.remanifestavel = ?", Boolean.TRUE);
+			query.whereIn("manifestonotafiscal.statusconfirmacaoentrega not", WmsUtil.concatenateWithLimit(status, "cdstatusconfirmacaoentrega", status.size()));
+			query.closeParentheses();			
 			
 		return query.list();
 	}
@@ -1061,8 +1387,9 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 			query.where("manifesto.cdmanifesto <> ?",cdmanifesto);
 			query.where("manifesto.cdmanifesto not in ("+whereInManifestos+")");
 			query.where("manifestostatus <> ?",Manifestostatus.CANCELADO);
+			query.where("notafiscalsaida.vinculado = ?", Boolean.TRUE);
 			query.where("manifesto.manifestopai.cdmanifesto is null");
-		
+
 		return query.list();
 	}
 	
@@ -1169,21 +1496,339 @@ public class ManifestoDAO extends GenericDAO<Manifesto>{
 	/**
 	 * 
 	 * @param codigoBarras
+	 * @param isBuscaPorNumeroManifesto 
 	 * @return
 	 */
-	public Manifesto findManifestoPaiWhenTransferencia(String codigoBarras) {
+	public Manifesto findManifestoPaiWhenTransferencia(String codigoBarras, Boolean isBuscaPorNumeroManifesto) {
 		
 		QueryBuilder<Manifesto> query = query();
 		
 			query.select("manifesto.cdmanifesto, manifestopai.cdmanifesto, tipoentrega.cdtipoentrega");
 			query.join("manifesto.tipoentrega tipoentrega");
 			query.join("manifesto.manifestopai manifestopai");
-			query.join("manifesto.listaManifestocodigobarra manifestocodigobarra");
+			query.join("manifesto.listaManifestocodigobarra manifestocodigobarras");
+			
+			montaQueryBuscaPorNumeroManifesto(codigoBarras, isBuscaPorNumeroManifesto, query);
+			
 			query.where("tipoentrega.cdtipoentrega = 1");
-			query.where("manifestocodigobarra.ativo = 1");
-			query.where("manifestocodigobarra.codigo = ?",codigoBarras);
 		
 		return query.unique();
 	}
+
+	/**
+	 * 
+	 * @param codigo
+	 * @param isBuscaPorNumeroManifesto 
+	 * @return
+	 */
+	public Manifesto findManifestoFilhoByCodigoBarras(String codigo, Boolean isBuscaPorNumeroManifesto) {
+
+		QueryBuilder<Manifesto> query = query();
+
+		query.select("manifesto.cdmanifesto");
+		query.join("manifesto.listaManifestocodigobarra manifestocodigobarras");
+		query.join("manifesto.manifestopai manifestopai");
+
+
+		montaQueryBuscaPorNumeroManifesto(codigo, isBuscaPorNumeroManifesto, query);
+
+
+		return query.unique();
+
+	}
+
 	
+
+	/**
+	 * 
+	 * @param manifesto
+	 * @return
+	 */
+	public void atualizarInfoConfirmacaoTransito(Manifesto manifesto) {
+		
+		StringBuilder sql = new StringBuilder();
+		
+		 sql.append(" update Manifesto m set ")
+			.append(" m.dtconfirmacaotransito = to_date('").append(WmsUtil.currentDate().toString()).append("','yyyy-MM-dd'), ")
+			.append(" m.manifestostatus.cdmanifestostatus = ").append(Manifestostatus.EM_PROCESSAMENTO_CDA.getCdmanifestostatus())
+			.append(" where m.cdmanifesto = ").append(manifesto.getCdmanifesto());
+		
+		getHibernateTemplate().bulkUpdate(sql.toString());
+		
+	}
+
+	/**
+	 * Recupera todos os manifestos, vinculados a um determinado recebimento.
+	 * @param recebimento
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Manifesto> findByRecebimento(Recebimento recebimento) {
+		
+		StringBuilder sql = new StringBuilder();
+		
+		sql.append(" select m.cdmanifesto ");
+		sql.append(" from recebimento r ");
+		sql.append(" join recebimentonotafiscal rnf on rnf.cdrecebimento = r.cdrecebimento ");
+		sql.append(" join notafiscalentrada nfe on nfe.cdnotafiscalentrada = rnf.cdnotafiscalentrada ");
+		sql.append(" join notafiscalsaida nfs on nfs.codigoerp = nfe.codigoerp ");
+		sql.append(" join manifestonotafiscal mnf on mnf.cdnotafiscalsaida = nfs.cdnotafiscalsaida ");
+		sql.append(" join manifesto m on m.cdmanifesto = mnf.cdmanifesto ");
+		sql.append(" join deposito d on d.cddeposito = m.cddeposito ");
+		sql.append(" where r.cdrecebimento = ").append(recebimento.getCdrecebimento());
+		sql.append(" group by m.cdmanifesto ");
+		
+		return getJdbcTemplate().query(sql.toString(), new RowMapper(){
+			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+				
+				Manifesto manifesto = new Manifesto();
+					
+					manifesto.setCdmanifesto(rs.getInt("cdmanifesto"));
+					
+				return manifesto;
+				
+			}
+		});
+		
+	}
+
+	@SuppressWarnings("rawtypes")
+	public List recuperaUFOrigemDestinoManifesto(Manifesto manifesto) {
+		StringBuilder sql = new StringBuilder();
+		
+		List<Object> args = new ArrayList<Object>();
+		
+		args.add(manifesto.getCdmanifesto());
+
+		sql.append(" SELECT F.UF AS UF_ORIGEM,                                            ");
+		sql.append("        (SELECT LISTAGG(UF, '; ')                                     ");
+		sql.append("           WITHIN GROUP (ORDER BY UF)                                 ");
+		sql.append("            FROM (SELECT DISTINCT PE.UF                               ");
+		sql.append("                  FROM MANIFESTONOTAFISCAL MN,                        ");
+		sql.append("                       NOTAFISCALSAIDA NF,                            ");
+		sql.append("                       PESSOAENDERECO PE                              ");
+		sql.append("                 WHERE MN.CDNOTAFISCALSAIDA = NF.CDNOTAFISCALSAIDA    ");
+		sql.append("                   AND NF.CDPESSOAENDERECO = PE.CDPESSOAENDERECO      ");
+		sql.append("                   AND MN.CDMANIFESTO = M.CDMANIFESTO)) as UF_DESTINO ");
+		sql.append(" FROM MANIFESTO M,                                                    ");
+		sql.append("      DEPOSITO D,                                                     ");
+		sql.append("      FILIAL F                                                        ");
+		sql.append("  WHERE M.CDDEPOSITO = D.CDDEPOSITO                                   ");
+		sql.append("    AND D.CODIGOERP = F.CODIGOERP                                     ");
+		sql.append("    AND D.CDEMPRESA = F.CDEMPRESA                                     ");
+		sql.append("    AND M.CDMANIFESTO = ?                                         ");
+
+		return getJdbcTemplate().query(sql.toString(), args.toArray(), new RowMapper(){
+			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				Map<String, String> ufs = new HashMap<String, String>();
+
+				ufs.put(rs.getString("UF_ORIGEM"), rs.getString("UF_DESTINO"));
+
+				return ufs;
+
+			}
+		});
+	}
+
+	/**
+	 * 
+	 * @param transportador
+	 * @param depositos
+	 * @return
+	 */
+	public List<Manifesto> findByTransportadorAndDepositos(Transportador transportador, String depositos) {
+		
+		List<Manifestostatus> listaManifestostatus = new ArrayList<Manifestostatus>();
+			listaManifestostatus.add(Manifestostatus.CANCELADO);
+			listaManifestostatus.add(Manifestostatus.FATURADO);
+
+		String cdmanifestostatus = CollectionsUtil.listAndConcatenate(listaManifestostatus, "cdmanifestostatus", ",");
+		
+		return query()
+				.select(" manifesto.cdmanifesto ")
+				.join("manifesto.transportador transportador")
+				.join("manifesto.deposito deposito")
+				.join("manifesto.manifestostatus manifestostatus")
+				.where("transportador = ?",transportador)
+				.where("deposito.cddeposito not in ("+depositos+")")
+				.where("manifestostatus.cdmanifestostatus not int ("+cdmanifestostatus+")")
+				.list();
+		
+	}
+
+	/**
+	 * Find for previsao frete.
+	 *
+	 * @param filtro the filtro
+	 * @return the list
+	 */
+	/*		@SuppressWarnings("unchecked")
+	public List<Manifesto> findForPrevisaoFrete(PrevisaoFreteFiltro filtro) {
+		StringBuilder hql = new StringBuilder();
+		Map<String, Object> args =  new HashMap<String, Object>();
+		
+		args.put("manifestostatus", new Integer[]{Manifestostatus.EM_ELABORACAO.getCdmanifestostatus(), 
+												  Manifestostatus.CANCELADO.getCdmanifestostatus()});
+		
+		hql.append("select new Manifesto (manifesto.cdmanifesto, deposito.cddeposito, deposito.nome, tipoentrega.cdtipoentrega,  ");
+		hql.append(" tipoentrega.nome, manifesto.dtemissao, manifestostatus.cdmanifestostatus, manifestostatus.nome) ");
+		hql.append(" from Manifesto manifesto ");
+		hql.append(" join manifesto.tipoentrega tipoentrega");
+		hql.append(" join manifesto.manifestostatus manifestostatus");
+		hql.append(" join manifesto.deposito deposito");
+		hql.append(" join manifesto.transportador transportador");
+		hql.append(" left join manifesto.manifestofinanceiro manifestofinanceiro");
+		hql.append(" where manifestostatus.cdmanifestostatus not in (:manifestostatus)");
+		hql.append(" and manifesto.manifestopai is null ");
+		hql.append(" and (coalesce(manifestofinanceiro.valorprevisaofrete, 0) = 0 ");
+		hql.append("      or exists(select manifesto2.cdmanifesto ");
+		hql.append("      		      from Manifestonotafiscal manifestonotafiscal");
+		hql.append("     			  join manifestonotafiscal.manifesto manifesto2");
+		hql.append("      			 where coalesce(manifestonotafiscal.valorprevisao,0) = 0 ");
+		hql.append("      			   and manifesto2.cdmanifesto = manifesto.cdmanifesto)) ");
+		
+		createConditionForFindPrevisaoFrete(" and deposito = :deposito", filtro.getDeposito(),
+				hql, args);
+		
+		createConditionForFindPrevisaoFrete(" and transportador = :transportador", filtro.getTransportador(),
+				hql, args);
+		
+		createConditionForFindPrevisaoFrete(" and trunc(manifesto.dtemissao) >= :dtinicio", filtro.getDtemissaoInicio(),
+				hql, args);
+		
+		createConditionForFindPrevisaoFrete(" and trunc(manifesto.dtemissao) <= :dtfim", filtro.getDtemissaoFim(),
+				hql, args);
+		
+		createConditionForFindPrevisaoFrete(" and manifesto.cdmanifesto = :manifesto", filtro.getNumeroManifesto(),
+				hql, args);
+		
+		createConditionForFindPrevisaoFrete(" and tipoentrega = :tipoentrega", filtro.getTipoentrega(),
+				hql, args);
+		
+		hql.append(" order by deposito.nome, manifesto.cdmanifesto, manifesto.dtemissao ");
+		
+		String[] params = Arrays.copyOf(args.keySet().toArray(), args.keySet().toArray().length, String[].class);
+		
+		return (List<Manifesto>)getHibernateTemplate().findByNamedParam(hql.toString(), params, args.values().toArray());
+	}*/
+
+	/**
+	 * Creates the condition for find previsao frete.
+	 *
+	 * @param condition the condition
+	 * @param valor the valor
+	 * @param hql the hql
+	 * @param args the args
+	 */
+	public void createConditionForFindPrevisaoFrete(String condition, Object valor,
+					StringBuilder hql, Map<String, Object> args) {
+		if (valor != null){
+			hql.append(condition);
+			args.put(condition.substring(condition.indexOf(":") + 1), valor);
+		}
+	}
+
+	/**
+	 * Find manifesto with deposito.
+	 *
+	 * @param cdManifesto the cd manifesto
+	 * @return the manifesto
+	 */
+	public Manifesto findManifestoWithDeposito(Integer cdManifesto) {
+		QueryBuilder<Manifesto> query = query();
+
+		query
+		.select("manifesto.cdmanifesto,deposito.cddeposito, deposito.nome")
+		.leftOuterJoin("manifesto.deposito deposito")
+		.where("manifesto.cdmanifesto = ?", cdManifesto);
+
+		return query.unique();
+	}
+
+	public SqlRowSet findByManifestoToExportacao(Manifesto manifesto) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT X.CDMANIFESTO, CASE WHEN  X.VLR_PREVISAO <> X.VLR_TOTAL AND ROWNUM=1 THEN VALOR_PREVISTO+((NVL(VLR_PREVISAO,0) - NVL(VLR_TOTAL,0))) ");
+		sql.append("ELSE VALOR_PREVISTO END AS VALOR_PREVISTO, ");
+		sql.append("X.ROTA, ");
+		sql.append("X.MOTORISTA, ");
+		sql.append("X.PLACA, ");
+		sql.append("X.TRANSPORTADOR             ");
+		sql.append("FROM ( ");
+		sql.append("SELECT  ");
+		sql.append("M.CDMANIFESTO,  NVL(ROUND(SUM(MN.VALORPREVISAO/100),2),0) AS VALOR_PREVISTO,R.NOME AS ROTA,  ");
+		sql.append("COUNT(1) LINHAS, ");
+		sql.append("(SELECT  NVL(ROUND(SUM(MX.VALORPREVISAO/100),2),0) FROM MANIFESTONOTAFISCAL MX WHERE MX.CDMANIFESTO = M.CDMANIFESTO) VLR_TOTAL, ");
+		sql.append("(NVL(MF.VALORPREVISAOFRETE,0)/100) VLR_PREVISAO, ");
+		sql.append("MT.NOME AS MOTORISTA,V.PLACA, T.NOME AS TRANSPORTADOR  ");
+		sql.append("FROM  ");
+		sql.append("MANIFESTO M, MANIFESTONOTAFISCAL MN, ROTAPRACA RP, ROTA R, MOTORISTA MT,  ");
+		sql.append("PESSOA T, VEICULO V,NOTAFISCALSAIDA NFS , MANIFESTOFINANCEIRO MF ");
+		sql.append("WHERE  ");
+		sql.append("M.CDMANIFESTO = MN.CDMANIFESTO  ");
+		sql.append("AND M.CDMANIFESTO = MF.CDMANIFESTO ");
+		sql.append("AND RP.CDPRACA (+)= NFS.CDPRACA  ");
+		sql.append("AND NFS.CDNOTAFISCALSAIDA = MN.CDNOTAFISCALSAIDA  ");
+		sql.append("AND V.CDVEICULO = M.CDVEICULO  ");
+		sql.append("AND RP.CDROTA = R.CDROTA  ");
+		sql.append("AND M.CDTRANSPORTADOR = T.CDPESSOA  ");
+		sql.append("AND M.CDMOTORISTA = MT.CDMOTORISTA  ");
+		
+		if(manifesto!=null && manifesto.getCdmanifesto() !=null){
+			sql.append(" AND M.CDMANIFESTO =  ").append(manifesto.getCdmanifesto());
+		}
+		sql.append(" GROUP BY M.CDMANIFESTO,R.NOME, MT.NOME,V.PLACA , MT.NOME, T.NOME,MF.VALORPREVISAOFRETE ");
+		sql.append(") X ");
+
+		return getJdbcTemplate().queryForRowSet(sql.toString());
+	}
+
+	/**
+	 * Recupera a qtde de notas com transbordo no manifesto manifesto.
+	 *
+	 * @param manifesto the manifesto
+	 * @return the long
+	 */
+	public Long recuperaQuantNotasTransbordoManifesto(Manifesto manifesto) {
+		List<Tipoentrega> tipoEntregasTransbordo = new ArrayList<Tipoentrega>(Arrays.asList(Tipoentrega.CONSOLIDACAO, Tipoentrega.TRANSFERENCIA));
+		
+		return new QueryBuilder<Long>(getHibernateTemplate())
+				.select("count(notafiscalsaida.cdnotafiscalsaida)")
+				.from(Manifesto.class, "manifesto")
+				.setUseTranslator(false)
+				.join("manifesto.listaManifestonotafiscal manifestonotafiscal")
+				.join("manifestonotafiscal.notafiscalsaida notafiscalsaida")
+				.join("manifesto.tipoentrega tipoentrega")
+				.join("notafiscalsaida.tipovenda tipovenda")
+				.leftOuterJoin("manifestonotafiscal.depositotransbordo depositotransbordomanifesto")
+				.leftOuterJoin("notafiscalsaida.praca praca")
+				.leftOuterJoin("praca.listaRotapraca rotapraca")
+				.leftOuterJoin("rotapraca.rota rota")
+				.leftOuterJoin("rota.depositotransbordo depositotransbordorota")
+				.leftOuterJoin("notafiscalsaida.pracaconsolidacao pracaconsolidacao")
+				.leftOuterJoin("pracaconsolidacao.listaRotapraca rotapracaconsolidacao")
+				.leftOuterJoin("rotapracaconsolidacao.rota rotaconsolidacao")
+				.leftOuterJoin("rotaconsolidacao.depositotransbordo depositotransbordorotaconsolidacao")
+				.where("manifesto = ?", manifesto)
+				.whereIn("tipoentrega.cdtipoentrega", WmsUtil.concatenateWithLimit(tipoEntregasTransbordo, "cdtipoentrega", tipoEntregasTransbordo.size()))
+				.openParentheses()
+					.openParentheses()
+						.where("tipovenda = ?", Tipovenda.LOJA_FISICA)
+						.where("depositotransbordorota is not null")
+						.where("rota.temDepositoTransbordo = ?", Boolean.TRUE)
+					.closeParentheses()
+					.or()
+					.openParentheses()
+						.where("tipovenda = ?", Tipovenda.SITE)
+						.where("depositotransbordorotaconsolidacao is not null")
+						.where("rotaconsolidacao.temDepositoTransbordo = ?", Boolean.TRUE)
+					.closeParentheses()
+					.or()
+					.openParentheses()
+						.where("depositotransbordomanifesto is not null")
+						.where("manifestonotafiscal.temDepositoTransbordo = ?", Boolean.TRUE)
+					.closeParentheses()
+				.closeParentheses()
+				.unique();
+	}
 }

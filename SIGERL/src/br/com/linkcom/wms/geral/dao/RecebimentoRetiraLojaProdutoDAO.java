@@ -43,7 +43,7 @@ public class RecebimentoRetiraLojaProdutoDAO extends GenericDAO<RecebimentoRetir
 		
 		return query()
 				.select("recebimentoRetiraLojaProduto.cdRecebimentoRetiraLojaProduto, produto.cdproduto, " +
-					    "recebimentoRetiraLojaProduto.qtde, tipoEstoque.cdtipoEstoque, tipoEstoque.descricao, " + 
+					    "recebimentoRetiraLojaProduto.qtde, tipoEstoque.cdTipoEstoque, tipoEstoque.descricao, " + 
 					    "recebimentoRetiraLoja.cdRecebimentoRetiraLoja, deposito.cddeposito ")
 				.join("recebimentoRetiraLojaProduto.produto produto")
 				.join("recebimentoRetiraLojaProduto.recebimentoRetiraLoja recebimentoRetiraLoja ")

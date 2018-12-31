@@ -16,6 +16,9 @@ public class Manifestostatus {
 	public static Manifestostatus PRESTACAO_CONTAS_FINALIZADO = new Manifestostatus(6,"Prest. Contas Finalizada");
 	public static Manifestostatus FATURADO = new Manifestostatus(7,"Faturado");
 	public static Manifestostatus AGUARANDO_PRESTACAO = new Manifestostatus(8,"Aguardando Prest. Contas");
+	public static Manifestostatus EM_PROCESSAMENTO_CDA = new Manifestostatus(9,"Em Processamento (CDA)");
+	public static Manifestostatus DISPONIVEL_REFATORAMENTO = new Manifestostatus(10,"Disponível para Re-Faturamento.");
+	public static Manifestostatus AGUARDANDO_LIBERACAO = new Manifestostatus(11,"Aguardando Liberação");
 	
 	private Integer cdmanifestostatus;
 	private String nome;

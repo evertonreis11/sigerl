@@ -14,6 +14,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import br.com.linkcom.neo.core.standard.Neo;
 import br.com.linkcom.neo.service.GenericService;
+import br.com.linkcom.wms.geral.bean.Praca;
 import br.com.linkcom.wms.geral.bean.Rota;
 import br.com.linkcom.wms.geral.bean.vo.RotaOcupacaoVO;
 import br.com.linkcom.wms.geral.dao.RotaDAO;
@@ -143,5 +144,15 @@ public class RotaService extends GenericService<Rota> {
 	 */
 	public List<Rota> findRotaWithTipoAutocomplete(String param){
 		return rotaDAO.findRotaWithTipoAutocomplete(param);
+	}
+	
+	/**
+	 * Recupera rota por praca para validacao transbordo.
+	 *
+	 * @param praca the praca
+	 * @return the rota
+	 */
+	public Rota recuperaRotaPorPracaParaValidacaoTransbordo(Praca praca){
+		return rotaDAO.recuperaRotaPorPracaParaValidacaoTransbordo(praca);
 	}
 } 

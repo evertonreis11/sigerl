@@ -7,7 +7,7 @@
 	rowonclick="javascript:$dg.coloreLinha('tabelaResultados',this)" 
 	rowonmouseover="javascript:$dg.mouseonOverTabela('tabelaResultados',this)" 
 	rowonmouseout="javascript:$dg.mouseonOutTabela('tabelaResultados',this)" 
-	id="tabelaResultados" varIndex="index">
+	id="tabelaResultados" varIndex="index" styleClass="table table-striped table-bordered">
 	
 	<n:bean name="${TtabelaResultados.name}" valueType="${TtabelaResultados.valueType}">
 		<c:if test="${TtabelaResultados.showExcluirLink}">

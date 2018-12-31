@@ -9,6 +9,7 @@ import java.util.List;
 import br.com.linkcom.wms.geral.bean.Deposito;
 import br.com.linkcom.wms.geral.bean.Notafiscalsaida;
 import br.com.linkcom.wms.geral.bean.vo.GestaoPedidoVO;
+import br.com.linkcom.wms.geral.bean.vo.ManifestoTransbordoVO;
 import br.com.linkcom.wms.geral.dao.NotafiscalsaidaDAO;
 import br.com.linkcom.wms.sincronizador.IntegradorSqlUtil;
 import br.com.linkcom.wms.util.WmsException;
@@ -137,6 +138,69 @@ public class NotafiscalsaidaService extends GenericService<Notafiscalsaida>{
 
 	public Notafiscalsaida recuperaNotaSaidaPorNumero(String numeroNota) {
 		return notafiscalsaidaDAO.recuperaNotaSaidaPorNumero(numeroNota);
+	}
+	
+	/**
+	 * 
+	 * @param filtro
+	 * @param isMultiCDByCodigoERP 
+	 * @return
+	 */
+	public List<Notafiscalsaida> findForListagemPopUp(ManifestoFiltro filtro, Boolean isMultiCDByCodigoERP) {
+		return notafiscalsaidaDAO.findForListagemPopUp(filtro,isMultiCDByCodigoERP);
+	}
+	
+	/**
+	 * 
+	 * @param listaNotafiscalsaida
+	 * @param deposito 
+	 */
+	public void atualizarDepositoNota(List<Notafiscalsaida> listaNotafiscalsaida, Deposito deposito) {
+		notafiscalsaidaDAO.atualizarDepositoNota(listaNotafiscalsaida,deposito);		
+	}
+	
+	/**
+	 * Find by importacao carga.
+	 *
+	 * @param cdsImportacaoCarga the cds importacao carga
+	 * @return the list
+	 */
+	public List<Notafiscalsaida> findByImportacaoCarga(String cdsImportacaoCarga) {
+		return notafiscalsaidaDAO.findByImportacaoCarga(cdsImportacaoCarga);
+	}
+	
+	/*
+	 * É pedido de troca
+	 * 
+	 * @param cdnotafiscalsaida
+	 * 
+	 * @return boolean
+	 * 
+	 */
+	public boolean isPedidoTroca(Integer cdnotafiscalsaida) {
+		return notafiscalsaidaDAO.isPedidoTroca(cdnotafiscalsaida);
+	}
+	
+	public Notafiscalsaida findNotaDevolucao(Notafiscalsaida notafiscalsaida) {
+		
+		return notafiscalsaidaDAO.findNotaDevolucao(notafiscalsaida);
+	}
+	
+	/**
+	 * 
+	 * @param listAndConcatenate
+	 */
+	public void autorizarNotasSemFreteCliente(String whereIn) {
+		if(whereIn == null || whereIn.isEmpty()){
+			throw new WmsException("Não foi possível autorizar as notas do manifesto.");
+		}
+		
+		notafiscalsaidaDAO.autorizarNotasSemFreteCliente(whereIn);
+	}
+	
+	
+	public List<ManifestoTransbordoVO> recuperaNotasTransbordoPopUp(Integer cdmanifesto) {
+		return notafiscalsaidaDAO.recuperaNotasTransbordoPopUp(cdmanifesto);
 	}
 
 }

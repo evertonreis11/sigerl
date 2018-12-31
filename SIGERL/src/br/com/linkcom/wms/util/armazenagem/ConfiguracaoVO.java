@@ -61,10 +61,29 @@ public class ConfiguracaoVO {
 	public static final String BORDERO_RATEIRO_EMPRESA = "BORDERO_RATEIRO_EMPRESA";
 	
 	public static final String COLETAR_APENAS_COMO_FRACIONADA = "COLETAR_APENAS_COMO_FRACIONADA";
+	
+	public static final String RETORNO_CONFERENCIA_COMPLETO = "RETORNO_CONFERENCIA_COMPLETO";
+	public static final String CUSTO_EXTRA_FRETE = "CUSTO_EXTRA_FRETE";
+	public static final String EXIGE_LINHA_SEPARACAO_RECEB = "EXIGE_LINHA_SEPARACAO_RECEB";
+	public static final String VALIDA_DEVOLUCAO_NO_MANIFESTO = "VALIDA_DEVOLUCAO_NO_MANIFESTO";
+	public static final String USA_NOVA_ITG_PEDIDOS = "USA_NOVA_ITG_PEDIDOS";
+	public static final String COLETA_QUANT_AUTO_RECEB = "COLETA_QUANT_AUTO_RECEB";
+	
 	/**
  	 * Este parâmetro é salvo no formato cd1,cd2,cd3
 	 */
 	public static final String ETIQUETA_SEPARACAO = "ETIQUETA_SEPARACAO";
+	
+	/**
+	 * Número máximo de registros do histórico de rota
+	 */
+	public static final String NUM_MAX_REG_LOG_ROTA = "NUM_MAX_REG_LOG_ROTA";
+	
+	/**
+	 * Valor máximo (e default) e mínimo para o campo NUM_MAX_REG_LOG_ROTA
+	 */
+	public static final long NUM_MAX_REG_LOG_ROTA_DEFAULT = 1000L; 
+	public static final long NUM_MIN_REG_LOG_ROTA_DEFAULT = 10L;
 	
 	public static final String WMSDL = "integrador.wsdl";
 	public static final String SENHA_INTEGRADOR = "integrador.senha";
@@ -73,8 +92,20 @@ public class ConfiguracaoVO {
 	public static final String REMETENTE_EMAIL_WMS = "REMETENTE_EMAIL_WMS";
 	
 	public static final String NUM_DIAS_RAV_CANCELAMENTO = "NUM_DIAS_RAV_CANCELAMENTO";
-	public static final String COLETA_QUANT_AUTO_RECEB = "COLETA_QUANT_AUTO_RECEB";
+	
+	public static final String QTDE_ESTOQUE_MINIMO = "QTDE_ESTOQUE_MINIMO";
+	
+	public static final String SOMENTE_NOTAS_PASSAGEM = "SOMENTE_NOTAS_PASSAGEM";
 
+	public static final String IMPRIME_DEPOSITO_NA_ETIQUETA = "IMPRIME_DEPOSITO_NA_ETIQUETA";
+	
+	public static final String GERACAO_AUTO_ORDEM_COMPRA = "GERACAO_AUTO_ORDEM_COMPRA";
+	
+	public static final String VALIDAR_FRETE_CLIENTE = "VALIDAR_FRETE_CLIENTE";
+	
+	public static final String LIMITE_CARGA_POR_CLASSE = "LIMITE_CARGA_POR_CLASSE";
+	
+	public static final String PERMITE_ALTERACAO_ENDERECO = "PERMITE_ALTERACAO_ENDERECO";
 
 	protected Double percentualDescarga = 15.0;
 	protected Boolean separarPorClienteMostruario = Boolean.FALSE;
@@ -105,6 +136,17 @@ public class ConfiguracaoVO {
 	protected Boolean utilizarCaixaMestre = Boolean.FALSE;
 	protected Boolean segundanotaCdclienteEntrega = Boolean.FALSE;
 	protected Boolean borderoRateioEmpresa = Boolean.FALSE;
+	protected Boolean retornoConferenciaCompleto = Boolean.FALSE;
+	protected Long qtdeEstoqueMinimo;
+	protected Boolean exigirCustoExtraFrete = Boolean.FALSE;
+	protected Boolean exigirLinhaSeparacaoRecebimento = Boolean.FALSE;
+	protected Boolean geracaoAutomaticaOrdemCompra = Boolean.FALSE;
+	protected Boolean validarFreteCliente = Boolean.FALSE;
+	protected Boolean limiteCargaPorClasse = Boolean.FALSE;
+	protected Boolean validaDevolucaoNoManifesto = Boolean.FALSE;
+	protected Boolean permiteAlteracaoEndereco = Boolean.FALSE;
+	protected Long numeroMaxRegistrosLogRota;
+			
 
 	@MaxLength(6)
 	@DisplayName("Percentual de retenção de descarga")
@@ -230,9 +272,45 @@ public class ConfiguracaoVO {
 	public Boolean getBorderoRateioEmpresa() {
 		return borderoRateioEmpresa;
 	}
+	
+	@MaxLength(9)
+	@DisplayName("Quantidade de estoque mínimo dos produtos")
+	public Long getQtdeEstoqueMinimo() {
+		return qtdeEstoqueMinimo;
+	}
+	
+	public Boolean getRetornoConferenciaCompleto() {
+		return retornoConferenciaCompleto;
+	}
+	
+	public Boolean getExigirCustoExtraFrete() {
+		return exigirCustoExtraFrete;
+	}
+	
+	public Boolean getExigirLinhaSeparacaoRecebimento() {
+		return exigirLinhaSeparacaoRecebimento;
+	}
+	
+	public Boolean getGeracaoAutomaticaOrdemCompra() {
+		return geracaoAutomaticaOrdemCompra;
+	}
+	
+	public Boolean getValidarFreteCliente() {
+		return validarFreteCliente;
+	}
+	
+	public Boolean getValidaDevolucaoNoManifesto() {
+		return validaDevolucaoNoManifesto;
+	}
+	
+	public Boolean getPermiteAlteracaoEndereco() {
+		return permiteAlteracaoEndereco;
+	}
+	
+	public void setExigirLinhaSeparacaoRecebimento(Boolean exigirLinhaSeparacaoRecebimento) {
+		this.exigirLinhaSeparacaoRecebimento = exigirLinhaSeparacaoRecebimento;
+	}
 
-	
-	
 	public void setUtilizarCaixaMestre(Boolean utilizarCaixaMestre) {
 		this.utilizarCaixaMestre = utilizarCaixaMestre;
 	}
@@ -360,5 +438,51 @@ public class ConfiguracaoVO {
 	public void setBorderoRateioEmpresa(Boolean borderoRateioEmpresa) {
 		this.borderoRateioEmpresa = borderoRateioEmpresa;
 	}
+
+	public void setQtdeEstoqueMinimo(Long qtdeEstoqueMinimo) {
+		this.qtdeEstoqueMinimo = qtdeEstoqueMinimo;
+	}
+
+	public void setRetornoConferenciaCompleto(Boolean retornoConferenciaCompleto) {
+		this.retornoConferenciaCompleto = retornoConferenciaCompleto;
+	}
+
+	public void setExigirCustoExtraFrete(Boolean exigirCustoExtraFrete) {
+		this.exigirCustoExtraFrete = exigirCustoExtraFrete;
+	}
 	
+	@MaxLength(6)
+	@DisplayName("Número máximo de registros de alteração de rota mantidos em log")
+	public Long getNumeroMaxRegistrosLogRota() {
+		return numeroMaxRegistrosLogRota;
+	}
+
+	public void setNumeroMaxRegistrosLogRota(Long numeroMaxRegistrosLogRota) {
+		this.numeroMaxRegistrosLogRota = numeroMaxRegistrosLogRota;
+	}
+
+	public void setGeracaoAutomaticaOrdemCompra(Boolean geracaoAutomaticaOrdemCompra) {
+		this.geracaoAutomaticaOrdemCompra = geracaoAutomaticaOrdemCompra;
+	}
+
+	public void setValidarFreteCliente(Boolean validarFreteCliente) {
+		this.validarFreteCliente = validarFreteCliente;
+	}
+
+	public void setValidaDevolucaoNoManifesto(Boolean validaDevolucaoNoManifesto) {
+		this.validaDevolucaoNoManifesto = validaDevolucaoNoManifesto;
+	}
+
+	public Boolean getLimiteCargaPorClasse() {
+		return limiteCargaPorClasse;
+	}
+
+	public void setLimiteCargaPorClasse(Boolean limiteCargaPorClasse) {
+		this.limiteCargaPorClasse = limiteCargaPorClasse;
+	}
+
+	public void setPermiteAlteracaoEndereco(Boolean permiteAlteracaoEndereco) {
+		this.permiteAlteracaoEndereco = permiteAlteracaoEndereco;
+	}
+
 }

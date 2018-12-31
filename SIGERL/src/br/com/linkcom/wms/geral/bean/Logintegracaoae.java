@@ -21,6 +21,19 @@ public class Logintegracaoae {
 	private String dserro;
 	private Integer cdae;
 	
+	public Logintegracaoae(Integer cdae, Manifesto manifesto, String dserro, Integer cderro) {
+
+		this.cdae = cdae;
+		this.manifesto = manifesto;
+		this.dserro = dserro;
+		this.cderro = cderro;
+
+	}
+	
+	
+	public Logintegracaoae() {}
+
+
 	//Get's
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sq_logintegracaoae")

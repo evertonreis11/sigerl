@@ -30,6 +30,10 @@ public class ManifestoVO {
 	private String observacao;
 	private String tipoentrega;
 	private String box;
+	private String codigoAe;
+	private String ufOrigem;
+	private String ufDestino;
+	private String qdteNotas;
 	
 	//Get's
 	public String getFilial() {
@@ -112,6 +116,9 @@ public class ManifestoVO {
 	}
 	public String getBox() {
 		return box;
+	}
+	public String getCodigoAe() {
+		return codigoAe;
 	}
 	
 	
@@ -197,5 +204,25 @@ public class ManifestoVO {
 	public void setBox(String box) {
 		this.box = box;
 	}
-	
+	public void setCodigoAe(String codigoAe) {
+		this.codigoAe = codigoAe;
+	}
+	public String getUfOrigem() {
+		return ufOrigem;
+	}
+	public String getUfDestino() {
+		return ufDestino;
+	}
+	public void setUfOrigem(String ufOrigem) {
+		this.ufOrigem = ufOrigem;
+	}
+	public void setUfDestino(String ufDestino) {
+		this.ufDestino = ufDestino;
+	}
+	public String getQdteNotas() {
+		return qdteNotas;
+	}
+	public void setQdteNotas(String qdteNotas) {
+		this.qdteNotas = qdteNotas;
+	}
 }

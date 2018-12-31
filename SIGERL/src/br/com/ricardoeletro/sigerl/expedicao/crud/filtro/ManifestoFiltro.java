@@ -4,12 +4,15 @@ import java.sql.Date;
 
 import br.com.linkcom.neo.bean.annotation.DisplayName;
 import br.com.linkcom.neo.controller.crud.FiltroListagem;
+import br.com.linkcom.neo.types.Money;
 import br.com.linkcom.neo.validation.annotation.Required;
 import br.com.linkcom.wms.geral.bean.Cliente;
 import br.com.linkcom.wms.geral.bean.Deposito;
 import br.com.linkcom.wms.geral.bean.Manifestostatus;
 import br.com.linkcom.wms.geral.bean.Motorista;
+import br.com.linkcom.wms.geral.bean.Statusconfirmacaoentrega;
 import br.com.linkcom.wms.geral.bean.Tipoentrega;
+import br.com.linkcom.wms.geral.bean.Tiponotafiscal;
 import br.com.linkcom.wms.geral.bean.Transportador;
 import br.com.linkcom.wms.geral.bean.Usuario;
 import br.com.linkcom.wms.geral.bean.Veiculo;
@@ -42,6 +45,9 @@ public class ManifestoFiltro extends FiltroListagem{
     private Long kmfinal;
     private Manifestostatus manifestostatus;
     private String cdcargaerp;
+    private Tiponotafiscal tiponotafiscal;  
+    private String codigosImportacaoCarga;
+    
     //Cupom Fiscal
     private Cliente filialCupom;
 	private Date dtEmissaoCupomInicio;
@@ -50,6 +56,12 @@ public class ManifestoFiltro extends FiltroListagem{
 	private String numeroNotaCupom;
 	private String idNotasSelecionadas;
 	private String cuponsSelecionados;
+	private Deposito depositoSelecionado;
+	
+	private Money vrtotalmanifesto;
+	
+	private Statusconfirmacaoentrega statusconfirmacaoentrega;
+	private Integer cdtipovenda;
     
     
 	//Get's
@@ -157,7 +169,21 @@ public class ManifestoFiltro extends FiltroListagem{
 	public String getCuponsSelecionados() {
 		return cuponsSelecionados;
 	}
-	
+	public Tiponotafiscal getTiponotafiscal() {
+		return tiponotafiscal;
+	}
+	public Deposito getDepositoSelecionado() {
+		return depositoSelecionado;
+	}
+	public Statusconfirmacaoentrega getStatusconfirmacaoentrega() {
+		return statusconfirmacaoentrega;
+	}
+	public Integer getCdtipovenda() {
+		return cdtipovenda;
+	}
+	public String getCodigosImportacaoCarga() {
+		return codigosImportacaoCarga;
+	}
 	
 	
 	//Set's
@@ -260,5 +286,27 @@ public class ManifestoFiltro extends FiltroListagem{
 	public void setCuponsSelecionados(String cuponsSelecionados) {
 		this.cuponsSelecionados = cuponsSelecionados;
 	}
+	public void setTiponotafiscal(Tiponotafiscal tiponotafiscal) {
+		this.tiponotafiscal = tiponotafiscal;
+	}
+	public void setDepositoSelecionado(Deposito depositoSelecionado) {
+		this.depositoSelecionado = depositoSelecionado;
+	}
+	public Money getVrtotalmanifesto() {
+		return vrtotalmanifesto;
+	}
+	public void setVrtotalmanifesto(Money vrtotalmanifesto) {
+		this.vrtotalmanifesto = vrtotalmanifesto;
+	}
+	public void setStatusconfirmacaoentrega(Statusconfirmacaoentrega statusconfirmacaoentrega) {
+		this.statusconfirmacaoentrega = statusconfirmacaoentrega;
+	}
+	public void setCdtipovenda(Integer cdtipovenda) {
+		this.cdtipovenda = cdtipovenda;
+	}
+	public void setCodigosImportacaoCarga(String codigosImportacaoCarga) {
+		this.codigosImportacaoCarga = codigosImportacaoCarga;
+	}
 
+	
 }

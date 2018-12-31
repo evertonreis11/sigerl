@@ -101,8 +101,8 @@ public class GestaoPedidoProcess extends MultiActionController{
 				|| StringUtils.isBlank(filtro.getNotasInfoProblema())){
 			request.addError("A seleção do problema e dos pedidos são obrigatórias para executar essa operação");
 		}else{
-			request.addMessage("As modficações na nota foram executadas com sucesso.");
 			problemaPedidoLojaService.informarProblemaPedido(filtro);
+			request.addMessage("As modficações na nota foram executadas com sucesso.");
 		}
 		
 		filtro.setCdProblemaPedidoLoja(null);

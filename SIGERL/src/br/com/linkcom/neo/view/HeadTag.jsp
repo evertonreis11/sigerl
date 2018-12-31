@@ -4,8 +4,9 @@
 <meta http-equiv="cache-control" content="no-cache">
 <meta http-equiv="expires" content="0">
 <% request.setAttribute("app", request.getContextPath()); %>
-<script language="JavaScript" src="${app}/resource/js/autocomplete/jquery.js"></script>	
-<script language="JavaScript" src="${app}/resource/js/jquery.maskedinput.js"></script>
+<script language="JavaScript" src="${app}/js/jquery.js"></script>	
+<%-- <script language="JavaScript" src="${app}/resource/js/autocomplete/jquery.js"></script> --%> 
+<script language="JavaScript" src="${app}/js/jquery.maskedinput.js"></script>
 <script language="JavaScript" src="${app}/resource/js/jquery.selectboxes.js"></script>
 <script language="JavaScript" src="${app}/resource/js/ajax.js"></script>
 <script language="JavaScript" src="${app}/resource/js/input.js"></script>
@@ -108,11 +109,11 @@
 		}});
 	} */
 	
-	$(document).ready(function(){
+	/* $(document).ready(function(){
 		//applyMask();
 		<c:if test="${includeAutocomplete}">
 		applyAutocomplete();
 		</c:if>
 		$("input:disabled").css("color","#000000");
-	});
+	}); */
 </script>

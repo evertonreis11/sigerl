@@ -11,6 +11,7 @@ public class Tipoentrega {
 	public static Tipoentrega TRANSFERENCIA = new Tipoentrega(1,"Transferência");
 	public static Tipoentrega ENTREGA_CLIENTE = new Tipoentrega(2,"Entrega Cliente");
 	public static Tipoentrega AGRUPAMENTO = new Tipoentrega(3,"Agrupamento");
+	public static Tipoentrega CONSOLIDACAO = new Tipoentrega(4,"Consolidação");
 	
 	private Integer cdtipoentrega;
 	private String nome;

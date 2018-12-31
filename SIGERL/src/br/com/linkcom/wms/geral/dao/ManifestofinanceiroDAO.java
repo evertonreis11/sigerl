@@ -12,6 +12,7 @@ import br.com.linkcom.neo.types.Money;
 import br.com.linkcom.wms.geral.bean.Manifesto;
 import br.com.linkcom.wms.geral.bean.Manifestofinanceiro;
 import br.com.linkcom.wms.geral.bean.vo.ExtratoFinanceiroVO;
+import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.WmsUtil;
 import br.com.linkcom.wms.util.neo.persistence.GenericDAO;
 
@@ -163,5 +164,18 @@ public class ManifestofinanceiroDAO extends GenericDAO<Manifestofinanceiro>{
 		StringBuilder sql = new StringBuilder();
 			sql.append(" update Manifestofinanceiro mf set mf.desconto = "+desconto+" where mf.cdmanifesto = ").append(manifesto.getCdmanifesto()); 
 		getJdbcTemplate().execute(sql.toString());
+	}
+	
+	/**
+	 * 
+	 * @param manifesto
+	 */
+	public void deleteByManifesto(String whereIn) {
+		
+		if(whereIn == null || whereIn.isEmpty()){
+			throw new WmsException("Parametros inválidos, erro ao excluir o registro da manifesto financeiro pelo manifesto.");
+		}
+		
+		getHibernateTemplate().bulkUpdate("delete from Manifestofinanceiro mf where mf.manifesto.id in ("+whereIn+") ");
 	}
 }

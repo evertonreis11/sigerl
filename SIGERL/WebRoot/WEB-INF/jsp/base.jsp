@@ -8,14 +8,16 @@
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-	<n:head searchJsDir="false" searchCssDir="false" includeDefaultCss="false" includeThemeCss="false" includeAutocomplete="true"/> 
+	<n:head searchJsDir="false" searchCssDir="false" includeDefaultCss="false" includeThemeCss="false" includeAutocomplete="false"/> 
 		
-		<script language="JavaScript" src="${ctx}/js/jquery.js"></script>	
+		<%-- <script language="JavaScript" src="${ctx}/js/jquery.js"></script> --%>
 		<script type="text/javascript" src="${ctx}/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="${ctx}/js/bootstrap-confirmation.min.js"></script>
 		<script type="text/javascript" src="${ctx}/js/wms.js"></script>
 		<script type="text/javascript" src="${ctx}/js/jquery.serialize.js"></script>
 		<script type="text/javascript" src="${ctx}/js/tabela.js"></script>
+		<script type="text/javascript" src="${ctx}/js/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="${ctx}/js/jqueryui-bootstrap-adapter.js"></script>
 		
 		<%-- <script  src="${ctx}/js/jquery-ui.js"></script> --%>
 		<%-- <script language="JavaScript" src="${ctx}/js/wz_tooltip.js"></script> --%>
@@ -24,7 +26,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 		
 		<link href="${ctx}/css/${tema_wms}/bootstrap.min.css" rel="stylesheet" media="screen"/>
-		<%-- <link rel="stylesheet"      href="${ctx}/css/${tema_wms}/jquery-ui.css"> --%>
+		<link href="${ctx}/css/${tema_wms}/jqueryui-bootstrap-adapter.css" rel="stylesheet" media="screen"/>
+		 <%-- <link rel="stylesheet"      href="${ctx}/css/${tema_wms}/jquery-ui.css"> --%>
 		<link rel="StyleSheet"        href="${ctx}/css/${tema_wms}/menu.css" type="text/css">
 		<link rel="StyleSheet"        href="${ctx}/css/${tema_wms}/base.css" type="text/css">
 		

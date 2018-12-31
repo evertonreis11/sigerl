@@ -21,6 +21,7 @@ import br.com.linkcom.neo.types.Hora;
 import br.com.linkcom.neo.types.Money;
 import br.com.linkcom.neo.validation.annotation.Required;
 import br.com.linkcom.wms.geral.bean.vo.Auditoria;
+import br.com.linkcom.wms.geral.bean.vo.ManifestoTransbordoVO;
 
 @Entity
 @SequenceGenerator(name = "sq_manifesto", sequenceName = "sq_manifesto")
@@ -66,6 +67,8 @@ public class Manifesto {
 	private Hora horainicio;
 	private Manifesto manifestopai;
 	private Filial filialreferencia;
+	private Date dtconfirmacaotransito;
+	private Boolean cteValidado  = Boolean.FALSE;
 	
 	//Transientes
 	private String motivo;
@@ -77,12 +80,46 @@ public class Manifesto {
 	private List<Manifesto> listaManifesto;
 	private String codigobarras;
 	private String showMsgSave;
+	private Integer cdSolictacaoAcrescimo;
+	private List<Notafiscalsaida> listaNotaFiscalDevolucao;
+	private Boolean temNotaDevolucao = Boolean.FALSE;
+	private List<Manifestonotafiscal> listaNotaFiscalSemFrete;
+	private String codigoPacklist;
+	private Deposito depositoDestino;
+	private String selectCdImportacaoCarga;
+	private Boolean existeFreteClienteNota = Boolean.FALSE;
+	private String senhaAutorizacao;
+	private Boolean exigeMotivo = Boolean.FALSE;	
+	private Boolean temTransbordo = Boolean.FALSE;
+	private List<ManifestoTransbordoVO> listaNotasTransbordo;
 	
     public Manifesto(){
     }
     
     public Manifesto(Integer cdmanifesto) {
     	this.cdmanifesto = cdmanifesto;
+    }
+    
+    public Manifesto (Integer cdManifesto, Integer cdDeposito, String nomeDeposito, Integer cdTipoEntrega,
+	   String descTipoEntrega, java.util.Date dtEmissao,Integer cdManifestoStatus, String status){
+    	this.cdmanifesto = cdManifesto;
+    	this.dtemissao = new Timestamp(dtEmissao.getTime());
+    	
+    	Deposito deposito = new Deposito();
+    	deposito.setCddeposito(cdDeposito);
+    	deposito.setNome(nomeDeposito);
+    	this.deposito = deposito;
+    	
+    	Tipoentrega tipoEntrega = new Tipoentrega();
+    	tipoEntrega.setCdtipoentrega(cdTipoEntrega);
+    	tipoEntrega.setNome(descTipoEntrega);
+    	this.tipoentrega = tipoEntrega;
+    	
+    	Manifestostatus manifestoStatus = new Manifestostatus();
+    	manifestoStatus.setCdmanifestostatus(cdManifestoStatus);
+    	manifestoStatus.setNome(status);
+    	this.manifestostatus = manifestoStatus;
+    	
     }
     
 	
@@ -273,6 +310,9 @@ public class Manifesto {
 	public Filial getFilialreferencia() {
 		return filialreferencia;
 	}
+	public Date getDtconfirmacaotransito() {
+		return dtconfirmacaotransito;
+	}
 
 	
 	//Set's
@@ -396,8 +436,18 @@ public class Manifesto {
 	public void setFilialreferencia(Filial filialreferencia) {
 		this.filialreferencia = filialreferencia;
 	}
+	public void setDtconfirmacaotransito(Date dtconfirmacaotransito) {
+		this.dtconfirmacaotransito = dtconfirmacaotransito;
+	}
+	@DisplayName("Cte Validado")
+	public Boolean getCteValidado() {
+		return cteValidado;
+	}
 
-	
+	public void setCteValidado(Boolean cteValidado) {
+		this.cteValidado = cteValidado;
+	}
+
 	//Transient's
 	@Transient
 	public String getMotivo() {
@@ -435,6 +485,35 @@ public class Manifesto {
 	public String getShowMsgSave() {
 		return showMsgSave;
 	}
+	@Transient
+	public Integer getCdSolictacaoAcrescimo() {
+		return cdSolictacaoAcrescimo;
+	}
+	@Transient
+	public List<Manifestonotafiscal> getListaNotaFiscalSemFrete() {
+		return listaNotaFiscalSemFrete;
+	}
+	public void setCdSolictacaoAcrescimo(Integer cdSolictacaoAcrescimo) {
+		this.cdSolictacaoAcrescimo = cdSolictacaoAcrescimo;
+	}
+	@Transient
+	public List<Notafiscalsaida> getListaNotaFiscalDevolucao() {
+		return listaNotaFiscalDevolucao;
+	}
+
+	public void setListaNotaFiscalDevolucao(List<Notafiscalsaida> listaNotaFiscalDevolucao) {
+		this.listaNotaFiscalDevolucao = listaNotaFiscalDevolucao;
+	}
+
+	@Transient
+	public Boolean getTemNotaDevolucao() {
+		return temNotaDevolucao;
+	}
+
+	public void setTemNotaDevolucao(Boolean temNotaDevolucao) {
+		this.temNotaDevolucao = temNotaDevolucao;
+	}
+
 	public void setShowMsgSave(String showMsgSave) {
 		this.showMsgSave = showMsgSave;
 	}
@@ -462,6 +541,77 @@ public class Manifesto {
 	public void setListaManifesto(List<Manifesto> listaManifesto) {
 		this.listaManifesto = listaManifesto;
 	}
+	public void setListaNotaFiscalSemFrete(List<Manifestonotafiscal> listaNotaFiscalSemFrete) {
+		this.listaNotaFiscalSemFrete = listaNotaFiscalSemFrete;
+	}
 	
+	@Transient
+	public String getCodigoPacklist() {
+		return codigoPacklist;
+	}
+
+	public void setCodigoPacklist(String codigoPacklist) {
+		this.codigoPacklist = codigoPacklist;
+	}
+	@Transient
+	public Deposito getDepositoDestino() {
+		return depositoDestino;
+	}
+
+	public void setDepositoDestino(Deposito depositoDestino) {
+		this.depositoDestino = depositoDestino;
+	}
+	
+	@Transient
+	public String getSelectCdImportacaoCarga() {
+		return selectCdImportacaoCarga;
+	}
+
+	public void setSelectCdImportacaoCarga(String selectCdImportacaoCarga) {
+		this.selectCdImportacaoCarga = selectCdImportacaoCarga;
+	}
+
+	@Transient
+	public Boolean getExisteFreteClienteNota() {
+		return existeFreteClienteNota;
+	}
+
+	public void setExisteFreteClienteNota(Boolean existeFreteClienteNota) {
+		this.existeFreteClienteNota = existeFreteClienteNota;
+	}
+	@Transient
+	public String getSenhaAutorizacao() {
+		return senhaAutorizacao;
+	}
+
+	public void setSenhaAutorizacao(String senhaAutorizacao) {
+		this.senhaAutorizacao = senhaAutorizacao;
+	}
+	@Transient
+	public Boolean getExigeMotivo() {
+		return exigeMotivo;
+	}
+
+	public void setExigeMotivo(Boolean exigeMotivo) {
+		this.exigeMotivo = exigeMotivo;
+	}
+	
+	@Transient
+	public Boolean getTemTransbordo() {
+		return temTransbordo;
+	}
+
+	public void setTemTransbordo(Boolean temTransbordo) {
+		this.temTransbordo = temTransbordo;
+	}
+	
+	@Transient
+	public List<ManifestoTransbordoVO> getListaNotasTransbordo() {
+		return listaNotasTransbordo;
+	}
+
+	public void setListaNotasTransbordo(List<ManifestoTransbordoVO> listaNotasTransbordo) {
+		this.listaNotasTransbordo = listaNotasTransbordo;
+	}
 	
 }

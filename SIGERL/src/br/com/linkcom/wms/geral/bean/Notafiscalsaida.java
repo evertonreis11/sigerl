@@ -42,6 +42,7 @@ public class Notafiscalsaida {
     private Boolean vinculado = Boolean.FALSE;
     private Notafiscaltipo notafiscaltipo;
     private Praca praca;
+    private Praca pracaconsolidacao;
     private Deposito depositoDestino;
     private String numeropedido;
     private String lojapedido;
@@ -50,11 +51,15 @@ public class Notafiscalsaida {
     private Cliente filialfaturamento;
     private Pessoaendereco pessoaendereco;
     private Cep cep;
-    private Integer numeroLojaRetirada; 
+    private Money valorfretecliente;
+    private Boolean notaautorizada;
+    private Boolean temtroca;
     private Tipovenda tipovenda;
+	private Long numeroLojaRetirada; 
     
     //Transient's
 	private Rota rota = null;
+	private Integer cdnotafiscalsaidareferencia = null;
     
     
 	//Get's    
@@ -166,18 +171,42 @@ public class Notafiscalsaida {
 	public Cep getCep() {
 		return cep;
 	}
-	@Column(name="NRO_LOJA_RETIRADA")
-	public Integer getNumeroLojaRetirada() {
-		return numeroLojaRetirada;
+	public Money getValorfretecliente() {
+		return valorfretecliente;
 	}
+	public Boolean getNotaautorizada() {
+		return notaautorizada;
+	}
+	public Boolean getTemtroca() {
+		return temtroca;
+	}
+	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "cdtipovenda")
+	@JoinColumn(name = "cdtipovenda") 
 	public Tipovenda getTipovenda() {
 		return tipovenda;
 	}
 	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "cdpracaconsolidacao", referencedColumnName="cdpraca")
+	public Praca getPracaconsolidacao() {
+		return pracaconsolidacao;
+	}
+	
+	@Column(name="NRO_LOJA_RETIRADA")
+	public Long getNumeroLojaRetirada() {
+		return numeroLojaRetirada;
+	}
+	
+	
 	
 	//Set's
+	public void setPracaconsolidacao(Praca pracaconsolidacao) {
+		this.pracaconsolidacao = pracaconsolidacao;
+	}
+	public void setTemtroca(Boolean temtroca) {
+		this.temtroca = temtroca;
+	}
 	public void setCdcargaerp(String cdcargaerp) {
 		this.cdcargaerp = cdcargaerp;
 	}
@@ -256,24 +285,19 @@ public class Notafiscalsaida {
 	public void setCep(Cep cep) {
 		this.cep = cep;
 	}
-	public void setNumeroLojaRetirada(Integer numeroLojaRetirada) {
-		this.numeroLojaRetirada = numeroLojaRetirada;
+	public void setValorfretecliente(Money valorfretecliente) {
+		this.valorfretecliente = valorfretecliente;
+	}
+	public void setNotaautorizada(Boolean notaautorizada) {
+		this.notaautorizada = notaautorizada;
 	}
 	public void setTipovenda(Tipovenda tipovenda) {
 		this.tipovenda = tipovenda;
 	}
-	
-	
-	@Override
-	public boolean equals(Object obj) {
-		if(obj!=null && obj instanceof Notafiscalsaida){
-			Notafiscalsaida nfs = (Notafiscalsaida) obj;
-			if(nfs.getCdnotafiscalsaida().equals(this.getCdnotafiscalsaida())){
-				return true;
-			}
-		}
-		return false;
+	public void setNumeroLojaRetirada(Long numeroLojaRetirada) {
+		this.numeroLojaRetirada = numeroLojaRetirada;
 	}
+	
 	
 	@Transient
 	public Rota getRota(){
@@ -288,5 +312,25 @@ public class Notafiscalsaida {
 	}
 	public void setRota(Rota rota) {
 		this.rota = rota;
+	}
+	
+	@Transient
+	public Integer getCdnotafiscalsaidareferencia() {
+		return cdnotafiscalsaidareferencia;
+	}
+	public void setCdnotafiscalsaidareferencia(Integer cdnotafiscalsaidareferencia) {
+		this.cdnotafiscalsaidareferencia = cdnotafiscalsaidareferencia;
+	}
+	
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj!=null && obj instanceof Notafiscalsaida){
+			Notafiscalsaida nfs = (Notafiscalsaida) obj;
+			if(nfs.getCdnotafiscalsaida().equals(this.getCdnotafiscalsaida())){
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -178,4 +178,8 @@ public class ManifestofinanceiroService extends GenericService<Manifestofinancei
 		return report; 
 	}
 	
+	public void deleteByManifesto(String whereIn) {
+		manifestofinanceiroDAO.deleteByManifesto(whereIn);
+	}
+	
 }

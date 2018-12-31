@@ -21,12 +21,74 @@
 	  font-family: Verdana;
 	  font-size: 10px;
 	}
+	.table-info {
+		display: table;
+	    width: 100%;
+	    max-width: 100%;
+	    margin-bottom: 20px;
+	    font-size: 11px;
+	    border-spacing: 0;
+	    border-collapse: collapse;
+	    background-color: transparent;
+	}
+	.table-info th{
+		background-color: #4cb46b;
+		text-align: left;
+	}
+	.dataGrid{
+     	border-spacing: 0;
+    	border-collapse: collapse;
+    	font-family: tahoma;
+		font-size: 10px;	
+		color: #000000;
+		background-color: #FFFFFF;
+	}
 </style>
 
-<t:entrada titulo="Manifesto de Carga ${manifesto.cdmanifesto}" submitConfirmationScript="validarCadastro()" showDeleteLink="${isEmElaboracao && !isAutorizado}" showEditLink="${isEmElaboracao && !isAutorizado}">
+
+<div class="container corpo-pagina">
+	<h3 class="titulo-pagina">Reversão de Pedidos</h3>
+	<n:form validateFunction="validarFormulario" enctype="${entradaTag.formEnctype}">
+		<n:validation functionName="validateForm">
+	     	<c:if test="${consultar}">
+				<input type="hidden" name="forcarConsulta" value="true"/>
+				<style>input, select, textarea, .required {background-color:#ffffff; color:#000000;}</style>
+			</c:if>
+			
+			<div class="panel panel-default" style="border: 0px;" >
+				<div class="panel-body">
+					<div class="col-md-6 pull-right" style="text-align: -webkit-right;">
+						<c:if test="${consultar}">
+							<c:if test="${(empty entradaTag.showListagemLink) || entradaTag.showListagemLink}">
+								<n:link action="listagem" id="btn_voltar"  checkPermission="true" description="Retornar à listagem" class="btn btn-default btn-sm">Retornar à listagem</n:link>&nbsp;|&nbsp;
+							</c:if>
+							
+							<n:link action="criar"  id="btn_novo" class="btn btn-info btn-sm"  checkPermission="true" description="Novo">Novo</n:link>&nbsp;|&nbsp;
+							
+							<c:if test="${(isEmElaboracao || isAguardandoLiberacao) && !isAutorizado}">								
+								<n:link action="editar" id="btn_editar" parameters="${n:idProperty(n:reevaluate(TEMPLATE_beanName,pageContext))}=${n:id(n:reevaluate(TEMPLATE_beanName,pageContext))}" class="btn .btn-primary btn-sm" checkPermission="true" description="Editar">Editar</n:link>&nbsp;|&nbsp;
+							</c:if>
+							
+							<c:if test="${(isEmElaboracao || isAguardandoLiberacao) && !isAutorizado}">
+								<n:link action="excluir" id="btn_excluir" parameters="${n:idProperty(n:reevaluate(TEMPLATE_beanName,pageContext))}=${n:id(n:reevaluate(TEMPLATE_beanName,pageContext))}" confirmationMessage="Você tem certeza que deseja excluir este registro?" class="btn btn-danger btn-sm"  checkPermission="true" description="Excluir">Excluir</n:link>
+							</c:if>
+						</c:if>
+						<c:if test="${!consultar}">
+							<n:link action="listagem" id="btn_voltar" confirmationMessage="Deseja retornar à listagem sem salvar as alterações?" class="btn btn-default btn-sm" checkPermission="true" description="Retornar à listagem">Retornar à listagem</n:link>					
+							<n:submit type="link" id="btn_gravar" title="Gravar" action="salvar" validate="true" confirmationScript="${entradaTag.dynamicAttributesMap['submitconfirmationscript']}" class="btn btn-success btn-sm" checkPermission="true" description="Salvar">Salvar</n:submit>
+						</c:if>
+					</div>		
+		        </div>
+			</div>
+			
+		</n:validation>
+	</n:form>
+</div>
+
+<%-- <t:entrada titulo="Manifesto de Carga ${manifesto.cdmanifesto}" submitConfirmationScript="validarCadastro()" showDeleteLink="" showEditLink="">
 	
 	<jsp:attribute name="linkArea">
-		<c:if test="${!isEmElaboracao && consultar}">
+		<c:if test="${!isEmElaboracao && !isAguardandoLiberacao && consultar}">
 			<c:choose>
 				<c:when test="${isImpresso}">
 					<a id="btn_excluir"  onmouseover="Tip('Cancelar Manifesto')" href="javascript:openDialogAuditoria()">Cancelar</a>
@@ -36,9 +98,12 @@
 				</c:otherwise>
 			</c:choose>
 		</c:if>
-		<c:if test="${isEmElaboracao || (!isImpresso && isAutorizado && consultar)}">
+		<c:if test="${isEmElaboracao || isAguardandoLiberacao || (!isImpresso && isAutorizado && consultar)}">
 			<c:if test="${isEmElaboracao && consultar}">
 				|&nbsp;&nbsp;<a id="btn_imprimir" onmouseover="Tip('Imprimir Manifesto')" href="javascript:imprimirManifesto()">Imprimir Manifesto</a>
+			</c:if>
+			<c:if test="${isAguardandoLiberacao && consultar}">
+				|&nbsp;&nbsp;<a id="btn_associar" onmouseover="Tip('Autorizar Notas')" href="javascript:autorizarNotas()">Autorizar Notas</a>
 			</c:if>
 			<c:if test="${isAutorizado && consultar}">
 				|&nbsp;&nbsp;<a id="btn_excluir"  onmouseover="Tip('Cancelar Manifesto')" href="javascript:openDialogAuditoria()">Cancelar</a>
@@ -61,10 +126,13 @@
 						<t:property name="usuarioemissor" type="hidden" write="false" label=""/>
 						<t:property name="cdae" type="hidden" write="false" label=""/>						
 						<t:property name="selectCdnotafiscalsaida" type="hidden" write="false" label=""/>		
+						<t:property name="selectCdImportacaoCarga" type="hidden" write="false" label=""/>		
 						<t:property name="isSolicitarAprovacao" type="hidden" write="false" label=""/>
 						<t:property name="selectCdmanifesto" type="hidden" write="false" label=""/>
 						<t:property name="filialreferencia" type="hidden" write="false" label=""/>
 						<t:property name="manifestopai" type="hidden" write="false" label=""/>
+						<t:property name="tipoentrega.cdtipoentrega" type="hidden" write="false" label=""/>
+						<t:property name="temTransbordo" type="hidden" write="false" label=""/>
 						<w:tableGroup columns="7" panelgridWidth="80%">
 							<t:property name="cdmanifesto" label="Manifesto" type="text" disabled="disabeld" class="disabled" style="width:60px;"/>
 							<t:property name="deposito" type="text" disabled="disabeld" class="disabled" style="width:120px;"/>
@@ -90,7 +158,7 @@
 													autocompleteGetterLabel="getIdNomeDocumento" 
 													autocompleteLabelProperty="transportador.cdpessoa,transportador.nome,transportador.documento"
 													autocompleteOnExcluir="carregaMotoristaVeiculo()"
-													onselect="carregaMotoristaVeiculo()" 
+													autocompleteOnSelect="carregaMotoristaVeiculo()"
 													style="width:300px;"/>
 										<t:property name="motorista" id="motoristaId" disabled="disabled" class="disabled" style="width:250px;"/>
 										<t:property name="veiculo" id="veiculoId" disabled="disabled" class="disabled" style="width:100px;"/>
@@ -139,6 +207,7 @@
 								 </n:panel>
 								  <n:panel>
 								  <br/>&nbsp;&nbsp;&nbsp;&nbsp;
+								  	
 								  	<c:if test="${consultar}">
 										<a href="#" class="btn_engrenagem" onclick="javascript:solicitarAnaliseConsult();" style="text-transform: none;">Solicitar Análise</a>
 									</c:if>
@@ -157,17 +226,20 @@
 									<a href="#1" class="btn_editar" id="incluirManifestoId" onclick="javascript:openDialogFilialReferencia();" style="text-transform: none;">Alterar a Filial Referência</a>|&nbsp;
 								</c:if>								
 								<a href="#1" class="btn_novo" id="incluirManifestoId" onclick="javascript:incluirManifesto();" style="text-transform: none;">Incluir Manifesto</a>
+								<a href="#1" class="btn_novo" id="incluirPackingListId" onclick="javascript:incluirPackingList();" style="text-transform: none;">Incluir packing list</a>
 							</div>
 						</c:if>
 						
 						<br>
 						<br>
-						<w:tableGroup columns="1" panelgridWidth="100%">
+						<w:tableGroup columns="1" panelgridWidth="100%" >
 							<t:detalhe name="listaManifestonotafiscal" id="listaManifestonotafiscalId" showBotaoNovaLinha="false" cellspacing="0" showBotaoRemover="${!isAgrupamento}">
 								<n:column header="" style="width:1%">
 									<t:property name="cdmanifestonotafiscal" type="hidden" write="false"/>
 									<t:property name="praca.cdpraca" type="hidden" write="false"/>
+									<t:property name="existeFreteClienteNota" type="hidden" write="false"/>
 									<t:property name="notafiscalsaida.cdnotafiscalsaida" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.notaautorizada" type="hidden" write="false"/>
 									<t:property name="notafiscalsaida.numero" type="hidden" write="false"/>
 									<t:property name="notafiscalsaida.serie" type="hidden" write="false"/>
 									<t:property name="notafiscalsaida.dtemissao" type="hidden" write="false"/>
@@ -175,72 +247,69 @@
 									<t:property name="notafiscalsaida.lojapedido" type="hidden" write="false"/>
 									<t:property name="notafiscalsaida.cliente.cdpessoa" type="hidden" write="false"/>
 									<t:property name="notafiscalsaida.cliente.nome" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.notafiscaltipo.cdnotafiscaltipo" type="hidden" write="false"/>
 									<t:property name="notafiscalsaida.praca.listaRotapraca[0].rota.cdrota" type="hidden" write="false"/>
 									<t:property name="notafiscalsaida.praca.listaRotapraca[0].rota.nome" type="hidden" write="false"/>
-									<t:property name="notafiscalsaida.praca.listaRotapraca[0].rota.temDepositoTransbordo" type="hidden" write="false"/>
-									<t:property name="notafiscalsaida.praca.listaRotapraca[0].rota.depositotransbordo" type="hidden" write="false"/>
 									<t:property name="notafiscalsaida.praca.cdpraca" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.praca.nome" type="hidden" write="false"/>
 									<t:property name="notafiscalsaida.qtdeitens" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.temtroca" type="hidden" write="false"/>
 									<t:property name="notafiscalsaida.vlrtotalnf" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.importacaocarga.cdcarga" type="hidden" write="false"/>
 									<t:property name="usuario.cdpessoa" type="hidden" write="false"/>
 									<t:property name="usuario.nome" type="hidden" write="false"/>	
 									<t:property name="dt_inclusao" type="hidden" write="false"/>
 									<t:property name="temDepositoTransbordo" type="hidden" write="false"/>
 									<t:property name="depositotransbordo" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.cdnotafiscalsaidareferencia" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.valorfretecliente" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.tipovenda" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.tipovenda.cdtipovenda" type="hidden" write="false"/>
 								</n:column>
 								<n:column header="Nro. Nota">
 									<t:property name="notafiscalsaida.numero" mode="output" style="width:80px;"/>
 								</n:column>
 								<n:column header="Série">
-									<t:property name="notafiscalsaida.serie" mode="output" style="width:80px;"/>
+									<t:property name="notafiscalsaida.serie" mode="output" style="width:70px;"/>
 								</n:column>
 								<n:column header="Dt. Emissão">
 									<t:property name="notafiscalsaida.dtemissao" mode="output" style="width:80px;"/>
 								</n:column>
-								<n:column header="Nro. Pedido">
+								<n:column header="Pedido">
 									<t:property name="notafiscalsaida.numeropedido" mode="output" style="width:80px;"/>
 								</n:column>
-								<n:column header="Nro. Loja">
+								<n:column header="Loja">
 									<t:property name="notafiscalsaida.lojapedido" mode="output" style="width:80px;"/>
 								</n:column>					
+								<n:column header="Carga">
+									<t:property name="notafiscalsaida.importacaocarga.cdcarga" mode="output" style="width:80px;"/>									
+								</n:column>
 								<n:column header="Cliente">
 									<span id="clientenome${index}" class="labelcolumn"></span>									
 								</n:column>
 								<n:column header="Rota" style="width:70px;">
 									<span id="rotanome${index}" class="labelcolumn"></span>
 								</n:column>
-								 <c:choose>
-									<c:when test="${!consultar && !isAgrupamento}">
-										<n:column header="Transbordo" id="transbordoHeaderID">
-											<a id="btn_editar" onmouseover="Tip('Definir Transbordo')" href="javascript:openDialogTransbordo(${index})">
-												<span id="isTransbordo${index}"></span>
-											</a>
-										</n:column>
-									</c:when>
-									<c:otherwise>
-										<n:column header="Transbordo">
-											<span id="isTransbordo${index}"></span>
-										</n:column>
-									</c:otherwise>
-								</c:choose>
+								<n:column header="Praça" style="width:70px;">
+									<span id="pracanome${index}" class="labelcolumn"></span>
+								</n:column>
+
+								<n:column header="Transbordo">
+									<span id="isTransbordo${index}"></span>
+								</n:column>
 								
-<%--								<n:column header="Transbordo">--%>
-<%--									<c:if test="${!consultar && !isAgrupamento}">--%>
-<%--										<a id="btn_editar"  onmouseover="Tip('Cancelar Manifesto')" href="javascript:openDialogTransbordo(${index})">--%>
-<%--											<span id="isTransbordo${index}"></span>--%>
-<%--										</a>--%>
-<%--									</c:if>--%>
-<%--									<c:if test="${consultar || isAgrupamento}">--%>
-<%--										<span id="isTransbordo${index}"></span>--%>
-<%--									</c:if>--%>
-<%--								</n:column>--%>
-								
-								<n:column header="Qtde. de Itens">
-									<t:property name="notafiscalsaida.qtdeitens" mode="output" style="width:80px;"/>
+								<n:column header="Qtde. Itens">
+									<t:property name="notafiscalsaida.qtdeitens" mode="output" style="width:50px;"/>
 								</n:column>
 								<n:column header="Valor total">
-									<t:property name="notafiscalsaida.vlrtotalnf" mode="output" style="width:80px;"/>
+									<t:property name="notafiscalsaida.vlrtotalnf" mode="output" style="width:70px;"/>
 								</n:column>
+								<n:column header="Site" id="novoSiteId">
+									<strong>
+									<c:if test="${manifestonotafiscal.notafiscalsaida.tipovenda.cdtipovenda != 2}">Não</c:if>						
+									<c:if test="${manifestonotafiscal.notafiscalsaida.tipovenda.cdtipovenda == 2}">Sim</c:if>						
+									</strong>							
+								</n:column>									
 							</t:detalhe>
 						</w:tableGroup>
 						
@@ -281,7 +350,7 @@
 		</t:janelaEntrada>
 	</jsp:body>		
 	
-</t:entrada>
+</t:entrada> 
 
 <div id="auditoria-emitirmanifesto-dialog" style="display:none;" title="Cancelamento de Manifesto">
 	<n:panelGrid columns="1" columnStyleClasses="labelColumn,propertyColumn"  propertyRenderAsDouble="false">
@@ -307,16 +376,13 @@
 	</n:panelGrid>
 </div>
 
-<div id="transbordo-dialog" style="display:none;" title="Adicionar / Remover CD Transbordo">
-	<n:panelGrid columns="1" columnStyleClasses="labelColumn,propertyColumn"  propertyRenderAsDouble="true">
+<div id="auditoria-nota-devolucao-dialog" style="display:none;" title="Nota de Devolução">
+	<n:panelGrid columns="1" columnStyleClasses="labelColumn,propertyColumn"  propertyRenderAsDouble="false">
 		<t:propertyConfig mode="input" renderAs="double">
-			<n:bean name="manifestonotafiscal" valueType="<%= Manifestonotafiscal.class %>">
-				<t:property name="temDepositoTransbordo" id="temDepositoTransbordoDialog" onchange="showHideDeposito()"/>
-				<n:panel id="painelDepositoTransbordo">
-					<span id="depositotransbordoLabelDialog">Depósito de Transbordo</span><br/><br/>
-					<t:property name="depositotransbordo" id="depositotransbordoDialog" itens="${LISTA_DEPOSITO_TRANSBORDO}" label=""/>
-				</n:panel>
-				<input name="indexParam" id="indexParamId" type="hidden"/>
+			<n:bean name="auditoriaVO" valueType="<%= Auditoria.class %>">
+				<t:property name="login" id="loginId3" class="required" style="width:200px;"/>
+				<t:property name="senha" id="senhaId3" class="required" style="width:200px;"/>
+				<t:property name="motivo" id="motivoId3" rows="6" class="required" style="width:200px;" label="Descreva no campo abaixo, <br>o motivo da retirada <br> do produto da carga."/>
 			</n:bean>
 		</t:propertyConfig>
 	</n:panelGrid>
@@ -352,10 +418,158 @@
 	</n:panelGrid>
 </div>
 
+
+<div id="info-nota-devolucao" style="display:none;" title="Manifesto">
+	<p>As notas da devolução abaixo são notas que tiveram retorno e foram automaticamente incluidas no 
+	manifesto para recolhimento, favor anexar as notas ao manifesto ou retira-lás.</p>
+	<table class="table-info">
+		<tr>
+			<th>Nota</th>
+			<th>Cliente</th>
+		<tr>
+		<c:forEach items="${ manifesto.listaNotaFiscalDevolucao }" var="item" varStatus="loop">
+			<tr>
+				<td>${ item.numero }</td>
+				<td>
+				${ item.cliente.nome }
+				<input type="hidden" name="excluirNota[]" id="excluirNota" value="[${ item.cdnotafiscalsaida }]"/>
+				</td>
+			<tr>
+		</c:forEach>
+	</table>
+</div>
+
+
+<div id="autorizarNotas-dialog" style="display:none;" title="Autorizar Notas">
+	<form method="POST" name="formAutorizarNotas" id="formAutorizarNotas" action="${ctx}/expedicao/crud/Manifesto" onsubmit="return false;">
+		<input type="hidden" name="ACAO" value="liberarNotas"/>
+		<n:panelGrid columns="1" columnStyleClasses="labelColumn,propertyColumn"  propertyRenderAsDouble="true">
+			<t:propertyConfig mode="input" renderAs="double">
+				<n:bean name="manifesto" valueType="<%= Manifesto.class %>">
+					<input name="cdmanifesto" id="cdmanifestoID" type="hidden" write="false" value="${manifesto.cdmanifesto}"/>
+					<br/>
+					<t:detalhe name="listaNotaFiscalSemFrete" id="listaNotaFiscalSemFreteDialog" var="manifestoNotaFiscal">
+						<n:column header="">
+							<t:property name="cdmanifestonotafiscal" type="hidden" write="false"/>
+						</n:column>
+						<n:column header="Nro. Nota">
+							<t:property name="notafiscalsaida.numero" mode="output"/>
+						</n:column>
+						<n:column header="Série">
+							<t:property name="notafiscalsaida.serie" mode="output"/>
+						</n:column>
+						<n:column header="Dt. Emissão">
+							<t:property name="notafiscalsaida.dtemissao" mode="output"/>
+						</n:column>
+						<n:column header="Pedido">
+							<t:property name="notafiscalsaida.numeropedido" mode="output"/>
+						</n:column>
+						<n:column header="Loja">
+							<t:property name="notafiscalsaida.lojapedido" mode="output"/>
+						</n:column>
+						<n:column header="Senha P/ Autorização">
+							<t:property name="senhaAutorizacao" mode="input"/>
+						</n:column>
+					</t:detalhe>
+				</n:bean>
+			</t:propertyConfig>
+		</n:panelGrid>
+	</form>	
+</div>
+
+<div id="notasTransbordo-dialog" style="display:none;" title="Notas com opção de Transbordo">
+	<form method="POST" name="formCriarTransbordo" id="formCriarTransbordo" action="${ctx}/expedicao/crud/Manifesto" onsubmit="return false;">
+		<input type="hidden" name="ACAO" value="incluirTransbordoNotas"/>
+		<n:panelGrid columns="1" columnStyleClasses="labelColumn,propertyColumn"  propertyRenderAsDouble="true">
+			<t:propertyConfig mode="input" renderAs="double">
+				<n:bean name="manifesto" valueType="<%= Manifesto.class %>">
+					<input name="cdmanifesto" id="cdmanifestoTranbordoID" type="hidden" write="false" value="${manifesto.cdmanifesto}"/>
+					<label style="font-weight: bold; font-size: 16px;">Foi detectado neste manifesto que será necessário fazer transbordo da carga em outro local. Favor validar!</label>
+					<br/>
+					<br/>
+					<t:detalhe name="listaNotasTransbordo" id="listaNotasTransbordoDialog" var="notasTransbordo">
+						<n:column header="">
+							<t:property name="cdManifestoNotaFiscal" type="hidden" write="false"/>
+						</n:column>
+						<n:column header="Nro. Nota">
+							<t:property name="numero" mode="output"/>
+						</n:column>
+						<n:column header="Série">
+							<t:property name="serie" mode="output"/>
+						</n:column>
+						<n:column header="Dt. Emissão">
+							<t:property name="dtEmissao" mode="output"/>
+						</n:column>
+						<n:column header="Pedido">
+							<t:property name="numeroPedido" mode="output"/>
+						</n:column>
+						<n:column header="Loja">
+							<t:property name="lojaPedido" mode="output"/>
+						</n:column>
+						<n:column header="Rota">
+							<t:property name="rota" mode="output"/>
+						</n:column>
+						<n:column header="Depósito de Transbordo">
+							<t:property name="depositoTransbordo" mode="input" itens="${LISTA_DEPOSITO_TRANSBORDO}"/>
+						</n:column>
+					</t:detalhe>
+				</n:bean>
+			</t:propertyConfig>
+		</n:panelGrid>
+	</form>	
+</div>
+<div id="motivodeExcessao-dialog">
+	<form class="margin-top: 67px;" method="POST" name="formMotivodeExcessao" id="formMotivodeExcessao" action="${ctx}/expedicao/crud/Manifesto" onsubmit="return false;">
+		<input type="hidden" name="ACAO" value="inserirMotivo"/>
+		<h3>Informe no campo abaixo,<br> o motivo do excesso de valores na carga.</h3>
+		<input type="hidden" name="ACAO" value="liberarManifesto"/>
+		<n:panelGrid columns="1" columnStyleClasses="labelColumn,propertyColumn"  propertyRenderAsDouble="true">
+			<n:bean name="manifesto" valueType="<%= Manifesto.class %>">
+				<input name="cdmanifesto" id="id_cdmanifesto_" type="hidden" write="false" value="${manifesto.cdmanifesto}"/>
+				<textarea name="motivo" rows="6" cols="15" style="width: 300px;padding: 0.7em; -webkit-border-radius: 5px" required></textarea>
+			</n:bean>
+		</n:panelGrid>
+	</form>	
+</div>
+<div id="autorizarManifesto-dialog" title="Token de Autorização">
+	<form class="margin-top: 67px;" method="POST" name="formAutorizarManifesto" id="formAutorizarManifesto" action="${ctx}/expedicao/crud/Manifesto" onsubmit="return false;">
+		<h3>Favor informar a senha de autorização para prosseguir com a liberação.</h3>
+		<input type="hidden" name="ACAO" value="liberarManifesto"/>
+		<n:panelGrid columns="1" columnStyleClasses="labelColumn,propertyColumn"  propertyRenderAsDouble="true">
+			<t:propertyConfig mode="input" renderAs="double">
+				<n:bean name="manifesto" valueType="<%= Manifesto.class %>">
+					<input name="cdmanifesto" id="id_cdmanifesto" type="hidden" write="false" value="${manifesto.cdmanifesto}"/>
+					<input type="password" name="senhaAutorizacao" style="width: 300px;padding: 0.7em; -webkit-border-radius: 5px" required>
+				</n:bean>
+			</t:propertyConfig>
+		</n:panelGrid>
+	</form>	
+</div>--%>
+
 <script type="text/javascript">
+
+	//caso seja alterada a função validation ela será chamada após a validacao do formulario
+	var validation;
 	
+	function validarFormulario(){
+		var valido = validateForm();
+		if(validation){
+			valido = validation(valido);
+		}
+		return valido;
+	}
+
+	function alertExclude(){
+		confirm("Você tem certeza que deseja excluir este registro?");
+	}
+	
+	function alertCancel(){
+		return confirm("Deseja retornar à consulta sem salvar as alterações?");
+	}
+
+/* LIBERADO = 0;
 	$(document).ready(function() {
-		
+
 		if('${isRedirectToListagem}'=='true'){
 			alert("Esse manifesto não pode ser salvo, as notas estão vinculados a outro manifesto.");
 			form.ACAO.value ='listagem';
@@ -365,7 +579,7 @@
 		}
 		
 		habilitarMotoristaVeiculo();
-		
+
 		$("#auditoria-emitirmanifesto-dialog2").dialog("destroy");
 		$("#auditoria-emitirmanifesto-dialog2").dialog({
 			autoOpen: false,
@@ -385,7 +599,26 @@
 				}
 			}
 		});
-		
+		$("#auditoria-nota-devolucao-dialog").dialog("destroy");
+		$("#auditoria-nota-devolucao-dialog").dialog({
+			autoOpen: false,
+			height: 400,
+			width: 249,
+			modal: true,
+			close: function( event, ui ) {
+				$("#loginId3").val(null);
+				$("#senhaId3").val(null);
+				$("#motivoId3").val(null);
+				$("#excluirNota").val(null);
+			},buttons: {
+				'Cancelar': function() {
+					$("#auditoria-nota-devolucao-dialog").dialog('close');
+				},
+				'Confirmar': function() {
+					naoIncluirNotaDevolucao();
+				}
+			}
+		});		
 		$("#auditoria-emitirmanifesto-dialog").dialog("destroy");
 		$("#auditoria-emitirmanifesto-dialog").dialog({
 			autoOpen: false,
@@ -402,26 +635,6 @@
 				},
 				'Confirmar': function() {
 					cancelarManifesto();
-				}
-			}
-		});
-		
-		$("#transbordo-dialog").dialog("destroy");
-		$("#transbordo-dialog").dialog({
-			autoOpen: false,
-			height: 250,
-			width: 300,
-			modal: true,
-			buttons: {
-				'Cancelar': function() {
-					$("#transbordo-dialog").dialog('close');
-				},
-				'Confirmar': function() {
-					var retorno = atualizarInfoTransbordo();
-					if (retorno){
-						$("#transbordo-dialog").dialog("close");
-						alert('Para confirmar as alterações é necessário salvar.')
-					}
 				}
 			}
 		});
@@ -471,8 +684,101 @@
 				}
 			}
 		});
-		
+
+		$("#info-nota-devolucao").dialog("destroy");
+		$("#info-nota-devolucao").dialog({
+			autoOpen: false,
+			modal: true,
+			closeOnEscape: false,
+			closeText: '',
+			height: 300,
+			width: 500,		
+			buttons: {
+				'Incluir': function() {
+					$("#info-nota-devolucao").dialog('close');
+				},				
+				'Não incluir': function() {
+					$("#info-nota-devolucao").dialog('close');
+					$("#auditoria-nota-devolucao-dialog").dialog("open");
+				}			
+			}
+		});	
+
+		$("#autorizarNotas-dialog").dialog("destroy");
+		$("#autorizarNotas-dialog").dialog({
+			autoOpen: false,
+			modal: true,
+			closeOnEscape: false,
+			closeText: '',
+			height: 280,
+			width: 550,
+			buttons: {
+				'Fechar': function() {
+					$("#autorizarNotas-dialog").dialog('close');
+				},
+				'Autorizar': function() {
+					liberarNotas();
+				}
+			}
+		});	
+		$("#notasTransbordo-dialog").dialog("destroy");
+		$("#notasTransbordo-dialog").dialog({
+			autoOpen: false,
+			modal: true,
+			closeOnEscape: false,
+			closeText: '',
+			height: 700,
+			width: 800,
+			open: function(event, ui) {
+		        $(this).parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+		    },
+			buttons: {
+				'Confirmar': function() {
+					confirmarTranbordoNotas();
+					$("#notasTransbordo-dialog").dialog("close");
+					$("#dialogLoading-dialog").dialog("open");
+				}
+			}
+		});	
+		$("#autorizarManifesto-dialog").dialog("destroy");
+		$("#autorizarManifesto-dialog").dialog({
+			autoOpen: false,
+			modal: true,
+			closeOnEscape: false,
+			closeText: '',
+			height: 280,
+			width: 550,
+			buttons: {
+				'Fechar': function() {
+					$("#autorizarManifesto-dialog").dialog('close');
+				},
+				'Autorizar': function() {
+					liberarManifesto();
+				}
+			}
+		});	
+		$("#motivodeExcessao-dialog").dialog("destroy");
+		$("#motivodeExcessao-dialog").dialog({
+			autoOpen: false,
+			modal: true,
+			closeOnEscape: false,
+			closeText: '',
+			height: 280,
+			width: 550,
+			buttons: {
+				'Fechar': function() {
+					$("#motivodeExcessao-dialog").dialog('close');
+				},
+				'Confirmar': function() {
+					enviarMotivodeExcessao();
+				}
+			}
+		});	
 		//
+		
+		if (${manifesto.temNotaDevolucao}){
+			openDialogInfoNotaDevolucao();
+		}
 		
 		if('${consultar}' != 'true'){
 			if(form['transportador'].value != '<null>'){
@@ -494,6 +800,7 @@
 		
 		populaInfoColunaTransbordo();
 		quebralinhaRota();
+		quebralinhaPraca();
 		quebralinhaCliente();
 		showHideBotaoInclusao();
 		
@@ -501,7 +808,16 @@
 			$("#log-dialog").dialog("open");
 		}
 
-		$("#transbordoHeaderID").html("Transbordo <button type='button' class='btnApp' onclick='javascript:openDialogTransbordo(\"todos\")' class=''>Todos</button>");
+		verificaNotasSemFrete();
+
+	
+
+		// se nota tem transbordo, exibe modal para confirmação de transbordo nas notas.		
+		if($("input[name*='temTransbordo']").val() == 'true'){
+			$("#notasTransbordo-dialog").dialog("open");
+			$("select[name*=depositoTransbordo]").removeAttr("disabled");
+			$("input[name*=cdManifestoNotaFiscal]").removeAttr("disabled");
+		}		
 	});
 	
 	function cancelarManifesto(){
@@ -520,6 +836,32 @@
 			);			
 		}
 	}
+
+	function naoIncluirNotaDevolucao(){
+		if($("#motivoId3").val().trim()==""){
+			alert("O campo motivo é obrigatório.");			
+		}else{
+			var motivo = $("#motivoId3").val();
+			var login = $("#loginId3").val();
+			var senha = $("#senhaId3").val();
+			
+			$w.getJSONSync("${ctx}/expedicao/crud/Manifesto",{ACAO:'naoIncluirNotaDevolucao','motivo':motivo,'login':login,'senha':senha},				
+				function(json){
+					if(json.error!=''){
+						$("#loginId3").val(null);
+						$("#senhaId3").val(null);
+						alert(json.error);
+					} else {
+						var notasDevolucao = buscaNotasDevolucao();
+						var notasReferencia = buscaReferenciaDasNotas(notasDevolucao);
+						excluirNotas(notasDevolucao,notasReferencia);
+						$("#auditoria-nota-devolucao-dialog").dialog("close");
+						alert('Operação realizada com sucesso!');
+					}
+				}
+			);
+		}
+	}	
 	
 	function openDialogAuditoria(){
 		$("#auditoria-emitirmanifesto-dialog").dialog("open");
@@ -596,13 +938,15 @@
 		$("#auditoria-emitirmanifesto-dialog2").dialog("open");
 	}
 	
-	function inserirNotas(notas){
-		form['selectCdnotafiscalsaida'].value = notas;
+	function inserirNotas(notas, nomeAtributo){
+		form[nomeAtributo].value = notas;
+		$("#dialogLoading-dialog").dialog("open");
 		form.ACAO.value ='inserirNotas';
 		form.action = '${ctx}/expedicao/crud/Manifesto'; 
 		form.validate = 'false'; 
 		submitForm();
 	}
+
 	
 	function habilitarMotoristaVeiculo(){
 		if(${!consultar}){
@@ -620,7 +964,7 @@
 	function imprimirManifesto(){
 		if(!isManifestoImpresso()){			
 			if(confirm("Uma vez impresso o manifesto não poderá ser editado. Deseja realmente confirmar a operação?")){
-				form.action = '${ctx}/expedicao/report/Emitirmanifesto?ACAO=gerar&cdmanifesto='+$("#cdmanifestoId").val()+'&manifestostatus.cdmanifestostatus='+$w.getValueId($("#manifestostatusId").val()) 
+				form.action = '${ctx}/expedicao/report/Emitirmanifesto?ACAO=gerar&cdmanifesto='+$("#cdmanifestoId").val() 
 				form.validate = 'false'; 
 				submitForm();
 			}
@@ -667,8 +1011,7 @@
 			                                                      			'&auditoriaVO.id='+cdmanifesto+
 			                                                      			'&auditoriaVO.login='+login+
 			                                                      			'&auditoriaVO.senha='+senha+
-			                                                      			'&auditoriaVO.motivo='+motivo+
-			                                                      			'&manifestostatus.cdmanifestostatus='+cdmanifestostatus;
+			                                                      			'&auditoriaVO.motivo='+motivo
 			
 			form.validate = 'false'; 
 			submitForm();	
@@ -714,75 +1057,12 @@
 		}
 	}
 	
-	function openDialogTransbordo(detalheIndicie){
-		if(detalheIndicie!='todos'){
-			populaInfoDialogTransbordo(detalheIndicie);
-		}
-		showHideDeposito();			
-		$("#transbordo-dialog").dialog("open");	
-		$("#indexParamId").val(detalheIndicie);
-	}
-	
-	function populaInfoDialogTransbordo(detalheIndicie){
-		if($('input[name="listaManifestonotafiscal['+detalheIndicie+'].temDepositoTransbordo"]').val() == "true"){
-			$("#temDepositoTransbordoDialog").attr("checked",true);
-			$("#temDepositoTransbordoDialog").val("true");
-			$("#depositotransbordoDialog").val($('input[name="listaManifestonotafiscal['+detalheIndicie+'].depositotransbordo"]').val());
-		}else if($('input[name="listaManifestonotafiscal['+detalheIndicie+'].notafiscalsaida.praca.listaRotapraca[0].rota.temDepositoTransbordo"]').val() == "true"){
-			$("#temDepositoTransbordoDialog").attr("checked",true);
-			$("#temDepositoTransbordoDialog").val("true");
-			$("#depositotransbordoDialog").val($('input[name="listaManifestonotafiscal['+detalheIndicie+'].notafiscalsaida.praca.listaRotapraca[0].rota.depositotransbordo"]').val());
-		}
-	}
-	
-	function atualizarInfoTransbordo(){
-		
-		var temDepositoTransbordo = $("#temDepositoTransbordoDialog").attr("checked");
-		var depositotransbordo = $("#depositotransbordoDialog").val();
-		var temDepositoTransbordoRota = false;
-
-		if ($('input[name="listaManifestonotafiscal['+$("#indexParamId").val()+'].notafiscalsaida.praca.listaRotapraca[0].rota.depositotransbordo"]').val() != '<null>')
-			var temDepositoTransbordoRota = $('input[name="listaManifestonotafiscal['+$("#indexParamId").val()+'].notafiscalsaida.praca.listaRotapraca[0].rota.depositotransbordo"]').val();
-
-		if (temDepositoTransbordoRota && !temDepositoTransbordo){
-			alert('Para esta rota, é obrigatorio realizar o transbordo!!!');
-			return false;
-		}
-		
-		if($("#indexParamId").val()=='todos'){
-			var count = 0;
-			$('input[name$=.numero]').each(function(){
-				$('input[name=listaManifestonotafiscal['+count+'].temDepositoTransbordo]').val(Boolean(temDepositoTransbordo));
-				$('input[name=listaManifestonotafiscal['+count+'].depositotransbordo]').val(depositotransbordo);
-				count++;
-			});
-		}else{
-			$('input[name=listaManifestonotafiscal['+$("#indexParamId").val()+'].temDepositoTransbordo]').val(Boolean(temDepositoTransbordo));
-			$('input[name=listaManifestonotafiscal['+$("#indexParamId").val()+'].depositotransbordo]').val(depositotransbordo);
-			$("#temDepositoTransbordoDialog").removeAttr("checked");
-		}
-
-		return true;
-	}
-	
-	function showHideDeposito(){
-		if($("#temDepositoTransbordoDialog").attr("checked") == true){
-			$("#painelDepositoTransbordo").show();
-		}else{
-			$("#painelDepositoTransbordo").hide();
-			$("#depositotransbordoDialog").val("<null>")
-		}
-	}
-	
 	function populaInfoColunaTransbordo(){
 		var count = 0;
+
 		$('input[name$=notafiscalsaida.numero]').each(function(){
 			if($('input[name="listaManifestonotafiscal['+count+'].temDepositoTransbordo"]').val() == "true"){
 				$("#isTransbordo"+count).html('Sim');
-			}else if($('input[name="listaManifestonotafiscal['+count+'].notafiscalsaida.praca.listaRotapraca[0].rota.temDepositoTransbordo"]').val() == "true"){
-				$("#isTransbordo"+count).html('Sim');
-				$('input[name="listaManifestonotafiscal['+count+'].temDepositoTransbordo').val("true");
-				$('input[name="listaManifestonotafiscal['+count+'].depositotransbordo"]').val($('input[name="listaManifestonotafiscal['+count+'].notafiscalsaida.praca.listaRotapraca[0].rota.depositotransbordo').val());
 			}else{
 				$("#isTransbordo"+count).html('Não');
 			}
@@ -843,7 +1123,6 @@
 		});
 	}
 	
-	/* Cria a linha do Datagrid */
 	function makeRow(i, log) {
 		var row = "<tr class='" + (i % 2 == 0 ? "dataGridBody1" : "dataGridBody2") + "'>";
 			row += "<td>" + log.cderro + "</td>";
@@ -854,8 +1133,6 @@
 	}
 	
 	function salvarForCDAE(){
-		//isSolicitarAprovacao
-		
 		form.ACAO.value ='salvar';
 		form.action = '/wmsre/expedicao/crud/Manifesto'; 
 		form.validate = 'true'; 
@@ -873,13 +1150,87 @@
 			}
 		}
 	}
+	function quebralinhaPraca(){
+		for(var i=0;i<=$("#listaManifestonotafiscalId tr").length;i++){
+			var pracaNome = $('input[name="listaManifestonotafiscal['+i+'].notafiscalsaida.praca.nome"]').val();
+			var id = "#pracanome"+i
+			try{
+				$(id).html($w.quebralinhaDetalhe(10,pracaNome));
+			}catch(err){
+				$(id).html('');
+			}
+		}
+	}
+	
+	function reindexaRota(){
+		$("#listaManifestonotafiscalId tr td span[id*='rotanome']").each(function (i) {
+			$(this).attr('id',"rotanome"+i);
+			
+		});
+
+	}	
+	function reindexaCliente(){
+		$("#listaManifestonotafiscalId tr td span[id*='clientenome']").each(function (i) {
+			$(this).attr('id',"clientenome"+i);
+			
+		});
+
+	}	
+
+	function reindex(form, removedIndexedProperty){
+		if(form==null){
+			alert("reindex(): O form fornecido ? null   \n\n@author rogelgarcia");
+			return;
+		}
+		if(removedIndexedProperty==null){
+			alert("reindex(): O removedIndexedProperty fornecido ? null   \n\n@author rogelgarcia");
+			return;
+		} else {
+			if(!removedIndexedProperty.match("\\w*\\[\\d*\\]")){
+				alert("reindex(): O removedIndexedProperty fornecido ? inv?lido ("+removedIndexedProperty+")\nO formato deve ser propriedade[indice]");
+				return;
+			}
+		}
+		var property = removedIndexedProperty.substring(0,removedIndexedProperty.indexOf("["));
+		var excludedNumber = extrairNumeroDeIndexedProperty(removedIndexedProperty);
+		for(i = 0; i < form.elements.length; i++){
+			var element = form.elements[i];
+			if(element.name == null) continue;
+			
+			var elementReducedProperty = element.name;
+			var indexBrackets = null;
+			var liorp = elementReducedProperty.indexOf("[");
+			if(liorp > 0){
+				elementReducedProperty = elementReducedProperty.substring(0,liorp);
+				indexBrackets = element.name.substring(element.name.indexOf('['), element.name.indexOf(']')+1);
+			}
+			
+			if(elementReducedProperty == property || elementReducedProperty == "_"+property){
+				var elementName = elementReducedProperty + indexBrackets;
+				//alert('before '+element.name);
+				var elementSubproperties = element.name.substring(elementName.length, element.name.length);
+				//alert(indexBrackets);
+				var open = elementName.indexOf("[");
+				var close = elementName.indexOf("]");
+				var number = extrairNumeroDeIndexedProperty(elementName);
+				//alert(number);
+				if(number>excludedNumber){
+					number--;
+					var reindexedName = elementName.substring(0,open)+"["+number+"]"+ elementSubproperties;
+					//alert(element.name + " -> "+reindexedName);
+					element.name = reindexedName;
+					//alert('after'+element.name);
+				}
+			}
+		}
+	}
 	
 	function quebralinhaCliente(){
 		for(var i=0;i<=$("#listaManifestonotafiscalId tr").length;i++){
 			var clienteNome = $('input[name="listaManifestonotafiscal['+i+'].notafiscalsaida.cliente.nome"]').val();
 			var id = "#clientenome"+i;		
 			try{
-				$(id).html($w.quebralinhaDetalhe(17,clienteNome));
+				$(id).html($w.quebralinhaDetalhe(14,clienteNome));
 			}catch(err){
 				$(id).html('');
 			}
@@ -895,28 +1246,35 @@
 	}
 	
 	function showHideBotaoInclusao(){
-		
 		var cdtipoentrega;
-		
 		try {
 		   	cdtipoentrega = $w.getComboIdSelected(form['tipoentrega']);
 		}
 		catch(err) {
 			cdtipoentrega = $w.getValueId($("#tipoentregaHideId").val());
 		}
-		
 		if(cdtipoentrega=='undefined' || cdtipoentrega=="<null>" || cdtipoentrega.trim()=="" || cdtipoentrega=="1" || cdtipoentrega=="2"){
 			$("#incluirNotaId").show();
 			$("#incluirManifestoId").hide();
-		}else{
+			$("#incluirPackingListId").hide();
+		}else if(cdtipoentrega == "4"){
+			$("#incluirPackingListId").show();
 			$("#incluirNotaId").hide();
+			$("#incluirManifestoId").hide();			
+		}else{
 			$("#incluirManifestoId").show();
+			$("#incluirNotaId").hide();
+			$("#incluirPackingListId").hide();
 		}
 		
 	}
 	
 	function incluirManifesto(){
-		$w.openPopup("${ctx}/expedicao/crud/Manifesto?ACAO=buscarManifesto&cdmanifesto",998,605);
+		$w.openPopup("${ctx}/expedicao/crud/Manifesto?ACAO=buscarManifesto&cdmanifesto",1028,605);
+	} 
+
+	function incluirPackingList(){
+		$w.openPopup("${ctx}/expedicao/crud/Manifesto?ACAO=buscarPackingList&cdmanifesto",1028,605);
 	} 
 	
 	function inserirManifestos(cdmanifestos){
@@ -934,5 +1292,211 @@
 	function openDialogFilialReferencia(){
 		$("#filialReferencia-dialog").dialog("open");
 	}
+
+
+	function verificaNotasSemFrete(){
+		var exibeModal = false;
+		
+		$("input[name*=existeFreteClienteNota]").each(function () {
+			if ($(this).val() == 'false'){
+				$(this).parent().parent().css("color", "red");
+				exibeModal = true;
+			}
+			
+		});
+
+		if (exibeModal){$("div.messageblock > ul > li.trace").css("font-size", "14px");}
+
+	}
+
+	function openDialogInfoNotaDevolucao(){
+		$("#info-nota-devolucao").dialog("open");
+	}
 	
+	function autorizarNotas(){
+		$("#autorizarNotas-dialog").dialog("open");
+		$("input[name*=senhaAutorizacao]").removeAttr("disabled");
+		$("input[name*=cdmanifestonotafiscal]").removeAttr("disabled");
+	}
+
+	function liberarNotas(){
+		document.forms["formAutorizarNotas"].submit();	
+	}	
+	function excluirLinhaPorNome(nome, ignoreMessage){ 
+		if(!ignoreMessage){
+			if (!confirm('Tem certeza que deseja excluir este item?')) {
+			   return false;
+			}
+		}
+
+		var open = nome.lastIndexOf("[");
+		var close = nome.lastIndexOf("]");
+		var prop = nome.substring(open+1,close);
+		var virgula = prop.lastIndexOf(",");
+		var table_id = prop.substring(9,virgula);
+		var indice = prop.substring(virgula+9, prop.length);
+		var i = indice - 1;
+        var refdevolucao= "listaManifestonotafiscal["+ i +"].notafiscalsaida.cdnotafiscalsaidareferencia";				
+        var devolucao= "listaManifestonotafiscal["+ i +"].notafiscalsaida.cdnotafiscalsaida";
+
+        var codigoDevolucao= $('input[name='+devolucao+']').val();
+        var codigoReferente = $('input[name='+refdevolucao+']').val();
+		if(codigoReferente > 0){
+			excluirNotas([codigoDevolucao], [codigoReferente]);
+			return false;
+		} else {
+			var name = "listaManifestonotafiscal["+ i +"].notafiscalsaida.cdnotafiscalsaida";
+
+			var codigo = $('input[name='+name+']').val()
+
+			var notas = buscaRelacionadas(codigo);
+			
+			if( notas.length > 0){
+				excluirNotas([codigo], notas)
+				return false;
+			} else {
+				removeRow(table_id, indice);
+				reindexButtons(table_id, indice);
+				reindexaRota();
+				reindexaCliente();
+			}
+		}
+		return true;
+	}
+
+	function buscaRelacionadas(codigo){
+		var ref = [];
+		$("#listaManifestonotafiscalId tr td :input:hidden").each(function (){
+			if($(this).attr("name").indexOf("cdnotafiscalsaidareferencia") != -1){
+
+				var name = $(this).attr('name');
+
+				var codigoref = $('input[name='+name+']').val();
+
+				if(codigoref == codigo){
+
+					var open_ = name.lastIndexOf("[");
+					var close_ = name.lastIndexOf("]");
+					var i = name.substring(open_+1,close_);
+
+	                var obj = "listaManifestonotafiscal["+i+"].notafiscalsaida.cdnotafiscalsaida";	
+
+                	ref.push($('input[name='+obj+']').val());	
+				}
+		    }
+		})
+		return ref;
+	}	
+	function buscaNotasDevolucao(){
+		var notas = [];
+		$('input[name^="excluirNota"]').each(function() {
+			var obj = JSON.parse((this).value);
+			notas.push(obj[0].toString());
+		});	
+		return notas;
+	}
+	function buscaReferenciaDasNotas(notas){
+		console.log("buscaReferenciaDasNotas: " + notas)
+		var ref = [];
+		$("#listaManifestonotafiscalId tr td :input:hidden").each(function (){
+			if($(this).attr("name").indexOf("cdnotafiscalsaida") != -1 && $(this).attr("name").indexOf("cdnotafiscalsaidareferencia") == -1 ){
+
+				var name = $(this).attr('name');
+
+				var open_ = name.lastIndexOf("[");
+				var close_ = name.lastIndexOf("]");
+				var indice = name.substring(open_+1,close_);
+
+				var codigo = $('input[name='+name+']').val();
+				
+				if( $.inArray(codigo, notas) >= 0 ){
+                    var referencia= "listaManifestonotafiscal["+indice+"].notafiscalsaida.cdnotafiscalsaidareferencia";				
+                    ref.push($('input[name='+referencia+']').val());	
+                }		
+		    }
+		})
+		return ref;
+	}
+	function excluirNotas(devolucao, referencia){
+
+		LIBERADO = 1;
+
+		var notas = $.merge(devolucao, referencia);
+		console.log(notas)
+
+		$("#listaManifestonotafiscalId tr td :input:hidden").each(function (){
+			if($(this).attr("name").indexOf("cdnotafiscalsaida") != -1 && $(this).attr("name").indexOf("cdnotafiscalsaidareferencia") == -1 ){
+
+				var name = $(this).attr('name');
+
+				var open_ = name.lastIndexOf("[");
+				var close_ = name.lastIndexOf("]");
+				var i = name.substring(open_+1,close_);
+
+                var obj= "listaManifestonotafiscal["+i+"].notafiscalsaida.cdnotafiscalsaida";				
+
+				var codigo = $('input[name='+obj+']').val();
+				
+				if($.inArray(codigo, notas) >= 0){
+					var indice = $(this).closest('tr')[0].rowIndex;
+					removeRow("listaManifestonotafiscalId", indice);
+					reindexButtons("listaManifestonotafiscalId", indice);
+					reindexaRota();
+					reindexaCliente();
+					//console.log("I: "+i)
+					indice--;
+					reindex(document.form, "listaManifestonotafiscal"+'['+indice+']');
+					//quebralinhaRota();
+				}
+		    }
+		})
+	}
+
+	function countNotasComReferencia(referencia){
+		var count = 0;
+		$("#listaManifestonotafiscalId tr td :input:hidden").each(function (){
+			if($(this).attr("name").indexOf("cdnotafiscalsaidareferencia") != -1 ){
+				var name = $(this).attr('name');
+
+				var codigo = $('input[name='+name+']').val();
+				
+				if(codigo > 0 && $.inArray(codigo, referencia)){
+					count++;
+				}
+		    }
+		})
+
+		return count;
+	}
+
+	function removeRow(tableId, rowNumber){
+		var table = document.getElementById(tableId);
+		table.deleteRow(rowNumber);
+		organizarCSS(table);	
+	}	
+
+	function reindexFormPorNome(nome, form, indexedProperty, considerHeader){
+
+		if(LIBERADO == 0){
+			//alert(nome);
+			var open = nome.lastIndexOf("[");
+			var close = nome.lastIndexOf("]");
+			var prop = nome.substring(open+1,close);
+			var virgula = prop.lastIndexOf(",");
+			var table_id = prop.substring(9,virgula);
+			var indice = prop.substring(virgula+9, prop.length);
+			if(considerHeader){
+				indice--;
+			}
+			reindex(form, indexedProperty+'['+indice+']');
+		}
+		
+	}
+
+
+	function confirmarTranbordoNotas(){
+		document.forms["formCriarTransbordo"].submit();	
+	}
+
+	 */
 </script>

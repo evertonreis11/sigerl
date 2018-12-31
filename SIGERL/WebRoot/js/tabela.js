@@ -5,7 +5,7 @@ function DataGridUtil (){
 DataGridUtil.prototype.changeCheckState = function(id){
 	if(!id)	id = "tabelaResultados";
 		
-	var check = $("#selectAll").attr("checked");
+	var check = $("#selectAll").is(":checked");
 	
 	$("#"+id+" input[type=checkbox][name=selecteditens]").each(function(){
 		if(check) $(this).attr("checked",check);

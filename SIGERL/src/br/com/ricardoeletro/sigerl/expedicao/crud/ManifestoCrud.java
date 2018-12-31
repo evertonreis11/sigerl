@@ -1,22 +1,30 @@
 package br.com.ricardoeletro.sigerl.expedicao.crud;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 
 import br.com.linkcom.neo.authorization.crud.CrudAuthorizationModule;
 import br.com.linkcom.neo.controller.Controller;
+import br.com.linkcom.neo.controller.Message;
+import br.com.linkcom.neo.controller.MessageType;
 import br.com.linkcom.neo.controller.crud.CrudException;
 import br.com.linkcom.neo.core.web.WebRequestContext;
 import br.com.linkcom.neo.types.Money;
 import br.com.linkcom.neo.util.CollectionsUtil;
 import br.com.linkcom.neo.view.ajax.JsonModelAndView;
 import br.com.linkcom.wms.geral.bean.Acao;
+import br.com.linkcom.wms.geral.bean.Cliente;
 import br.com.linkcom.wms.geral.bean.Deposito;
+import br.com.linkcom.wms.geral.bean.Depositofilial;
 import br.com.linkcom.wms.geral.bean.Logintegracaoae;
 import br.com.linkcom.wms.geral.bean.Manifesto;
 import br.com.linkcom.wms.geral.bean.Manifestohistorico;
@@ -24,36 +32,43 @@ import br.com.linkcom.wms.geral.bean.Manifestonotafiscal;
 import br.com.linkcom.wms.geral.bean.Manifestostatus;
 import br.com.linkcom.wms.geral.bean.Motorista;
 import br.com.linkcom.wms.geral.bean.Notafiscalsaida;
+import br.com.linkcom.wms.geral.bean.Notafiscaltipo;
+import br.com.linkcom.wms.geral.bean.Rota;
 import br.com.linkcom.wms.geral.bean.Rotagerenciadora;
 import br.com.linkcom.wms.geral.bean.Statusconfirmacaoentrega;
 import br.com.linkcom.wms.geral.bean.Tipoentrega;
 import br.com.linkcom.wms.geral.bean.Tipomanifestohistorico;
+import br.com.linkcom.wms.geral.bean.Tipovenda;
 import br.com.linkcom.wms.geral.bean.Transportador;
 import br.com.linkcom.wms.geral.bean.Veiculo;
 import br.com.linkcom.wms.geral.bean.vo.Auditoria;
 import br.com.linkcom.wms.geral.service.AuditoriaService;
 import br.com.linkcom.wms.geral.service.ClienteService;
+import br.com.linkcom.wms.geral.service.ConfiguracaoService;
 import br.com.linkcom.wms.geral.service.DepositoService;
+import br.com.linkcom.wms.geral.service.DepositofilialService;
 import br.com.linkcom.wms.geral.service.LogintegracaoaeService;
 import br.com.linkcom.wms.geral.service.ManifestoService;
 import br.com.linkcom.wms.geral.service.ManifestocodigobarrasService;
+import br.com.linkcom.wms.geral.service.ManifestofinanceiroService;
 import br.com.linkcom.wms.geral.service.ManifestohistoricoService;
 import br.com.linkcom.wms.geral.service.ManifestonotafiscalService;
 import br.com.linkcom.wms.geral.service.MotoristaService;
 import br.com.linkcom.wms.geral.service.NotafiscalsaidaService;
 import br.com.linkcom.wms.geral.service.RotaService;
 import br.com.linkcom.wms.geral.service.RotagerenciadoraService;
+import br.com.linkcom.wms.geral.service.TiponotafiscalService;
 import br.com.linkcom.wms.geral.service.TransportadorService;
 import br.com.linkcom.wms.geral.service.UsuarioService;
 import br.com.linkcom.wms.geral.service.VeiculoService;
 import br.com.linkcom.wms.util.CrudController;
 import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.WmsUtil;
+import br.com.linkcom.wms.util.armazenagem.ConfiguracaoVO;
 import br.com.ricardoeletro.sigerl.expedicao.crud.filtro.ManifestoFiltro;
 
 @Controller(path="/expedicao/crud/Manifesto", authorizationModule=CrudAuthorizationModule.class)
 public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Manifesto>{
-	
 	private ManifestoService manifestoService;
 	private DepositoService depositoService;
 	private MotoristaService motoristaService;
@@ -67,8 +82,13 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 	private LogintegracaoaeService logintegracaoaeService;
 	private ClienteService clienteService;
 	private ManifestocodigobarrasService manifestocodigobarrasService;
+	private TiponotafiscalService tiponotafiscalService;
 	private RotaService rotaService;
-	
+	private DepositofilialService depositofilialService;
+	private ManifestofinanceiroService manifestofinanceiroService;
+	private ConfiguracaoService configuracaoService;
+//	private ImportacaocargaService importacaocargaService;
+
 	public void setManifestoService(ManifestoService manifestoService) {
 		this.manifestoService = manifestoService;
 	}
@@ -108,10 +128,24 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 	public void setManifestocodigobarrasService(ManifestocodigobarrasService manifestocodigobarrasService) {
 		this.manifestocodigobarrasService = manifestocodigobarrasService;
 	}
+	public void setTiponotafiscalService(TiponotafiscalService tiponotafiscalService) {
+		this.tiponotafiscalService = tiponotafiscalService;
+	}
 	public void setRotaService(RotaService rotaService) {
 		this.rotaService = rotaService;
 	}
-	
+	public void setDepositofilialService(DepositofilialService depositofilialService) {
+		this.depositofilialService = depositofilialService;
+	}
+	public void setManifestofinanceiroService(ManifestofinanceiroService manifestofinanceiroService) {
+		this.manifestofinanceiroService = manifestofinanceiroService;
+	}
+	public void setConfiguracaoService(ConfiguracaoService configuracaoService) {
+		this.configuracaoService = configuracaoService;
+	}
+/*	public void setImportacaocargaService(ImportacaocargaService importacaocargaService) {
+		this.importacaocargaService = importacaocargaService;
+	}*/
 	
 	@Override
 	protected void listagem(WebRequestContext request, ManifestoFiltro filtro) throws Exception {
@@ -141,8 +175,40 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 		String acao = request.getParameter("ACAO");
 		
 		if(acao != null && acao.toLowerCase().equals("editar")){
-			if(manifesto != null && !manifesto.getManifestostatus().equals(Manifestostatus.EM_ELABORACAO)){
-				throw new WmsException("Não é possível editar um Manifesto com status diferente de 'Em Elaboração'.");
+			if(manifesto != null && 
+					!manifesto.getManifestostatus().equals(Manifestostatus.EM_ELABORACAO) &&
+					!manifesto.getManifestostatus().equals(Manifestostatus.AGUARDANDO_LIBERACAO)){
+				throw new WmsException("Não é possível editar um Manifesto com status diferente de 'Em Elaboração' ou 'Aguardando Liberação'");
+			}
+		}
+		request.setAttribute("LISTA_DEPOSITO", depositoService.findAtivos());
+		
+
+		if(manifesto!=null && manifesto.getCdmanifesto()!=null){
+			manifesto.setListaManifestohistorico(manifestohistoricoService.findByManifesto(manifesto));
+			if(manifesto.getListaManifestonotafiscal()==null || manifesto.getListaManifestonotafiscal().isEmpty()){
+				manifesto.setListaManifestonotafiscal(manifestonotafiscalService.findByManifesto(manifesto));
+			}
+			request.setAttribute("listaLog", logintegracaoaeService.findByManifesto(manifesto));
+		}
+		
+		if (Tipoentrega.ENTREGA_CLIENTE.equals(manifesto.getTipoentrega()) 
+				&& manifesto.getListaManifestonotafiscal() != null 
+				&& !manifesto.getListaManifestonotafiscal().isEmpty()
+				&& (Manifestostatus.EM_ELABORACAO.equals(manifesto.getManifestostatus()) || 
+					 (Manifestostatus.AGUARDANDO_LIBERACAO.equals(manifesto.getManifestostatus())))){
+			
+			validaNotasPedidoSemFrete(manifesto);
+			
+			if (CollectionUtils.exists(manifesto.getListaManifestonotafiscal(), 
+					new BeanPropertyValueEqualsPredicate("existeFreteClienteNota", Boolean.FALSE))){
+				
+				StringBuilder msg = new StringBuilder();
+				msg.append("Atenção!!! Existem notas inclusas neste manifesto, vinculadas a pedidos que não ")
+				.append("tiveram contratação de frete, por este motivo o manifesto somente poderá ")
+				.append("ser impresso após autorização");
+				
+				request.addMessage(msg.toString(), MessageType.TRACE);
 			}
 		}
 		
@@ -152,7 +218,16 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 			request.setAttribute("isEmElaboracao", Boolean.FALSE);
 		}
 		
-		if(manifesto!=null && manifesto.getCdae()!=null && manifesto.getManifestostatus()!=null && (manifesto.getManifestostatus().equals(Manifestostatus.EM_ELABORACAO) || manifesto.getManifestostatus().equals(Manifestostatus.IMPRESSO))){
+		request.setAttribute("isAguardandoLiberacao", manifesto!=null && 
+				manifesto.getManifestostatus()!=null && 
+				manifesto.getManifestostatus().equals(Manifestostatus.AGUARDANDO_LIBERACAO));
+		
+		if(manifesto!=null 
+				&& manifesto.getCdae()!=null 
+				&& manifesto.getManifestostatus()!=null 
+				&& (manifesto.getManifestostatus().equals(Manifestostatus.EM_ELABORACAO) || 
+					manifesto.getManifestostatus().equals(Manifestostatus.IMPRESSO) || 
+					manifesto.getManifestostatus().equals(Manifestostatus.AGUARDANDO_LIBERACAO))){
 			request.setAttribute("isAutorizado", Boolean.TRUE);
 		}else{
 			request.setAttribute("isAutorizado", Boolean.FALSE);
@@ -164,17 +239,20 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 			request.setAttribute("isImpresso", Boolean.FALSE);
 		}
 		
-		if(manifesto!=null && manifesto.getCdmanifesto()!=null){
-			manifesto.setListaManifestohistorico(manifestohistoricoService.findByManifesto(manifesto));
-			if(manifesto.getListaManifestonotafiscal()==null || manifesto.getListaManifestonotafiscal().isEmpty()){
-				manifesto.setListaManifestonotafiscal(manifestonotafiscalService.findByManifesto(manifesto));
-			}
-			request.setAttribute("listaLog", logintegracaoaeService.findByManifesto(manifesto));
-		}
-		
 		calcularTotalizadores(request,manifesto);
 		
-		request.setAttribute("LISTA_DEPOSITO_TRANSBORDO", getListaDeposito());
+		if (acao != null && acao.toLowerCase().equals("salvar")){
+			if (Tipoentrega.TRANSFERENCIA.equals(manifesto.getTipoentrega())
+					|| Tipoentrega.CONSOLIDACAO.equals(manifesto.getTipoentrega())){
+				manifesto.setTemTransbordo(manifestoService.validarTransbordoNotas(manifesto));
+				
+				if (manifesto.getTemTransbordo()){
+					request.setAttribute("LISTA_DEPOSITO_TRANSBORDO", getListaDeposito());
+					manifesto.setListaNotasTransbordo(notafiscalsaidaService.recuperaNotasTransbordoPopUp(manifesto.getCdmanifesto()));
+				}
+			}
+		}
+		
 		
 		if(manifesto!=null && manifesto.getTipoentrega()!=null && manifesto.getTipoentrega().equals(Tipoentrega.AGRUPAMENTO)){
 			request.setAttribute("isAgrupamento", "true");
@@ -197,6 +275,74 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 		super.entrada(request, manifesto);
 	}
 	
+	/**
+	 * Valida notas com o pedido preenchido para verificar sem tem frete de cliente.
+	 *
+	 * @param listaManifestonotafiscal the lista manifestonotafiscal
+	 * @param deposito the deposito
+	 */
+	@SuppressWarnings("unchecked")
+	private void validaNotasPedidoSemFrete(Manifesto manifesto) {
+		
+		Boolean validaFreteCliente = ConfiguracaoService.getInstance().isTrue(ConfiguracaoVO.VALIDAR_FRETE_CLIENTE, manifesto.getDeposito());
+		manifesto.setListaNotaFiscalSemFrete(new ArrayList<Manifestonotafiscal>());
+		ArrayList<Integer> listIdCliente = new ArrayList<Integer>();
+		Boolean peloMenosUmaNotaComFrete = false; 
+		Integer idcliente;
+		for (Manifestonotafiscal manifestonotafiscal : manifesto.getListaManifestonotafiscal()) {
+			idcliente = manifestonotafiscal.getNotafiscalsaida().getCliente().getCdpessoa();
+			if(!listIdCliente.contains(idcliente)){
+				listIdCliente.add(idcliente);
+			}
+		}
+		for (Integer codigo : listIdCliente){	
+			List<Manifestonotafiscal> listaNotaCliente = (List<Manifestonotafiscal>) CollectionUtils.select(
+					manifesto.getListaManifestonotafiscal(), 
+					new BeanPropertyValueEqualsPredicate("notafiscalsaida.cliente.cdpessoa", codigo)
+			);
+			for (Manifestonotafiscal manifestonotafiscalCliente : listaNotaCliente) {
+				if(manifestonotafiscalCliente.getNotafiscalsaida().getValorfretecliente().getValue() != null && 
+						manifestonotafiscalCliente.getNotafiscalsaida().getValorfretecliente().getValue().compareTo(BigDecimal.ZERO) > 0){
+					peloMenosUmaNotaComFrete =  Boolean.TRUE;
+				}
+			}
+			if(peloMenosUmaNotaComFrete.equals(Boolean.TRUE)){
+				for (Manifestonotafiscal manifestonotafiscalCliente : listaNotaCliente) {
+					manifestonotafiscalCliente.setTemFretePago(Boolean.TRUE);
+				}
+			}
+			peloMenosUmaNotaComFrete  = Boolean.FALSE;
+		}		
+		for (Manifestonotafiscal manifestonotafiscal : manifesto.getListaManifestonotafiscal()) {
+			if (validaFreteCliente){
+				manifestonotafiscal.setExisteFreteClienteNota(isNotaSemFreteCliente(manifestonotafiscal));
+				
+				if (!manifestonotafiscal.getExisteFreteClienteNota()){
+					manifesto.getListaNotaFiscalSemFrete().add(manifestonotafiscal);
+				}
+			}
+		}
+		
+		setManifestoStatus(manifesto);
+	}
+	
+	/**
+	 * Valida se a nota tem o valor de frete pago pelo cliente ou foi autorizada a ser manifestada.
+	 *
+	 * @param manifestonotafiscal the manifestonotafiscal
+	 * @return the boolean
+	 */
+	public Boolean isNotaSemFreteCliente(Manifestonotafiscal manifestonotafiscal) {
+		return !(manifestonotafiscal.getTemFretePago() == Boolean.FALSE && 
+				manifestonotafiscal.getNotafiscalsaida().getNumeropedido() != null &&
+				Tipovenda.LOJA_FISICA.getCdtipovenda().equals(manifestonotafiscal.getNotafiscalsaida().getTipovenda().getCdtipovenda()) &&
+				 (manifestonotafiscal.getNotafiscalsaida().getNotaautorizada() == null || 
+				   Boolean.FALSE.equals(manifestonotafiscal.getNotafiscalsaida().getNotaautorizada())) && 
+				(manifestonotafiscal.getNotafiscalsaida().getValorfretecliente() == null ||  
+				 manifestonotafiscal.getNotafiscalsaida().getValorfretecliente().getValue().compareTo(BigDecimal.ZERO) <= 0) &&
+				!manifestonotafiscal.getNotafiscalsaida().getTemtroca() &&
+				!Notafiscaltipo.DEVOLUCAO.getCdnotafiscaltipo().equals(manifestonotafiscal.getNotafiscalsaida().getNotafiscaltipo().getCdnotafiscaltipo()));
+	}
 	/**
 	 * 
 	 * @param manifesto
@@ -235,6 +381,7 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 	@Override
 	protected void salvar(WebRequestContext request, Manifesto manifesto) throws Exception {
 		
+
 		if(manifesto.getListaManifestonotafiscal()==null || manifesto.getListaManifestonotafiscal().isEmpty()){
 			throw new WmsException("Não é possível salvar o manifesto sem ao menos 1 nota vinculada.");
 		}else{
@@ -242,15 +389,23 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 			Integer cdmanifesto = manifesto.getCdmanifesto();
 			
 			if(!manifesto.getTipoentrega().equals(Tipoentrega.AGRUPAMENTO) && manifestoService.validarNotasVinculadas(manifesto.getListaManifestonotafiscal(),cdmanifesto)){
+				
 				request.setAttribute("isRedirectToListagem", "true");	
 				throw new WmsException("Esse manifesto não pode ser salvo, as notas estão vinculados a outro manifesto.");
+				
 			}else if(manifesto.getTipoentrega().equals(Tipoentrega.AGRUPAMENTO) && manifestoService.validarNotasVinculadasAgrupamento(manifesto.getListaManifestonotafiscal(),cdmanifesto,manifesto.getSelectCdmanifesto())){
+				
 				request.setAttribute("isRedirectToListagem", "true");	
 				throw new WmsException("Esse manifesto não pode ser salvo, as notas estão vinculados a outro manifesto.");
+				
 			}
 			
-			if(manifesto.getManifestostatus()==null || !manifesto.getManifestostatus().equals(Manifestostatus.EM_ELABORACAO)){
-				throw new WmsException("Não é possível salvar o manifesto. O status está diferente de 'Em Elaboração'.");
+			if(manifesto.getManifestostatus()==null || 
+					(!manifesto.getManifestostatus().equals(Manifestostatus.EM_ELABORACAO) && 
+					!manifesto.getManifestostatus().equals(Manifestostatus.AGUARDANDO_LIBERACAO))){
+				
+				throw new WmsException("Não é possível salvar o manifesto. O status está diferente de 'Em Elaboração' e 'Aguardando Liberação'.");
+				
 			}
 			
 			if(manifesto!=null && manifesto.getCdmanifesto()!=null){
@@ -276,9 +431,18 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 			manifesto.setQtdtotalnf(manifesto.getListaManifestonotafiscal().size());
 			manifesto.setQtdtotalitensnf(somatorioItensNotas(manifesto.getListaManifestonotafiscal()));
 			
-			
 			setarStatusEntregaNotas(manifesto);
 			
+			if (Tipoentrega.ENTREGA_CLIENTE.equals(manifesto.getTipoentrega()) 
+					&& (Manifestostatus.EM_ELABORACAO.equals(manifesto.getManifestostatus()) || 
+						 (Manifestostatus.AGUARDANDO_LIBERACAO.equals(manifesto.getManifestostatus())))){
+				
+				validaNotasPedidoSemFrete(manifesto);
+				
+				if (manifesto.getCdmanifesto() != null && manifesto.getCdmanifesto() > 0){
+					setTokenInManifestoNota(manifesto);
+				}
+			}
 			super.salvar(request, manifesto);
 			
 			if(cdmanifesto==null){
@@ -295,11 +459,61 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 			}
 			
 			if(manifesto.getIsSolicitarAprovacao()){
-				solicitarAnalise(manifesto);
+				solicitarAnalise(request, manifesto);
 				request.setAttribute("showLogList", Boolean.TRUE);
 			}
-					
+
+			/*if (Manifestostatus.AGUARDANDO_LIBERACAO.equals(manifesto.getManifestostatus())){
+				manifestoService.enviarEmailPedidosSemFrete(manifesto);
+			}*/
 		}
+	}
+	
+	/**
+	 * Sets the token in manifesto nota.
+	 *
+	 * @param manifesto the new token in manifesto nota
+	 */
+	private void setTokenInManifestoNota(Manifesto manifesto) {
+		List<Manifestonotafiscal> tokens = manifestonotafiscalService.findTokenByManifesto(manifesto);
+		
+		for (Manifestonotafiscal manifestonotafiscal : manifesto.getListaManifestonotafiscal()) {
+			if (tokens != null && !tokens.isEmpty()){
+				Manifestonotafiscal manifestoNotaPrevisao = (Manifestonotafiscal) CollectionUtils.find(tokens, 
+						new BeanPropertyValueEqualsPredicate("cdmanifestonotafiscal", manifestonotafiscal.getCdmanifestonotafiscal()));
+				
+				if (manifestoNotaPrevisao != null){
+					manifestonotafiscal.setToken(manifestoNotaPrevisao.getToken());
+				}
+			}
+		}
+		
+	}
+	/**
+	 * Método que garante que o transbordo será sempre preenchido quando utilizado.
+	 * 
+	 * @param listaManifestonotafiscal
+	 */
+	private void validarTransbordoNotas(List<Manifestonotafiscal> listaManifestonotafiscal) {
+		for (Manifestonotafiscal manifestonotafiscal : listaManifestonotafiscal) {
+			if (manifestonotafiscal.getNotafiscalsaida().getPraca() != null 
+					&& manifestonotafiscal.getNotafiscalsaida().getPraca().getCdpraca() != null){
+				
+				Rota rota = rotaService.recuperaRotaPorPracaParaValidacaoTransbordo(manifestonotafiscal.getNotafiscalsaida().getPraca());
+				
+				Boolean temDepositoTransbordoManifesto = manifestonotafiscal.getTemDepositoTransbordo();
+				
+				Boolean temDepositoTransbordoRota = (rota != null && rota.getTemDepositoTransbordo() == null) ? Boolean.FALSE: rota.getTemDepositoTransbordo();
+				
+				Deposito depositoTransbordo = rota.getDepositotransbordo();
+				
+				if (temDepositoTransbordoRota && !temDepositoTransbordoRota.equals(temDepositoTransbordoManifesto)){
+					manifestonotafiscal.setTemDepositoTransbordo(temDepositoTransbordoRota);
+					manifestonotafiscal.setDepositotransbordo(depositoTransbordo);
+				}
+			}
+		}
+		
 	}
 	
 	/**
@@ -313,7 +527,7 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 		
 		if(manifesto.getIsSolicitarAprovacao()){
 			manifesto = manifestoService.loadForEntrada(manifesto);
-			solicitarAnalise(manifesto);
+			solicitarAnalise(request, manifesto);
 			request.setAttribute("showLogList", Boolean.TRUE);
 		}
 		
@@ -366,6 +580,7 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 				manifestoService.desvincularManifestoFilho(manifesto, null);
 				manifestonotafiscalService.deleteByManifesto(manifesto.getCdmanifesto().toString());
 				manifestohistoricoService.deleteByManifesto(manifesto.getCdmanifesto().toString());
+				manifestofinanceiroService.deleteByManifesto(manifesto.getCdmanifesto().toString());
 				super.excluir(request, manifesto);	
 			}
 		}else if(request.getParameter("itenstodelete")!=null){
@@ -373,6 +588,7 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 				manifestoService.desvincularManifestoFilho(null, request.getParameter("itenstodelete"));
 				manifestonotafiscalService.deleteByManifesto(request.getParameter("itenstodelete"));
 				manifestohistoricoService.deleteByManifesto(request.getParameter("itenstodelete"));
+				manifestofinanceiroService.deleteByManifesto(request.getParameter("itenstodelete"));
 				super.excluir(request, manifesto);
 			}else{
 				request.addError("Existem manifesto com status diferente de 'Em Elaboração'.");
@@ -441,20 +657,31 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 			if(AuditoriaService.validaUsuario(request, auditoria, Acao.CANCELAR_MANIFESTO)){
 				try{
 					Manifesto manifesto = new Manifesto(auditoria.getId());
-					manifesto.setListaManifestonotafiscal(manifestonotafiscalService.findByManifesto(manifesto));
-					String whereIn = CollectionsUtil.listAndConcatenate(manifesto.getListaManifestonotafiscal(), "notafiscalsaida.cdnotafiscalsaida", ",");
-					auditoria.setUsuario(usuarioService.findByLoginUsuario(auditoria.getLogin()));
-					auditoria.setMotivo(Manifestohistorico.CANCELAR+auditoria.getMotivo());
-					manifestohistoricoService.criarHistoricoWithUsuario(manifesto, Manifestostatus.CANCELADO, auditoria, Tipomanifestohistorico.STATUS);
-					notafiscalsaidaService.desvincularNotas(whereIn);
-					manifestoService.cancelarManifesto(manifesto);
 					
 					Tipoentrega tipoentrega = manifestoService.findTipoEntregaForManifesto(manifesto);
+					
 					if(tipoentrega.equals(Tipoentrega.AGRUPAMENTO)){
-						manifestoService.desvincularManifestoFilho(manifesto,null);
+						request.addError("Não é permitido realizar o cancelamento de Manifesto do tipo AGRUPAMENTO pelo sistema. "
+								+ "Gentileza entrar em contato com o suporte do sistema para efetuar a ação.");
+						
+						
+						/* Metodo comentado devido a problema de cancelamento para manifesto agrupado.
+						 * Onde há a necessidade de desvincular as notas do manifesto de transferencia mas não é realizado.
+						 * 
+						 * Everton Reis - 13/09/2018
+						manifestoService.desvincularManifestoFilho(manifesto,null);*/
+					}else{
+						manifesto.setListaManifestonotafiscal(manifestonotafiscalService.findByManifesto(manifesto));
+						auditoria.setUsuario(usuarioService.findByLoginUsuario(auditoria.getLogin()));
+						auditoria.setMotivo(Manifestohistorico.CANCELAR+auditoria.getMotivo());
+						manifestohistoricoService.criarHistoricoWithUsuario(manifesto, Manifestostatus.CANCELADO, auditoria, Tipomanifestohistorico.STATUS);
+						String whereIn = CollectionsUtil.listAndConcatenate(manifesto.getListaManifestonotafiscal(), "notafiscalsaida.cdnotafiscalsaida", ",");
+						notafiscalsaidaService.desvincularNotas(whereIn);
+						manifestoService.cancelarManifesto(manifesto);
+						
+						request.addMessage("Manifesto(s) cancelado(s) com sucesso!");
 					}
 					
-					request.addMessage("Manifesto(s) cancelado(s) com sucesso!");
 				}catch (Exception e) {
 					e.printStackTrace();
 					request.addError("Operação não realizada.");
@@ -475,7 +702,9 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 	private void setDefaultValuesManifesto(Manifesto manifesto) {
 		
 		manifesto.setDeposito(WmsUtil.getDeposito());
-		manifesto.setManifestostatus(Manifestostatus.EM_ELABORACAO);
+		
+		setManifestoStatus(manifesto);
+		
 		manifesto.setDtemissao(new Timestamp(System.currentTimeMillis()));
 		manifesto.setUsuarioemissor(WmsUtil.getUsuarioLogado());
 		
@@ -488,6 +717,27 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 		}
 	}
 	
+	/**
+	 * Sets the manifesto status.
+	 *
+	 * @param manifesto the manifesto
+	 * @param existeNotaSemFrete the existe nota sem frete
+	 */
+	public void setManifestoStatus(Manifesto manifesto) {
+		Boolean existeNotaSemFrete = Boolean.FALSE;
+		
+		
+		if (manifesto.getListaManifestonotafiscal() != null && !manifesto.getListaManifestonotafiscal().isEmpty()) {
+			existeNotaSemFrete = CollectionUtils.exists(manifesto.getListaManifestonotafiscal(), 
+					new BeanPropertyValueEqualsPredicate("existeFreteClienteNota", Boolean.FALSE));
+		}
+		
+		if (existeNotaSemFrete)
+			manifesto.setManifestostatus(Manifestostatus.AGUARDANDO_LIBERACAO);
+		else
+			manifesto.setManifestostatus(Manifestostatus.EM_ELABORACAO);
+		}
+		
 	/**
 	 * Chama o popUp de inclusão de pedidos
 	 * 
@@ -525,26 +775,42 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 			numeronfe = null;
 		}
 		
-		/*try {
+		try {
 			tiponotafiscal = filtro.getTiponotafiscal().getCdtiponotafiscal(); 
 		} catch (Exception e) {
 			tiponotafiscal = 1;
-		}*/
+		}
 		
 		if(filtro.getCdcarregamento()!=null || filtro.getFilial()!=null || filtro.getCdcargaerp() !=null){
+			
 			if(filtro.getCdcarregamento()!=null || (filtro.getCdcargaerp() !=null && !filtro.getCdcargaerp().isEmpty()) ){
-				List<Notafiscalsaida> listaNotafiscalsaida = notafiscalsaidaService.findForListagemPopUp(filtro);
+				
+				List<Notafiscalsaida> listaNotafiscalsaida = notafiscalsaidaService.findForListagemPopUp(filtro,false);
 				request.setAttribute("NOTAS",listaNotafiscalsaida);			
-				/*}else if(manifestonotafiscalService.findNotasSaidaByProcedure(cddeposito, chavenfe, numeronfe, dataemissao, codigoerp, serienfe, tiponotafiscal)){
+				
+			}else if(manifestonotafiscalService.findNotasSaidaByProcedure(cddeposito, chavenfe, numeronfe, dataemissao, codigoerp, serienfe, tiponotafiscal)){
 				
 				List<Notafiscalsaida> listaNotafiscalsaida = new ArrayList<Notafiscalsaida>();
+				Boolean isMultiCDByCodigoERP = Boolean.FALSE; 
+				
+				if(filtro.getDepositoSelecionado()!=null && filtro.getDepositoSelecionado().getCddeposito()!=null){
+					isMultiCDByCodigoERP = depositofilialService.isMultiCDByCodigoERP(codigoerp);
+					System.out.println("faça a atualização");
+				}
 				
 				// realiza a chamada 3 vezes, devido ao tempo de espera de um serviço assicrono para a inclusao da nota na base WMS;
 				for (int i=0; i<3; i++){
-					listaNotafiscalsaida = notafiscalsaidaService.findForListagemPopUp(filtro);
 					
-					if (listaNotafiscalsaida != null && !listaNotafiscalsaida.isEmpty())
+					listaNotafiscalsaida = notafiscalsaidaService.findForListagemPopUp(filtro,isMultiCDByCodigoERP);
+					
+					if(listaNotafiscalsaida != null && !listaNotafiscalsaida.isEmpty()){
+						if (isMultiCDByCodigoERP){
+							listaNotafiscalsaida = alteraDepositoFilialMultiCd(filtro, listaNotafiscalsaida);
+						}
+						
 						break;
+						
+					}
 					
 					try {
 						Thread.sleep(4000);
@@ -553,19 +819,90 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 					}
 				}
 				
-				request.setAttribute("NOTAS",listaNotafiscalsaida);*/
+				request.setAttribute("NOTAS",listaNotafiscalsaida);
+				
 			}else{
-				List<Notafiscalsaida> listaNotafiscalsaida = notafiscalsaidaService.findForListagemPopUp(filtro);
-				request.setAttribute("NOTAS",listaNotafiscalsaida);				
+				
+				List<Notafiscalsaida> listaNotafiscalsaida = notafiscalsaidaService.findForListagemPopUp(filtro,false);
+				request.setAttribute("NOTAS",listaNotafiscalsaida);
+				
 			}
 		}
 		
 		request.setAttribute("FILIAL", clienteService.findFilialByDepositoLogado());
+		request.setAttribute("TIPONF", tiponotafiscalService.findAll());
 		
 		return new ModelAndView("direct:/crud/incluirNotasPopUp", "filtro", filtro);
+	}
+	/**
+	 * @param request
+	 * @return
+	 *//*
+	public ModelAndView buscarPacklist(WebRequestContext request, ManifestoFiltro filtro){
+		
+		if(filtro.getCodigo() !=null){
+			
+			try {
+				
+				boolean valid = notafiscalsaidaService.validaPacklist(filtro.getCodigo());
+				
+				if(!valid){
+					
+					String result = importacaocargaService.importarNotas(Integer.parseInt(filtro.getCodigo()));
+					
+					if (!result.equals("OK")){
+						request.addError("Erro ao importar as notas para o sistema. Erro :" + result);
+					}
+				}
+				
+				filtro.setCodigosImportacaoCarga(filtro.getCodigosImportacaoCarga() + ',' +filtro.getCodigo());
+				
+				List<ImportacaoCargaSiteVO> registros = importacaocargaService.findimportacaoCargaForIds(filtro.getCodigosImportacaoCarga().substring(1));
+				
+				if((registros == null || registros.isEmpty() ||
+					!CollectionUtils.exists(registros, new BeanPropertyValueEqualsPredicate("cdCarga", NumberUtils.toLong(filtro.getCodigo()))))
+					&& request.getMessages().length <= 0){
+					request.addError("A Carga "+ filtro.getCodigo()+" já foi importada e as suas notas utilizadas em um manifesto!");
+				}
+				
+				request.setAttribute("REGISTROS", registros);		
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new WmsException ("Erro ao realizar a importação da notas.", e);
+			}
+				
+		}
+		
+		
+		return new ModelAndView("direct:/crud/incluirPackingListPopUp", "filtro", filtro);
+	}*/
+	
+	/**
+	 * Altera deposito filial multi cd.
+	 *
+	 * @param filtro the filtro
+	 * @param listaNotafiscalsaida the lista notafiscalsaida
+	 * @return the list
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Notafiscalsaida> alteraDepositoFilialMultiCd(ManifestoFiltro filtro,
+			List<Notafiscalsaida> listaNotafiscalsaida) {
+		
+		if (CollectionUtils.exists(listaNotafiscalsaida, 
+				new BeanPropertyValueEqualsPredicate("deposito.cddeposito", filtro.getDepositoSelecionado().getCddeposito()))){
+			
+			listaNotafiscalsaida = (List<Notafiscalsaida>) CollectionUtils.select(listaNotafiscalsaida, 
+					new BeanPropertyValueEqualsPredicate("deposito.cddeposito", filtro.getDepositoSelecionado().getCddeposito()));
+		}else{
+			notafiscalsaidaService.atualizarDepositoNota(listaNotafiscalsaida,filtro.getDepositoSelecionado());
+		}
+		return listaNotafiscalsaida;
 	}	
 	
 	/**
+	 * 
+	 * 
 	 * 
 	 * @param request
 	 * @param manifesto
@@ -575,13 +912,24 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 	public ModelAndView inserirNotas (WebRequestContext request, Manifesto manifesto) throws CrudException{
 		
 		List<Manifestonotafiscal> listaManifestonotafiscal = new ArrayList<Manifestonotafiscal>();
-		List<Notafiscalsaida> listaNotafiscalsaida = new ArrayList<Notafiscalsaida>();		
+		List<Notafiscalsaida> listaNotafiscalsaida = null;		
 		
-		if(manifesto!=null && manifesto.getSelectCdnotafiscalsaida()!=null && !manifesto.getSelectCdnotafiscalsaida().isEmpty()){
-			listaNotafiscalsaida = notafiscalsaidaService.findByWhereIn(manifesto.getSelectCdnotafiscalsaida());
+		if(manifesto!=null){
+			listaNotafiscalsaida = recuperaNotas(manifesto); 
 		}
 		
+		
+		if (configuracaoService.isTrue(ConfiguracaoVO.VALIDA_DEVOLUCAO_NO_MANIFESTO, WmsUtil.getDeposito())){
+			int tam = listaNotafiscalsaida.size();
+			addNotasDevelucao(listaNotafiscalsaida, manifesto);
+			if(listaNotafiscalsaida.size() > tam){
+				manifesto.setTemNotaDevolucao(true);
+			}
+		}		
+		
 		validaNotasRepetidas(request, manifesto, listaNotafiscalsaida);
+		if(manifesto.getListaManifestonotafiscal()!=null && !manifesto.getListaManifestonotafiscal().isEmpty())
+		removeNotaNula(manifesto.getListaManifestonotafiscal());
 		
 		if(listaNotafiscalsaida!=null && !listaNotafiscalsaida.isEmpty()) {
 			
@@ -589,6 +937,7 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 				Manifestonotafiscal manifestonotafiscal = new Manifestonotafiscal();
 				manifestonotafiscal.setDt_inclusao(WmsUtil.currentDate());
 				manifestonotafiscal.setNotafiscalsaida(notafiscalsaida);
+				
 				try{
 					manifestonotafiscal.setPraca(notafiscalsaida.getPraca());
 				}catch (Exception e) {
@@ -610,6 +959,78 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 		return super.doEntrada(request, manifesto);
 	}
 	
+	/**
+	 * Recupera notas fiscais de acordo com o filtro.
+	 *
+	 * @param manifesto the manifesto
+	 * @return the list
+	 */
+	private List<Notafiscalsaida> recuperaNotas(Manifesto manifesto) {
+		if (StringUtils.isNotBlank(manifesto.getSelectCdImportacaoCarga())){
+			return notafiscalsaidaService.findByImportacaoCarga(manifesto.getSelectCdImportacaoCarga());
+		}
+		
+		if (StringUtils.isNotBlank(manifesto.getSelectCdnotafiscalsaida())){
+			return notafiscalsaidaService.findByWhereIn(manifesto.getSelectCdnotafiscalsaida());
+		}
+	
+		return new ArrayList<Notafiscalsaida>();
+	}
+	
+	public ModelAndView excluirNotas(WebRequestContext request, Manifesto manifesto) throws CrudException{
+		return super.doEntrada(request, manifesto);
+	}
+	
+	private void addNotasDevelucao(List<Notafiscalsaida> listaNotafiscalsaida, Manifesto manifesto) {
+		List<Notafiscalsaida> listNotaDevolucao = new  ArrayList<Notafiscalsaida>();
+		
+		for (Notafiscalsaida notafiscalsaida : listaNotafiscalsaida) {
+			if( notafiscalsaidaService.isPedidoTroca(notafiscalsaida.getCdnotafiscalsaida()) ){
+				Notafiscalsaida notaDevolucao = notafiscalsaidaService.findNotaDevolucao(notafiscalsaida);
+				if( notaDevolucao != null){
+					notaDevolucao.setCdnotafiscalsaidareferencia(notafiscalsaida.getCdnotafiscalsaida());
+					listNotaDevolucao.add(notaDevolucao);
+				}
+			}
+		}
+		
+		if (listNotaDevolucao != null && !listNotaDevolucao.isEmpty()) {
+			for (Notafiscalsaida notafiscalsaida : listNotaDevolucao) {
+				listaNotafiscalsaida.add(notafiscalsaida);
+			}
+			
+			if(manifesto!=null && manifesto.getListaNotaFiscalDevolucao()!=null && !manifesto.getListaNotaFiscalDevolucao().isEmpty()){
+				manifesto.getListaNotaFiscalDevolucao().addAll(listNotaDevolucao);
+			}else{
+				manifesto.setListaNotaFiscalDevolucao(listNotaDevolucao);
+			}	
+
+		}
+	}
+	
+	/**
+	 * Método que autentica usuário para não incluir nota de devolução no manifesto
+	 * 
+	 * @param request
+	 * @param filtro
+	 * @return JSON
+	 */
+	public ModelAndView naoIncluirNotaDevolucao (WebRequestContext request, Auditoria auditoria){
+		
+		StringBuilder txt = new StringBuilder();
+		if(auditoria!=null && auditoria.getMotivo()!=null && !auditoria.getMotivo().isEmpty()){
+			if(!AuditoriaService.validaUsuario(request, auditoria, Acao.CANCELAR_MANIFESTO)){
+				for (Message msg : request.getMessages()) {
+					txt.append( msg.getSource().toString() + " ");
+				}
+			}
+			
+		}else{
+			txt.append("Preencha todos os dados corretamente! ");
+		}
+		request.clearMessages();
+		return new JsonModelAndView().addObject("error", txt.toString());
+	}	
 	/**
 	 * @param manifesto
 	 * @param listaNotafiscalsaida
@@ -639,7 +1060,21 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 			}
 		}
 	}
-	
+	/**
+	 * @param request
+	 * @param listaNotafiscalsaida
+	 * @param notafiscalsaida
+	 */
+	private void removeNotaNula(List<Manifestonotafiscal> listaManifestonotafiscal) {
+		Iterator<Manifestonotafiscal> iterator = listaManifestonotafiscal.iterator();
+		while(iterator.hasNext()){
+			Manifestonotafiscal mnfs = iterator.next();
+			if(mnfs.getNotafiscalsaida() != null && mnfs.getNotafiscalsaida().getCdnotafiscalsaida() == null)	{
+				iterator.remove();
+			}
+		}
+	}
+		
 	/**
 	 * 
 	 * @param request
@@ -687,9 +1122,12 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 	 * @return
 	 */
 	public ModelAndView atualizarRotaGerenciadora(WebRequestContext request, Deposito deposito){		
+		
 		String retorno = rotagerenciadoraService.callAtualizaRotaGerenciadora(deposito);
 		List<Rotagerenciadora> listaRotagerenciadora = rotagerenciadoraService.findAllByDepositoLogado();
+		
 		return new JsonModelAndView().addObject("retorno",retorno).addObject("listaRotagerenciadora", listaRotagerenciadora);
+		
 	}
 	
 	/**
@@ -698,10 +1136,12 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 	 * @param deposito
 	 * @return
 	 */
-	public ModelAndView solicitarAnalise(WebRequestContext request, Manifesto manifesto){
+	private void solicitarAnalise(WebRequestContext request, Manifesto manifesto){
 		
 		Integer cdae = null;
 		String retorno = manifestoService.callCriarAE(manifesto);
+		String retornoCombonho = null;
+		
 		List<Logintegracaoae> listaLog = logintegracaoaeService.findByManifesto(manifesto);
 		
 		if(listaLog!=null && !listaLog.isEmpty()){
@@ -710,36 +1150,36 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 					cdae = logintegracaoae.getCdae();
 				}
 			}
-		}		
-		
-		if(cdae != null && manifesto!=null && manifesto.getCdmanifesto()!= null){
-			manifestoService.updateCDAE(cdae,manifesto.getCdmanifesto());
 		}
 		
-		return new JsonModelAndView().addObject("retorno",retorno).addObject("listaLog", listaLog).addObject("cdae", cdae);
-	}
-	
-	/**
-	 * 
-	 * @param manifesto
-	 */
-	private void solicitarAnalise(Manifesto manifesto){
-		
-		Integer cdae = null;
-		manifestoService.callCriarAE(manifesto);
-		List<Logintegracaoae> listaLog = logintegracaoaeService.findByManifesto(manifesto);
-		
-		if(listaLog!=null && !listaLog.isEmpty()){
-			for (Logintegracaoae logintegracaoae : listaLog) {
-				if(logintegracaoae!=null && logintegracaoae.getCdae()!=null){
-					cdae = logintegracaoae.getCdae();
-				}
+		if(cdae != null && manifesto!=null && manifesto.getCdmanifesto()!= null){
+
+			try {
+				
+				retornoCombonho = manifestoService.callVerificaCombonhoOpenTech(cdae,WmsUtil.getDeposito().getCddeposito());
+				
+				if(retornoCombonho!=null && !retornoCombonho.isEmpty())
+					logintegracaoaeService.criarLogIntegracaoOpenTech(cdae,manifesto,retornoCombonho,1);
+				
+			} catch (Exception e) {
+				
+				e.printStackTrace();
+				System.out.println(retornoCombonho);
+				
+				request.addError("Ocorreu um erro durante a execução do procedimento de Verificação de Combonho da OpenTech.");
+				
 			}
-		}		
-		
-		if(cdae != null && manifesto!=null && manifesto.getCdmanifesto()!= null){
+			
 			manifestoService.updateCDAE(cdae,manifesto.getCdmanifesto());
+			
+			request.addMessage(retorno);
+			
+		}else{
+			
+			request.addError(retorno);
+			
 		}
+		
 	}
 
 	/**
@@ -752,6 +1192,18 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 	 */
 	public ModelAndView buscarManifesto(WebRequestContext request, Manifesto manifesto){	
 		return new ModelAndView("direct:/crud/incluirManifestoPopUp", "manifesto", manifesto);
+	}	
+	
+	/**
+	 * Chama o popUp de inclusão de Manifestos
+	 * 
+	 * @author Filipe Santos
+	 * @param request
+	 * @param agenda
+	 * @return
+	 */
+	public ModelAndView buscarPackingList(WebRequestContext request, Manifesto manifesto){	
+		return new ModelAndView("direct:/crud/incluirPackingListPopUp", "manifesto", manifesto);
 	}	
 	
 	/**
@@ -771,12 +1223,12 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 				manifesto.getListaManifesto().add(manifestofilho);
 			}
 		}else {
-			request.setAttribute("msg", "O Manifesto bibpado está com status diferente de impresso ou já está agrupado a outro manifesto.");
+			request.setAttribute("msg", "O Manifesto bipado está com status diferente de impresso ou já está agrupado a outro manifesto.");
 		}
 		
 		return new ModelAndView("direct:/crud/incluirManifestoPopUp", "manifesto", manifesto);
 	}
-	
+
 	/**
 	 * 
 	 * @param request
@@ -799,7 +1251,7 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 		setDefaultValuesManifesto(manifesto);
 		return super.doEntrada(request, manifesto);
 	}
-	
+
 	/**
 	 * 
 	 * @param listaManifestonotafiscal
@@ -828,5 +1280,104 @@ public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Ma
 	protected boolean listagemVaziaPrimeiraVez() {
 		return true;
 	}
+	
+	/**
+	 * 
+	 * @param request
+	 * @param cliente
+	 * @return
+	 */
+	public ModelAndView buscarDepositoByFilial(WebRequestContext request, Cliente cliente){
+		
+		Boolean isShowModal = Boolean.FALSE;
+		List<Depositofilial> lista = depositofilialService.findByFilial(cliente);
+		
+		if(lista!=null && !lista.isEmpty() && lista.size() > 1){
+			isShowModal = Boolean.TRUE;
+		}
+		
+		return new JsonModelAndView().addObject("isShowModal",isShowModal).addObject("listaDepositoFilial", lista); 
+		
+	}
+
+	/**
+	 * 
+	 * @param request
+	 * @param deposito
+	 * @return
+	 */
+	public ModelAndView getNomeDepositoSelecionado(WebRequestContext request, Deposito deposito){
+		
+		if(deposito!=null && deposito.getCddeposito()!=null)
+			deposito = depositoService.load(deposito);
+		
+		return new JsonModelAndView().addObject("nomeDeposito",deposito.getNome());
+		
+	}
+	
+	/**
+	 * Liberar notas para manifestar sem frete.
+	 *
+	 * @param request the request
+	 * @param manifesto the manifesto
+	 * @return the model and view
+	 * @throws Exception 
+	 */
+	public ModelAndView liberarNotas (WebRequestContext request, Manifesto manifesto) throws Exception{
+		
+		List<Manifestonotafiscal> notasSemFrete = manifesto.getListaNotaFiscalSemFrete();
+		
+		StringBuilder notasAutorizadas = new StringBuilder();
+		
+		manifesto = manifestoService.loadForEntrada(manifesto);
+		
+		manifesto.setListaManifestonotafiscal(manifestonotafiscalService.findByManifesto(manifesto));
+		
+		if (notasSemFrete != null && !notasSemFrete.isEmpty()){
+			for (Manifestonotafiscal manifestonotafiscal : manifesto.getListaManifestonotafiscal()) {
+				Manifestonotafiscal notaSemFrete = (Manifestonotafiscal) CollectionUtils.find(notasSemFrete, new BeanPropertyValueEqualsPredicate("cdmanifestonotafiscal",
+						manifestonotafiscal.getCdmanifestonotafiscal()));
+				
+				if (notaSemFrete != null){
+					if (manifestonotafiscal.getToken().equals(notaSemFrete.getSenhaAutorizacao())){
+						
+						manifestonotafiscal.getNotafiscalsaida().setNotaautorizada(Boolean.TRUE);
+						notasAutorizadas.append(manifestonotafiscal.getNotafiscalsaida().getCdnotafiscalsaida()).append( ",");
+						
+						manifestohistoricoService.criarHistorico(manifesto, "Nota "+ manifestonotafiscal.getNotafiscalsaida().getNumero()+ " autorizada pelo usuário "+WmsUtil.getUsuarioLogado().getNome(), 
+								manifesto.getManifestostatus(), WmsUtil.getUsuarioLogado(), Tipomanifestohistorico.STATUS);
+					}else{
+						request.addError("A senha informada para a nota " + manifestonotafiscal.getNotafiscalsaida().getNumero()+ " está incorreta.");
+					}
+				}
+			}
+		}
+		
+		if (StringUtils.isNotBlank(notasAutorizadas.toString())){
+			notafiscalsaidaService.autorizarNotasSemFreteCliente(notasAutorizadas.toString().substring(0, notasAutorizadas.toString().length() - 1));
+		}
+		
+		salvar(request, manifesto);
+		
+		request.setAttribute(CONSULTAR, true);
+		return super.doEntrada(request, manifesto);
+	}
+	
+	/**
+	 *
+	 * @param request the request
+	 * @param manifesto the manifesto
+	 * @return the model and view
+	 * @throws Exception 
+	 */
+	public ModelAndView incluirTransbordoNotas (WebRequestContext request, Manifesto manifesto) throws Exception{
+		
+		manifestonotafiscalService.incluirTransbordoNotas(manifesto.getListaNotasTransbordo());
+		
+		manifesto = manifestoService.loadForEntrada(manifesto);
+		
+		return super.doConsultar(request, manifesto);
+	}
+	
 	
 }

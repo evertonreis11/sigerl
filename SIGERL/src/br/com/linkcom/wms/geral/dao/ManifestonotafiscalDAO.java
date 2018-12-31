@@ -228,4 +228,20 @@ public class ManifestonotafiscalDAO extends GenericDAO<Manifestonotafiscal>{
 		getJdbcTemplate().execute(sql.toString());
 	}
 	
+	/**
+	 * Find token by manifesto.
+	 *
+	 * @param manifesto the manifesto
+	 * @return the list
+	 */
+	public List<Manifestonotafiscal> findTokenByManifesto(Manifesto manifesto) {
+		QueryBuilder<Manifestonotafiscal> query = query();
+
+		query.select("manifestonotafiscal.cdmanifestonotafiscal, manifestonotafiscal.token")
+			 .where("manifesto = ?",manifesto)
+			 .orderBy("manifestonotafiscal.cdmanifestonotafiscal");
+		
+		return query.list();
+	}
+	
 }

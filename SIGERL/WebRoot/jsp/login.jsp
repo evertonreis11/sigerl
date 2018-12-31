@@ -13,7 +13,8 @@
 	<HEAD>
 		<script language="JavaScript" src="${ctx}/js/jquery.js"></script>	
 		<script type="text/javascript" src="${ctx}/js/bootstrap.min.js"></script>
-		<script  src="${ctx}/js/jquery-ui.js"></script>
+		<script type="text/javascript" src="${ctx}/js/bootstrap-confirmation.min.js"></script>
+		<script  src="${ctx}/js/jquery-ui.min.js"></script>
 		
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />

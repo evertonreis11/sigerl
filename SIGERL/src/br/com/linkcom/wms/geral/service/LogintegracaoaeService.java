@@ -23,5 +23,19 @@ public class LogintegracaoaeService extends GenericService<Logintegracaoae> {
 	public List<Logintegracaoae> findByManifesto(Manifesto manifesto) {
 		return logintegracaoaeDAO.findByManifesto(manifesto);
 	}
+	
+	/**
+	 * 
+	 * @param cdae
+	 * @param manifesto
+	 * @param menssagem
+	 * @param cderro 
+	 */
+	public void criarLogIntegracaoOpenTech(Integer cdae, Manifesto manifesto, String dserro, Integer cderro) {
+		
+		Logintegracaoae log = new Logintegracaoae(cdae,manifesto,dserro,cderro);
+		saveOrUpdate(log);
+		
+	}
 
 }

@@ -305,3 +305,13 @@ legend{
 	padding-top:25px;
 	background: url(../../imagens/default/img_login/alerta.gif) left no-repeat;
 }
+
+.dataGridHeader > th > a {
+	color: #FFFFFF;
+	font-family: Verdana;
+	font-weight: bold;	
+}
+
+.dataGridHeader > th > a:hover {
+	color: #255025;
+}

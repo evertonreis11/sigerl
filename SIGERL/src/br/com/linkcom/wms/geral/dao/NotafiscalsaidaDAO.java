@@ -4,19 +4,27 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.orm.hibernate3.HibernateCallback;
 
 import br.com.linkcom.neo.persistence.QueryBuilder;
 import br.com.linkcom.neo.util.CollectionsUtil;
+import br.com.linkcom.wms.geral.bean.Carregamentoitem;
 import br.com.linkcom.wms.geral.bean.Deposito;
 import br.com.linkcom.wms.geral.bean.Notafiscalsaida;
+import br.com.linkcom.wms.geral.bean.Tipoentrega;
 import br.com.linkcom.wms.geral.bean.Tipovenda;
 import br.com.linkcom.wms.geral.bean.vo.GestaoPedidoVO;
+import br.com.linkcom.wms.geral.bean.vo.ManifestoTransbordoVO;
 import br.com.linkcom.wms.util.WmsException;
 import br.com.linkcom.wms.util.WmsUtil;
 import br.com.linkcom.wms.util.neo.persistence.GenericDAO;
@@ -318,13 +326,300 @@ public class NotafiscalsaidaDAO extends GenericDAO<Notafiscalsaida>{
 	 * @param numeroNota the numero nota
 	 * @return the notafiscalsaida
 	 */
-	public Notafiscalsaida recuperaNotaSaidaPorNumero(String numeroNota) {
-		return query().select("max(cdnotafiscalsaida)")
-			.join("notafiscalsaida.tipovenda tipovenda")
-			.where("numeronota = ?", numeroNota)
-			.where("numeroLojaRetirada = ? ", WmsUtil.getDeposito().getCodigoerp())
-			.where("tipovenda = ?", Tipovenda.SITE)
-			.unique();
+	public Notafiscalsaida recuperaNotaSaidaPorNumero(final String numeroNota) {
+	   
+		Integer cdNotaFiscalSaida =  (Integer) getHibernateTemplate().execute(new HibernateCallback(){
+			 
+			public Object doInHibernate(Session session) throws HibernateException, SQLException    {
+				StringBuilder hql = new StringBuilder();
+				
+				hql.append("select max(notafiscalsaida.cdnotafiscalsaida)	   				   ");
+				hql.append("  from Notafiscalsaida notafiscalsaida             				   ");
+				hql.append("  inner join notafiscalsaida.tipovenda tipovenda   				   ");
+				hql.append(" where notafiscalsaida.numero = :numeronota                    		");
+				hql.append("   and notafiscalsaida.numeroLojaRetirada = :numeroLojaRetirada    ");
+				hql.append("   and notafiscalsaida.tipovenda.cdtipovenda = :cdtipovenda        ");
+
+				Query query = session.createQuery(hql.toString());
+				query.setParameter("numeronota", numeroNota);
+				query.setParameter("numeroLojaRetirada", WmsUtil.getDeposito().getCodigoerp());
+				query.setParameter("cdtipovenda", Tipovenda.SITE.getCdtipovenda());
+				
+				return query.uniqueResult();	
+			}
+			
+		});
+		
+		Notafiscalsaida notaFiscalSaida = new Notafiscalsaida();
+		
+		notaFiscalSaida.setCdnotafiscalsaida(cdNotaFiscalSaida);
+		
+		return notaFiscalSaida;  
+	}
+	
+	/**
+	 * 
+	 * @param filtro
+	 * @param isMultiCDByCodigoERP 
+	 * @return
+	 */
+	public List<Notafiscalsaida> findForListagemPopUp(ManifestoFiltro filtro, Boolean isMultiCDByCodigoERP) {
+		
+		QueryBuilder<Notafiscalsaida> query = query();
+			
+			query.select("notafiscalsaida.cdnotafiscalsaida, notafiscalsaida.serie, notafiscalsaida.numero, notafiscalsaida.chavenfe, " +
+					"notafiscalsaida.dtemissao ,notafiscalsaida.vlrtotalnf ,notafiscalsaida.qtdeitens, deposito.cddeposito, deposito.nome, " +
+					"cliente.cdpessoa, cliente.nome, notafiscalsaida.numeropedido, notafiscalsaida.lojapedido ");
+					 if(filtro.getCdcarregamento()!=null){
+						 query.select(query.getSelect().getValue()+",carregamento.cdcarregamento, carregamentostatus.cdcarregamentostatus ")
+						 		.join("notafiscalsaida.carregamento carregamento")	
+						 		.join("carregamento.carregamentostatus carregamentostatus");
+					 }
+			query.join("notafiscalsaida.deposito deposito")
+				.join("notafiscalsaida.notafiscaltipo notafiscaltipo")
+				.join("notafiscalsaida.cliente cliente");
+				if(!isMultiCDByCodigoERP)
+					query.where("deposito = ?",WmsUtil.getDeposito());
+			query.where("notafiscalsaida.vinculado = 0")		
+				.where("notafiscalsaida.filialfaturamento = ?",filtro.getFilial())
+				.openParentheses();
+					if(filtro.getCdcarregamento()!=null){
+						query.where("carregamentostatus.cdcarregamentostatus = 6 and carregamento.cdcarregamento = ?",filtro.getCdcarregamento());				 
+						query.or();
+					}
+					query.where("notafiscalsaida.chavenfe = ?",filtro.getChavenfe())
+						.where("notafiscalsaida.numero = ?",filtro.getNroNotaSaida())
+						.where("notafiscalsaida.serie = ?",filtro.getSerieNota()!=null ? filtro.getSerieNota().toUpperCase() : null)
+					 	.where("trunc(notafiscalsaida.dtemissao) = ?", filtro.getDtemissaoNotaSaida())				 
+			 	.closeParentheses();
+			if(filtro!=null && filtro.getTipoentrega()!=null){
+				if(filtro.getTipoentrega().getCdtipoentrega() == 1){
+					query.where("notafiscaltipo.cdnotafiscaltipo in (4,5)");
+				}else if(filtro.getTipoentrega().getCdtipoentrega() == 2){
+					query.where("notafiscaltipo.cdnotafiscaltipo in (3,5,6)");
+				}
+			}
+			//queiroz - 16/07/15 incluindo filtro de carga do erp
+			if((filtro.getCdcargaerp()!=null)&&(!(filtro.getCdcargaerp().equalsIgnoreCase("")))){
+				query.where("notafiscalsaida.cdcargaerp = ?",filtro.getCdcargaerp());
+			}
+			
+		return query.list();
+		
+	}
+	
+	/**
+	 * 
+	 * @param listaNotafiscalsaida
+	 * @param deposito 
+	 */
+	public void atualizarDepositoNota(List<Notafiscalsaida> listaNotafiscalsaida, Deposito deposito) {
+
+		if(listaNotafiscalsaida==null || listaNotafiscalsaida.isEmpty()){
+			throw new WmsException("Parametros Invalidos. Nenhuma nota está dispoinvel para essa operação.");
+		}else if(deposito == null || deposito.getCddeposito() == null){
+			throw new WmsException("Parametros Invalidos. Nenhum depositio foi selecionado para essa operação.");
+		}
+		
+		StringBuilder sql = new StringBuilder();
+			
+			sql.append(" update Notafiscalsaida nfs set nfs.deposito.id = ").append(deposito.getCddeposito());
+			sql.append(" where nfs.id in ( ");
+			sql.append(CollectionsUtil.listAndConcatenate(listaNotafiscalsaida, "cdnotafiscalsaida", ","));
+			sql.append(" ) "); 
+			
+		getHibernateTemplate().bulkUpdate(sql.toString());
+		
+	}
+	
+	
+	/**
+	 * Find by importacao carga.
+	 *
+	 * @param cdsImportacaoCarga the cds importacao carga
+	 * @return the list
+	 */
+	public List<Notafiscalsaida> findByImportacaoCarga(String cdsImportacaoCarga) {
+		
+		QueryBuilder<Notafiscalsaida> query = query();
+		
+		createQueryFindNotaFiscal(query);
+		
+		query.whereIn("importacaocarga.cdimportacaocarga",cdsImportacaoCarga!=null?cdsImportacaoCarga.trim() : null);
+		
+		return query.list();
+	}
+	
+	/**
+	 * Creates the query find nota fiscal.
+	 *
+	 * @param query the query
+	 * @return the query builder
+	 */
+	public QueryBuilder<Notafiscalsaida> createQueryFindNotaFiscal(QueryBuilder<Notafiscalsaida> query) {
+		
+		return query.select("notafiscalsaida.cdnotafiscalsaida, notafiscalsaida.serie, notafiscalsaida.numero, notafiscalsaida.chavenfe, " +
+					"notafiscalsaida.dtemissao, notafiscalsaida.vlrtotalnf, notafiscalsaida.qtdeitens, notafiscalsaida.valorfretecliente, " + 
+					"notafiscalsaida.notaautorizada, notafiscalsaida.numeropedido, notafiscalsaida.lojapedido, deposito.cddeposito, deposito.nome, " +
+					"cliente.cdpessoa, cliente.nome, pedidovenda.cdpedidovenda, notafiscalsaida.temtroca, " +
+					"pedidovendaproduto.cdpedidovendaproduto, carregamentoitem.cdcarregamentoitem, carregamento.cdcarregamento," +
+					"carregamentostatus.cdcarregamentostatus, rota.cdrota, rota.nome, rota.temDepositoTransbordo, depositotransbordo.cddeposito," +
+					"depositotransbordo.nome, notafiscaltipo.cdnotafiscaltipo, notafiscaltipo.nome, praca.cdpraca, praca.nome, tipovenda.cdtipovenda," + 
+					"importacaocarga.cdimportacaocarga, importacaocarga.cdcarga ")
+				 .join("notafiscalsaida.deposito deposito")
+				 .join("notafiscalsaida.tipovenda tipovenda")
+				 .join("notafiscalsaida.cliente cliente")
+				 .join("notafiscalsaida.notafiscaltipo notafiscaltipo")
+				 .leftOuterJoin("notafiscalsaida.listNotafiscalsaidaproduto notafiscalsaidaproduto")
+				 .leftOuterJoin("notafiscalsaidaproduto.pedidovenda pedidovenda")
+				 .leftOuterJoin("notafiscalsaidaproduto.pedidovendaproduto pedidovendaproduto")
+				 .leftOuterJoin("pedidovendaproduto.listaCarregamentoitem carregamentoitem")
+				 .leftOuterJoin("carregamentoitem.carregamento carregamento")
+				 .leftOuterJoin("carregamento.carregamentostatus carregamentostatus")
+				 .leftOuterJoin("notafiscalsaida.praca praca")
+				 .leftOuterJoin("praca.listaRotapraca rotapraca")
+				 .leftOuterJoin("rotapraca.rota rota")
+				 .leftOuterJoin("rota.depositotransbordo depositotransbordo")
+				 .leftOuterJoin("notafiscalsaida.importacaocarga importacaocarga")
+				 .where("deposito = ?",WmsUtil.getDeposito())
+				 .where("notafiscalsaida.vinculado = 0");
+	}
+	
+	
+	/*
+	 * Busca uma notafiscalsaida de devolucao
+	 * 
+	 * @param notafiscalsaida
+	 * 
+	 * @return @notafiscalsaida
+	 */
+	public Notafiscalsaida findNotaDevolucao(Notafiscalsaida notafiscalsaida) {
+		
+		QueryBuilder<Notafiscalsaida> query = query();
+		
+		StringBuilder fields = new StringBuilder();
+		fields.append(" notafiscalsaida.cdnotafiscalsaida, notafiscalsaida.serie, notafiscalsaida.numero, notafiscalsaida.chavenfe, ");
+		fields.append(" notafiscalsaida.dtemissao ,notafiscalsaida.vlrtotalnf ,notafiscalsaida.qtdeitens, deposito.cddeposito, ");
+		fields.append(" notafiscalsaida.numeropedido, notafiscalsaida.lojapedido, notafiscalsaida.temtroca, deposito.nome, ");
+		fields.append(" cliente.cdpessoa, cliente.nome, ");
+		fields.append(" rota.cdrota, rota.nome, rota.temDepositoTransbordo, ");
+		fields.append(" depositotransbordo.cddeposito, depositotransbordo.nome, ");
+		fields.append(" notafiscaltipo.cdnotafiscaltipo, notafiscaltipo.nome ");
+		
+		query.select(fields.toString())
+		.join("notafiscalsaida.deposito deposito")
+		.join("notafiscalsaida.cliente cliente")
+		.leftOuterJoin("notafiscalsaida.praca praca")
+		.leftOuterJoin("praca.listaRotapraca rotapraca")
+		.leftOuterJoin("rotapraca.rota rota")
+		.leftOuterJoin("rota.depositotransbordo depositotransbordo")
+		.leftOuterJoin("notafiscalsaida.notafiscaltipo notafiscaltipo")
+		.where("notafiscalsaida.numeropedido = ? ", notafiscalsaida.getNumeropedido())
+		.where("notafiscalsaida.lojapedido = ?", notafiscalsaida.getLojapedido())
+		.where("notafiscaltipo.cdnotafiscaltipo =3")
+		.where("notafiscalsaida.vinculado =0");
+		
+		if(notafiscalsaida.getListNotafiscalsaidaproduto() != null && notafiscalsaida.getListNotafiscalsaidaproduto().get(0).getPedidovendaproduto() != null){
+			List<Carregamentoitem> item =new ArrayList<Carregamentoitem>(notafiscalsaida.getListNotafiscalsaidaproduto().get(0).getPedidovendaproduto().getListaCarregamentoitem());
+			query.where("notafiscalsaida.carregamento != ?", item.get(0).getCarregamento());
+		}
+				
+		
+		return query.unique();
+	}
+
+	/*
+	 * Como saber se o pedido é de troca
+	 * 
+	 * @param cdnotafiscalsaida
+	 * 
+	 * @return boolean
+	 */
+	public boolean isPedidoTroca(Integer cdnotafiscalsaida) {
+		return query()
+				.join("notafiscalsaida.listNotafiscalsaidaproduto notafiscalsaidaproduto")
+				.join("notafiscalsaidaproduto.pedidovendaproduto pedidovendaproduto")
+				.join("pedidovendaproduto.pedidovenda pedidovenda")
+				.where("notafiscalsaida.cdnotafiscalsaida = ?", cdnotafiscalsaida)
+				.where("pedidovenda.troca=1")
+				.setMaxResults(1)
+				.unique() != null;
+	}
+	
+	public void autorizarNotasSemFreteCliente(String whereIn) {
+		StringBuilder sql = new StringBuilder();
+
+		sql.append(" update Notafiscalsaida nfs set nfs.notaautorizada = 1");
+		sql.append(" where nfs.id in ( ").append(whereIn).append(" ) "); 
+
+		getHibernateTemplate().bulkUpdate(sql.toString());
+
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ManifestoTransbordoVO> recuperaNotasTransbordoPopUp(final Integer cdmanifesto) {
+		return getHibernateTemplate().executeFind(new HibernateCallback(){
+			 
+			public Object doInHibernate(Session session) throws HibernateException, SQLException    {
+				StringBuilder hql = new StringBuilder();
+				
+				hql.append(" select new br.com.linkcom.wms.geral.bean.vo.ManifestoTransbordoVO (manifestonotafiscal.cdmanifestonotafiscal, ");
+				hql.append(" 	   notafiscalsaida.numero,                                                            ");
+				hql.append(" 	   notafiscalsaida.serie,                                                             ");
+				hql.append(" 	   notafiscalsaida.dtemissao,                                                         ");
+				hql.append(" 	   notafiscalsaida.numeropedido,                                                      ");
+				hql.append(" 	   notafiscalsaida.lojapedido,                                                        ");
+				hql.append(" 	   rota.nome,                                                                         ");
+				hql.append(" 	   rotaconsolidacao.nome,                                                             ");
+				hql.append(" 	   manifestonotafiscal.temDepositoTransbordo,                                         ");
+				hql.append(" 	   rota.temDepositoTransbordo,                                                        ");
+				hql.append(" 	   rotaconsolidacao.temDepositoTransbordo,                                            ");
+				hql.append(" 	   depositotransbordomanifesto.cddeposito,                                            ");
+				hql.append(" 	   depositotransbordorota.cddeposito,												  ");
+				hql.append(" 	   depositotransbordorotaconsolidacao.cddeposito)									  ");
+				hql.append("   from Manifesto manifesto                                                               ");
+				hql.append("   inner join manifesto.listaManifestonotafiscal manifestonotafiscal                      ");
+				hql.append("   inner join manifestonotafiscal.notafiscalsaida notafiscalsaida                         ");
+				hql.append("   inner join manifesto.tipoentrega tipoentrega                                           ");
+				hql.append("   inner join notafiscalsaida.tipovenda tipovenda                                         ");
+				hql.append("   left outer Join manifestonotafiscal.depositotransbordo depositotransbordomanifesto     ");
+				hql.append("   left outer Join notafiscalsaida.praca praca                                            ");
+				hql.append("   left outer Join praca.listaRotapraca rotapraca                                         ");
+				hql.append("   left outer Join rotapraca.rota rota                                                    ");
+				hql.append("   left outer Join rota.depositotransbordo depositotransbordorota                         ");
+				hql.append("   left outer Join notafiscalsaida.pracaconsolidacao pracaconsolidacao                    ");
+				hql.append("   left outer Join pracaconsolidacao.listaRotapraca rotapracaconsolidacao                 ");
+				hql.append("   left outer Join rotapracaconsolidacao.rota rotaconsolidacao                            ");
+				hql.append("   left outer Join rotaconsolidacao.depositotransbordo depositotransbordorotaconsolidacao ");
+				hql.append("  where manifesto.cdmanifesto = :manifesto                                                ");
+				hql.append("    and (                                                                                 ");
+				hql.append(" 		  (tipovenda = :tipovendaLoja                                                     ");
+				hql.append(" 		  	and rota.temDepositoTransbordo = :temDepositoTransbordo                       ");
+				hql.append(" 		  	and depositotransbordorota is not null                                        ");
+				hql.append(" 		  )                                                                            	  ");
+				hql.append(" 		  or                                                                              ");
+				hql.append(" 		  (tipovenda = :tipovendaSite                                                     ");
+				hql.append(" 		  	and rotaconsolidacao.temDepositoTransbordo = :temDepositoTransbordo           ");
+				hql.append(" 		  	and depositotransbordorotaconsolidacao is not null                            ");
+				hql.append(" 		  )                                                                            	  ");
+				hql.append(" 		  or                                                                              ");
+				hql.append(" 		  (depositotransbordomanifesto is not null  									  ");
+				hql.append(" 		    and manifestonotafiscal.temDepositoTransbordo = :temDepositoTransbordo 		  ");
+				hql.append(" 		   ) 																			  ");
+				hql.append(" 	    )                                                                                 ");
+				hql.append("    and tipoentrega in (:tipos)		                                                      ");
+
+				Query query = session.createQuery(hql.toString());
+				query.setParameter("manifesto", cdmanifesto);
+				query.setParameter("temDepositoTransbordo", Boolean.TRUE);
+				query.setParameter("tipovendaLoja", Tipovenda.LOJA_FISICA);
+				query.setParameter("tipovendaSite", Tipovenda.SITE);
+				query.setParameterList("tipos", new ArrayList<Tipoentrega>(Arrays.asList(Tipoentrega.CONSOLIDACAO, Tipoentrega.TRANSFERENCIA)));
+				
+				return query.list();	
+			}
+			
+		});
 	}
 	
 }
