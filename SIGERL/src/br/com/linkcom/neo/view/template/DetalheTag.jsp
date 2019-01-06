@@ -4,7 +4,7 @@
 <t:acao></t:acao><%-- Resetando a tag ação --%>
 <n:panel title="${Tdetalhe.detailDysplayName}">
 	<div class="detailBlock">
-	<n:dataGrid itens="${Tdetalhe.itens}" cellspacing="1" dynaLine="true" id="${Tdetalhe.tableId}"  var="${Tdetalhe.detailVar}">
+	<n:dataGrid itens="${Tdetalhe.itens}" cellspacing="1" dynaLine="true" id="${Tdetalhe.tableId}"  var="${Tdetalhe.detailVar}" styleClass="dataGrid table table-striped table-bordered">
 		<n:bean name="${Tdetalhe.detailVar}" valueType="${Tdetalhe.detailClass}" propertyPrefix="${Tdetalhe.fullNestedName}" propertyIndex="${index}">
 			<t:propertyConfig mode="input" renderAs="column" disabled="${consultar}">
 				<n:doBody/>

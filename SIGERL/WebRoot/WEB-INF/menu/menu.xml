@@ -5,6 +5,6 @@
 	<menu title="Confirmar Entrega" url="/expedicao/process/expedicaoloja"/>
 	<menu title="Termo de Entrega" url="/expedicao/report/termoentrega"/>
 	<menu title="Gestão de Pedidos" url="/expedicao/process/gestaopedido"/>
-	<!-- <menu title="Reversão de Pedidos" url="/expedicao/crud/Manifesto"/> -->
+	<menu title="Reversão de Pedidos" url="/expedicao/crud/ManifestoLoja"/>
 	<menu title="Sair" url="/logout.jsp" />
 </menugroup>

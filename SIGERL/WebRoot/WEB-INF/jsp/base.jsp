@@ -63,7 +63,95 @@
 			    });
 
 			    $(document).ready(function(){
-				    $('[data-toggle="tooltip"]').tooltip();   
+			    	var contextoAutoComplete = '${ctx}';
+				    
+				    $('[data-toggle="tooltip"]').tooltip();
+
+				    $('input[funcao="autocomplete"]').each(function (){
+						var $el = $(this);
+						var name = $(this).attr('name');
+						var beanName =  $(this).attr('beanName');
+						var functionLoad =  $(this).attr('loadFunctionAutocomplete'); 
+						var propertyLabel = $(this).attr('propertyLabel');
+						var propertyMatch = $(this).attr('propertyMatch');
+						var getterLabel = $(this).attr('getterLabel');
+						var autocompleteOnSelect = $(this).attr('autocompleteOnSelect');
+						var autocompleteOnExcluir = $(this).attr('autocompleteOnExcluir');
+						var fnSelect;
+						var fnExcluir;
+						
+						if (autocompleteOnSelect != '' && autocompleteOnSelect!= null){fnSelect = window[autocompleteOnSelect.substring(0,autocompleteOnSelect.length-2)];}
+						if (autocompleteOnExcluir != '' && autocompleteOnExcluir!= null){fnExcluir = window[autocompleteOnExcluir.substring(0,autocompleteOnExcluir.length-2)];}
+						
+						name = name.substring(0,name.length-6);
+						
+						$el.autocomplete({
+						    source: function(request, response) {
+						        $.get(contextoAutoComplete + '/ajax/autocomplete', 
+								        { q: request.term,
+								          beanName: beanName,
+									      functionLoad: functionLoad, 
+									      propertyLabel: propertyLabel,
+									      propertyMatch: propertyMatch,
+									      getterLabel: getterLabel,
+									      matchOption: 'false' },
+								      function(data) {
+									    var results = data.split('\n');
+										var parsed_data = [];
+										var cont = 0;
+													
+									    for(var i=0; i < results.length; i++){
+									    	var obj = results[i].split('|'); 
+										    
+											if (obj[0].trim() != '' && obj[0].trim() != null 
+												 && typeof obj[0].trim() !== "undefined" ){
+
+											     parsed_data[cont] = { 
+										           value: obj[1], 
+										           result: obj[0].trim() 
+												} 
+
+												cont++;	
+											}
+											
+									    }
+									    
+					            		response(parsed_data);
+					        		 });
+						    },
+						    open: function(event, ui) {
+								$(this).autocomplete("widget").css({
+						            "width": ("40%")
+						        });
+						    },
+						    minLength: 3,
+						    select:function( event, ui ) {
+						    	$('input[name=' + name + '_label]').val(ui.item.result);
+								$('input[autocompleteId=' + name + '_value]').val(ui.item.value);
+								$('input[autocompleteId=' + name + '_value]').val(ui.item.value);
+
+								if (fnSelect != null){
+									fnSelect();	
+								}
+									
+								return false;
+						    },
+						    change:function( event, ui ) {
+								if (ui.item == null){
+									$('input[name=' + name + '_label]').val('');
+									$('input[autocompleteId=' + name + '_value]').val('<null>');
+
+									if (fnExcluir != null){
+										fnExcluir();	
+									}
+								}
+						    }
+						}).autocomplete( "instance" )._renderItem = function( ul, item ) {
+						   	 return $( "<li>" )
+						         .append( "<div>"+item.result+"</div>" )
+						         .appendTo( ul );
+					    };
+					});   
 				});
 			});
 		</script>

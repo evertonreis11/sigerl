@@ -180,7 +180,8 @@ public class TransportadorDAO extends GenericDAO<Transportador> {
 					.whereLikeIgnoreAll("transportador.cdpessoa", param)
 				.closeParentheses()
 			.where("deposito = ?",WmsUtil.getDeposito())
-			.where("transportador.ativo = 1");
+			.where("transportador.ativo = 1")
+			.setMaxResults(10);
 			
 		return query.list();
 	}

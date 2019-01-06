@@ -67,7 +67,7 @@ import br.com.linkcom.wms.util.WmsUtil;
 import br.com.linkcom.wms.util.armazenagem.ConfiguracaoVO;
 import br.com.ricardoeletro.sigerl.expedicao.crud.filtro.ManifestoFiltro;
 
-@Controller(path="/expedicao/crud/Manifesto", authorizationModule=CrudAuthorizationModule.class)
+@Controller(path="/expedicao/crud/ManifestoLoja", authorizationModule=CrudAuthorizationModule.class)
 public class ManifestoCrud extends CrudController<ManifestoFiltro, Manifesto, Manifesto>{
 	private ManifestoService manifestoService;
 	private DepositoService depositoService;

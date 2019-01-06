@@ -35,7 +35,7 @@
 		background-color: #4cb46b;
 		text-align: left;
 	}
-	.dataGrid{
+    .dataGrid{
      	border-spacing: 0;
     	border-collapse: collapse;
     	font-family: tahoma;
@@ -50,69 +50,358 @@
 	<h3 class="titulo-pagina">Reversão de Pedidos</h3>
 	<n:form validateFunction="validarFormulario" enctype="${entradaTag.formEnctype}">
 		<n:validation functionName="validateForm">
-	     	<c:if test="${consultar}">
+     		<c:if test="${consultar}">
 				<input type="hidden" name="forcarConsulta" value="true"/>
 				<style>input, select, textarea, .required {background-color:#ffffff; color:#000000;}</style>
 			</c:if>
 			
-			<div class="panel panel-default" style="border: 0px;" >
+			<div class="panel panel-default" style="border: 0px;">
 				<div class="panel-body">
-					<div class="col-md-6 pull-right" style="text-align: -webkit-right;">
-						<c:if test="${consultar}">
-							<c:if test="${(empty entradaTag.showListagemLink) || entradaTag.showListagemLink}">
-								<n:link action="listagem" id="btn_voltar"  checkPermission="true" description="Retornar à listagem" class="btn btn-default btn-sm">Retornar à listagem</n:link>&nbsp;|&nbsp;
-							</c:if>
-							
-							<n:link action="criar"  id="btn_novo" class="btn btn-info btn-sm"  checkPermission="true" description="Novo">Novo</n:link>&nbsp;|&nbsp;
-							
-							<c:if test="${(isEmElaboracao || isAguardandoLiberacao) && !isAutorizado}">								
-								<n:link action="editar" id="btn_editar" parameters="${n:idProperty(n:reevaluate(TEMPLATE_beanName,pageContext))}=${n:id(n:reevaluate(TEMPLATE_beanName,pageContext))}" class="btn .btn-primary btn-sm" checkPermission="true" description="Editar">Editar</n:link>&nbsp;|&nbsp;
-							</c:if>
-							
-							<c:if test="${(isEmElaboracao || isAguardandoLiberacao) && !isAutorizado}">
-								<n:link action="excluir" id="btn_excluir" parameters="${n:idProperty(n:reevaluate(TEMPLATE_beanName,pageContext))}=${n:id(n:reevaluate(TEMPLATE_beanName,pageContext))}" confirmationMessage="Você tem certeza que deseja excluir este registro?" class="btn btn-danger btn-sm"  checkPermission="true" description="Excluir">Excluir</n:link>
-							</c:if>
-						</c:if>
-						<c:if test="${!consultar}">
-							<n:link action="listagem" id="btn_voltar" confirmationMessage="Deseja retornar à listagem sem salvar as alterações?" class="btn btn-default btn-sm" checkPermission="true" description="Retornar à listagem">Retornar à listagem</n:link>					
-							<n:submit type="link" id="btn_gravar" title="Gravar" action="salvar" validate="true" confirmationScript="${entradaTag.dynamicAttributesMap['submitconfirmationscript']}" class="btn btn-success btn-sm" checkPermission="true" description="Salvar">Salvar</n:submit>
-						</c:if>
-					</div>		
+					<jsp:include page="manifestoEntradaBotoes.jsp"></jsp:include>	
 		        </div>
 			</div>
 			
+			<n:bean name="${TEMPLATE_beanName}">
+				<div class="panel panel-success" style="border: 0px;">
+					<div class="panel-body">
+						<div class="row">
+							<t:property name="cdmanifesto" id="cdmanifestoId" type="hidden" write="false" label="" />
+							<t:property name="deposito" id="depositoId" type="hidden" write="false" label=""/>
+							<t:property name="manifestostatus" id="manifestostatusId" type="hidden" write="false" label=""/>
+							<t:property name="dtemissao" type="hidden" write="false" label=""/>
+							<t:property name="usuarioemissor" type="hidden" write="false" label=""/>
+							<t:property name="cdae" type="hidden" write="false" label=""/>						
+							<t:property name="selectCdnotafiscalsaida" type="hidden" write="false" label=""/>		
+							<t:property name="selectCdImportacaoCarga" type="hidden" write="false" label=""/>		
+							<t:property name="isSolicitarAprovacao" type="hidden" write="false" label=""/>
+							<t:property name="selectCdmanifesto" type="hidden" write="false" label=""/>
+							<t:property name="filialreferencia" type="hidden" write="false" label=""/>
+							<t:property name="manifestopai" type="hidden" write="false" label=""/>
+							<t:property name="tipoentrega.cdtipoentrega" type="hidden" write="false" label=""/>
+							<t:property name="temTransbordo" type="hidden" write="false" label=""/>
+						</div>
+						</br>
+						<div class="form-group">
+							<c:if test="${not empty manifesto.cdmanifesto}">
+								<div class="col-md-2">
+									<t:property name="cdmanifesto" label="Manifesto" type="text" disabled="disabled" class="form-control input-sm" mode="input" showLabel="true"/>
+								</div>
+							</c:if>
+							
+							<div class="col-md-2">
+								<t:property name="deposito" type="text" disabled="disabled" class="form-control input-sm" mode="input" showLabel="true"/>
+							</div>
+							<div class="col-md-2">
+								<t:property name="manifestostatus" type="text" disabled="disabled" class="form-control input-sm" mode="input" showLabel="true"/>
+							</div>
+							<div class="col-md-2">
+								<t:property name="dtemissao" type="text" disabled="disabled" class="form-control input-sm" mode="input" showLabel="true"/>
+							</div>
+							<div class="col-md-2">
+								<t:property name="usuarioemissor" type="text" disabled="disabled" class="form-control input-sm" mode="input" showLabel="true"/>
+							</div>
+							<div class="col-md-2">
+								<t:property name="cdae" type="text" disabled="disabled" class="form-control input-sm" mode="input" showLabel="true"/>
+							</div>
+							
+							<%-- <c:if test="${not empty manifesto.manifestopai}">
+								<div class="col-md-1">
+									<t:property name="manifestopai.cdmanifesto" type="text" disabled="disabled" class="form-control input-sm" mode="input" showLabel="true" label="Agrupado"/>
+								</div>
+							</c:if> --%>
+						</div>
+			        </div>
+				</div>
+				
+				<div class="row">
+					<div class="col-md-10">
+						<div class="panel panel-success">
+							<div class="panel-heading">Detalhes do Transportador</div>
+							<div class="panel-body">
+								<div class="form-group">
+									<c:choose>
+										<c:when test="${consultar}">
+											<div class="col-md-4">
+												<t:property name="transportador.nome" label="Transportador" class="form-control input-sm" mode="input" showLabel="true"/>
+											</div>
+											<div class="col-md-4">
+												<t:property name="motorista.nome" label="Motorista" class="form-control input-sm" mode="input" showLabel="true"/>
+											</div>
+											<div class="col-md-4">
+												<t:property name="veiculo.placa" label="Veículo" class="form-control input-sm" mode="input" showLabel="true"/>
+											</div>
+										</c:when>
+										
+										<c:otherwise>
+											<div class="col-md-4">
+												<t:property name="transportador"
+															type="autocomplete" 
+															itens="transportadorService.findForAutocompleteWithDepositoLogado" 
+															autocompleteGetterLabel="getIdNomeDocumento" 
+															autocompleteLabelProperty="transportador.cdpessoa,transportador.nome,transportador.documento"
+															autocompleteOnExcluir="carregaMotoristaVeiculo()"
+															autocompleteOnSelect="carregaMotoristaVeiculo()"
+															class="form-control input-sm" 
+															mode="input" 
+															showLabel="true"/>
+											</div>
+										
+											<div class="col-md-4">
+												<t:property name="motorista" id="motoristaId" disabled="disabled" class="form-control input-sm" mode="input" showLabel="true"/>
+											</div>
+											<div class="col-md-4">
+												<t:property name="veiculo" id="veiculoId" disabled="disabled" class="form-control input-sm" mode="input" showLabel="true"/>
+											</div>
+											
+										</c:otherwise>
+									</c:choose>
+								</div>
+					        </div>
+						</div>
+				 	</div>
+				
+					<div class="col-md-2">
+						<div class="panel panel-success">
+							<div class="panel-heading">Tipo de Manifesto</div>
+							<div class="panel-body">
+								<c:choose>
+									<c:when test="${manifesto.tipoentrega.cdtipoentrega == null}">
+										<t:property name="tipoentrega" label="Selecione" onclick="showHideBotaoInclusao()" mode="input" showLabel="true" class="form-control input-sm required"/>
+									</c:when>
+									<c:otherwise>
+										<t:property name="tipoentrega" id="tipoentregaHideId" type="hidden" write="false" label="" renderAs="double" mode="input" showLabel="true"/>										
+										<t:property name="tipoentrega" label="" disabled="disabled" mode="input" class="form-control input-sm"/>
+									</c:otherwise>
+								</c:choose>
+					        </div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="panel panel-success">
+					<div class="panel-heading">Dados Complementares</div>
+					<div class="panel-body">
+						<div class="form-group">
+							<div class="col-md-6">
+								<t:property name="observacao" rows="3" class="form-control input-sm" mode="input" showLabel="true"/>
+							</div>
+							
+							<%-- <div class="col-md-3">
+								<t:property name="lacrelateral" class="form-control input-md" mode="input" showLabel="true"/>
+							</div>
+							<div class="col-md-3">
+								<t:property name="lacretraseiro" class="form-control input-md" mode="input" showLabel="true"/>
+							</div>
+							<div class="col-md-3">
+								<t:property name="box" class="form-control input-md" mode="input" showLabel="true"/>
+							</div> --%>
+						</div>
+			        </div>
+				</div>
+				
+				<%-- <div class="panel panel-success">
+					<div class="panel-heading">Gerenciamento de Risco</div>
+					<div class="panel-body">
+						<div class="form-group">
+							<div class="col-md-4">
+								<div class="row">
+					                <label class="col-xs-12">Rota Gerenciadora</label>
+					            </div>
+					            
+					            <div class="row">
+					              <div class="input-group">
+								      <t:property type="autocomplete" name="rotagerenciadora" itens="rotagerenciadoraService.findByAutocomplete" mode="input" showLabel="false" class="form-control input-sm"/>
+								      <c:if test="${!consultar}">
+										  <div class="input-group-btn">
+							        		 <button onclick="javascript:atualizarRotaGerenciadora();" type="button" class="btn btn-success btn-sm">Atualizar</button>
+							      		  </div>
+									  </c:if>	
+								      
+								   </div>
+								</div> 
+							</div>
+							
+							<div class="col-md-4">
+								<div class="row">
+					                <label class="col-xs-12">DATA/HORA INICIO</label>
+					            </div>
+					            <div class="row">
+					              <div class="col-xs-12 form-inline">
+						              <div class="form-group">
+											<t:property name="datainicio" id="datainicio" label="" mode="input" showLabel="false" class="form-control input-sm"/>
+										</div>
+										<div class="form-group">
+											<t:property name="horainicio" id="horainicio" renderAs="single" showLabel="false" mode="input" class="form-control input-sm"/>
+										</div>
+					              </div>	
+								</div>
+								
+									
+							</div>
+							
+							<div class="col-md-4">
+								<br />
+								<c:if test="${consultar}">
+									<a href="#" onclick="javascript:solicitarAnaliseConsult();" class="btn btn-success">
+										<span class="glyphicon glyphicon-cloud-upload"></span> Solicitar Análise
+									</a>
+								</c:if>
+								<c:if test="${!consultar}">
+									<a href="#" onclick="javascript:solicitarAnaliseEdit();" class="btn btn-success">
+										<span class="glyphicon glyphicon-cloud-upload"></span> Solicitar Análise
+									</a>
+								</c:if>
+								<a href="#" onclick="javascript:visularRetorno();" class="btn btn-success">
+									<span class="glyphicon glyphicon-modal-window"></span> Visualizar Retorno
+								</a>
+							</div>
+							
+						</div>
+			        </div>
+				</div> --%>
+				
+				<div class="panel panel-default" style="border: 0px;">
+					<div class="panel-body">
+						<c:if test="${!consultar}">
+							<div class="col-md-4 pull-right" style="text-align: -webkit-right;">
+								<button type="button" class="btn btn-success btn-lg" onclick="javascript:incluirNotas();" id="incluirNotaId">
+								  <span class="glyphicon glyphicon-plus-sign"></span> Incluir Notas 
+								</button>
+							
+								<c:if test="${manifesto.filialreferencia.cdfilial != null}">
+									<button type="button" class="btn btn-success btn-lg" onclick="javascript:openDialogFilialReferencia();" id="incluirManifestoId">
+									  <span class="glyphicon glyphicon-plus-sign"></span> Alterar a Filial Referência
+									</button>
+								</c:if>	
+								
+								<button type="button" class="btn btn-success btn-lg" onclick="javascript:incluirManifesto();" id="incluirManifestoId">
+								  <span class="glyphicon glyphicon-plus-sign"></span> Incluir Manifesto
+								</button>
+								
+								<button type="button" class="btn btn-success btn-lg" onclick="javascript:incluirPackingList();" id="incluirPackingListId">
+								  <span class="glyphicon glyphicon-plus-sign"></span> Incluir packing list
+								</button>
+							</div>
+						</c:if>	
+			        </div>
+				</div>
+				
+				
+				<div class="panel panel-default" style="border: 0px !important;">
+					<div class="panel-body">
+						<div class="table-responsive">
+							<t:detalhe name="listaManifestonotafiscal" id="listaManifestonotafiscalId" showBotaoNovaLinha="false" cellspacing="0" showBotaoRemover="${!isAgrupamento}">
+								<n:column header="" style="width:1%">
+									<t:property name="cdmanifestonotafiscal" type="hidden" write="false"/>
+									<t:property name="praca.cdpraca" type="hidden" write="false"/>
+									<t:property name="existeFreteClienteNota" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.cdnotafiscalsaida" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.notaautorizada" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.numero" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.serie" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.dtemissao" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.numeropedido" type="hidden" write="false"/> 
+									<t:property name="notafiscalsaida.lojapedido" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.cliente.cdpessoa" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.cliente.nome" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.notafiscaltipo.cdnotafiscaltipo" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.praca.listaRotapraca[0].rota.cdrota" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.praca.listaRotapraca[0].rota.nome" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.praca.cdpraca" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.praca.nome" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.qtdeitens" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.temtroca" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.vlrtotalnf" type="hidden" write="false"/>
+									<t:property name="usuario.cdpessoa" type="hidden" write="false"/>
+									<t:property name="usuario.nome" type="hidden" write="false"/>	
+									<t:property name="dt_inclusao" type="hidden" write="false"/>
+									<t:property name="temDepositoTransbordo" type="hidden" write="false"/>
+									<t:property name="depositotransbordo" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.cdnotafiscalsaidareferencia" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.valorfretecliente" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.tipovenda" type="hidden" write="false"/>
+									<t:property name="notafiscalsaida.tipovenda.cdtipovenda" type="hidden" write="false"/>
+								</n:column>
+								<n:column header="Nro. Nota">
+									<t:property name="notafiscalsaida.numero" mode="output" />
+								</n:column>
+								<n:column header="Série">
+									<t:property name="notafiscalsaida.serie" mode="output" />
+								</n:column>
+								<n:column header="Dt. Emissão">
+									<t:property name="notafiscalsaida.dtemissao" mode="output" />
+								</n:column>
+								<n:column header="Pedido">
+									<t:property name="notafiscalsaida.numeropedido" mode="output" />
+								</n:column>
+								<n:column header="Loja">
+									<t:property name="notafiscalsaida.lojapedido" mode="output" />
+								</n:column>					
+								<n:column header="Cliente">
+									<span id="clientenome${index}" class="labelcolumn"></span>									
+								</n:column>
+								<n:column header="Rota" >
+									<span id="rotanome${index}" class="labelcolumn"></span>
+								</n:column>
+								<n:column header="Praça">
+									<span id="pracanome${index}" class="labelcolumn"></span>
+								</n:column>
+
+								<n:column header="Transbordo">
+									<span id="isTransbordo${index}"></span>
+								</n:column>
+								
+								<n:column header="Qtde. Itens">
+									<t:property name="notafiscalsaida.qtdeitens" mode="output" />
+								</n:column>
+								<n:column header="Valor total">
+									<t:property name="notafiscalsaida.vlrtotalnf" mode="output" />
+								</n:column>
+								<n:column header="Site" id="novoSiteId">
+									<strong>
+									<c:if test="${manifestonotafiscal.notafiscalsaida.tipovenda.cdtipovenda != 2}">Não</c:if>						
+									<c:if test="${manifestonotafiscal.notafiscalsaida.tipovenda.cdtipovenda == 2}">Sim</c:if>						
+									</strong>							
+								</n:column>									
+							</t:detalhe>
+						</div>
+					</div>
+				</div>
+				
+				<div class="panel panel-default" style="border: 0px !important;">
+					<div class="panel-body">
+						<div class="col-md-4">
+							<div class="row">
+								<h4><p class="text-center">Total de NF's</p></h4>
+							</div>
+							<div class="row">
+								<h4><p class="text-center">${qtdeNotas}</p></h4>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="row">
+								<h4><p class="text-center">Total de Itens</p></h4>
+							</div>
+							<div class="row">
+								<h4><p class="text-center">${qtdeItens}</p></h4>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="row">
+								<h4><p class="text-center">Valor Total</p></h4>
+							</div>
+							<div class="row">
+								<h4><p class="text-center">${valorTotal}</p></h4>
+							</div>
+						</div>
+					</div>
+				</div>
+			</n:bean>
 		</n:validation>
 	</n:form>
 </div>
 
 <%-- <t:entrada titulo="Manifesto de Carga ${manifesto.cdmanifesto}" submitConfirmationScript="validarCadastro()" showDeleteLink="" showEditLink="">
-	
-	<jsp:attribute name="linkArea">
-		<c:if test="${!isEmElaboracao && !isAguardandoLiberacao && consultar}">
-			<c:choose>
-				<c:when test="${isImpresso}">
-					<a id="btn_excluir"  onmouseover="Tip('Cancelar Manifesto')" href="javascript:openDialogAuditoria()">Cancelar</a>
-				</c:when>
-				<c:otherwise>
-					<span>Excluir</span> 
-				</c:otherwise>
-			</c:choose>
-		</c:if>
-		<c:if test="${isEmElaboracao || isAguardandoLiberacao || (!isImpresso && isAutorizado && consultar)}">
-			<c:if test="${isEmElaboracao && consultar}">
-				|&nbsp;&nbsp;<a id="btn_imprimir" onmouseover="Tip('Imprimir Manifesto')" href="javascript:imprimirManifesto()">Imprimir Manifesto</a>
-			</c:if>
-			<c:if test="${isAguardandoLiberacao && consultar}">
-				|&nbsp;&nbsp;<a id="btn_associar" onmouseover="Tip('Autorizar Notas')" href="javascript:autorizarNotas()">Autorizar Notas</a>
-			</c:if>
-			<c:if test="${isAutorizado && consultar}">
-				|&nbsp;&nbsp;<a id="btn_excluir"  onmouseover="Tip('Cancelar Manifesto')" href="javascript:openDialogAuditoria()">Cancelar</a>
-			</c:if>
-		</c:if>
-		<c:if test="${isImpresso && consultar}">
-			|&nbsp;&nbsp;<a id="btn_imprimir" onmouseover="Tip('re-imprimir Manifesto')" href="javascript:openDialogReImpressao();">Re-Imprimir Manifesto</a>
-		</c:if>
-	</jsp:attribute>
 	
 	<jsp:body>
 		<t:janelaEntrada>
@@ -441,7 +730,7 @@
 
 
 <div id="autorizarNotas-dialog" style="display:none;" title="Autorizar Notas">
-	<form method="POST" name="formAutorizarNotas" id="formAutorizarNotas" action="${ctx}/expedicao/crud/Manifesto" onsubmit="return false;">
+	<form method="POST" name="formAutorizarNotas" id="formAutorizarNotas" action="${ctx}/expedicao/crud/ManifestoLoja" onsubmit="return false;">
 		<input type="hidden" name="ACAO" value="liberarNotas"/>
 		<n:panelGrid columns="1" columnStyleClasses="labelColumn,propertyColumn"  propertyRenderAsDouble="true">
 			<t:propertyConfig mode="input" renderAs="double">
@@ -478,7 +767,7 @@
 </div>
 
 <div id="notasTransbordo-dialog" style="display:none;" title="Notas com opção de Transbordo">
-	<form method="POST" name="formCriarTransbordo" id="formCriarTransbordo" action="${ctx}/expedicao/crud/Manifesto" onsubmit="return false;">
+	<form method="POST" name="formCriarTransbordo" id="formCriarTransbordo" action="${ctx}/expedicao/crud/ManifestoLoja" onsubmit="return false;">
 		<input type="hidden" name="ACAO" value="incluirTransbordoNotas"/>
 		<n:panelGrid columns="1" columnStyleClasses="labelColumn,propertyColumn"  propertyRenderAsDouble="true">
 			<t:propertyConfig mode="input" renderAs="double">
@@ -519,7 +808,7 @@
 	</form>	
 </div>
 <div id="motivodeExcessao-dialog">
-	<form class="margin-top: 67px;" method="POST" name="formMotivodeExcessao" id="formMotivodeExcessao" action="${ctx}/expedicao/crud/Manifesto" onsubmit="return false;">
+	<form class="margin-top: 67px;" method="POST" name="formMotivodeExcessao" id="formMotivodeExcessao" action="${ctx}/expedicao/crud/ManifestoLoja" onsubmit="return false;">
 		<input type="hidden" name="ACAO" value="inserirMotivo"/>
 		<h3>Informe no campo abaixo,<br> o motivo do excesso de valores na carga.</h3>
 		<input type="hidden" name="ACAO" value="liberarManifesto"/>
@@ -532,7 +821,7 @@
 	</form>	
 </div>
 <div id="autorizarManifesto-dialog" title="Token de Autorização">
-	<form class="margin-top: 67px;" method="POST" name="formAutorizarManifesto" id="formAutorizarManifesto" action="${ctx}/expedicao/crud/Manifesto" onsubmit="return false;">
+	<form class="margin-top: 67px;" method="POST" name="formAutorizarManifesto" id="formAutorizarManifesto" action="${ctx}/expedicao/crud/ManifestoLoja" onsubmit="return false;">
 		<h3>Favor informar a senha de autorização para prosseguir com a liberação.</h3>
 		<input type="hidden" name="ACAO" value="liberarManifesto"/>
 		<n:panelGrid columns="1" columnStyleClasses="labelColumn,propertyColumn"  propertyRenderAsDouble="true">
@@ -567,20 +856,48 @@
 		return confirm("Deseja retornar à consulta sem salvar as alterações?");
 	}
 
-/* LIBERADO = 0;
-	$(document).ready(function() {
+//LIBERADO = 0;
+	 $(document).ready(function() {
+		/*$('input[funcao="autocomplete"]').each(function (){
+			var $el = $(this);
+			var beanName =  $(this).attr('beanName');
+			var functionLoad =  $(this).attr('loadFunctionAutocomplete'); 
+			var propertyLabel = $(this).attr('propertyLabel');
+			var propertyMatch = $(this).attr('propertyMatch');
+			var getterLabel = $(this).attr('getterLabel');
+			
+			$el.autocomplete({
+			    source: function(request, response) {
+			        $.get(contextoAutoComplete + '/ajax/autocomplete', 
+					        { q: request.term,
+					          beanName: beanName,
+						      functionLoad: functionLoad, 
+						      propertyLabel: propertyLabel,
+						      propertyMatch: propertyMatch,
+						      getterLabel: getterLabel,
+						      matchOption: 'false' },
+					      function(data) {
+		            		response(data.split('\n'));
+		        		 });
+			    },
+			    minLength: 3
+			});
+		}); */
+
+
+		 
 
 		if('${isRedirectToListagem}'=='true'){
 			alert("Esse manifesto não pode ser salvo, as notas estão vinculados a outro manifesto.");
 			form.ACAO.value ='listagem';
-			form.action = '${ctx}/expedicao/crud/Manifesto'; 
+			form.action = '${ctx}/expedicao/crud/ManifestoLoja'; 
 			form.validate = 'false'; 
 			submitForm();
 		}
 		
 		habilitarMotoristaVeiculo();
 
-		$("#auditoria-emitirmanifesto-dialog2").dialog("destroy");
+		/* $("#auditoria-emitirmanifesto-dialog2").dialog("destroy");
 		$("#auditoria-emitirmanifesto-dialog2").dialog({
 			autoOpen: false,
 			height: 400,
@@ -773,12 +1090,19 @@
 					enviarMotivodeExcessao();
 				}
 			}
-		});	
-		//
+		});	 
+
+		
 		
 		if (${manifesto.temNotaDevolucao}){
 			openDialogInfoNotaDevolucao();
 		}
+
+		if('${showLogList}' == 'true'){
+			$("#log-dialog").dialog("open");
+		}
+
+		*/
 		
 		if('${consultar}' != 'true'){
 			if(form['transportador'].value != '<null>'){
@@ -804,9 +1128,7 @@
 		quebralinhaCliente();
 		showHideBotaoInclusao();
 		
-		if('${showLogList}' == 'true'){
-			$("#log-dialog").dialog("open");
-		}
+	
 
 		verificaNotasSemFrete();
 
@@ -819,58 +1141,83 @@
 			$("input[name*=cdManifestoNotaFiscal]").removeAttr("disabled");
 		}		
 	});
-	
-	function cancelarManifesto(){
-		if($("#motivoId").val().trim()==""){
-			alert("O campo motivo é obrigatório.");			
-		}else{
-			var motivo = $("#motivoId").val();
-			var cdmanifesto = $("#cdmanifestoId").val();
-			var login = $("#loginId").val();
-			var senha = $("#senhaId").val();
-			
-			$w.getJSONSync("${ctx}/expedicao/crud/Manifesto",{ACAO:'cancelarManifesto','motivo':motivo,'id':cdmanifesto,'login':login,'senha':senha},				
-				function(json){
-					location.reload(true);
-				}
-			);			
+
+	function populaInfoColunaTransbordo(){
+		var count = 0;
+
+		$('input[name$="notafiscalsaida.numero"]').each(function(){
+			if($('input[name="listaManifestonotafiscal['+count+'].temDepositoTransbordo"]').val() == "true"){
+				$("#isTransbordo"+count).html('Sim');
+			}else{
+				$("#isTransbordo"+count).html('Não');
+			}
+			count++;
+		})
+	}
+
+	function quebralinhaRota(){
+		for(var i=0;i<=$("#listaManifestonotafiscalId tr").length;i++){
+			var rotaNome = $('input[name="listaManifestonotafiscal['+i+'].notafiscalsaida.praca.listaRotapraca[0].rota.nome"]').val();
+			var id = "#rotanome"+i
+			try{
+				$(id).html($w.quebralinhaDetalhe(17,rotaNome));
+			}catch(err){
+				$(id).html('');
+			}
+		}
+	}
+	function quebralinhaPraca(){
+		for(var i=0;i<=$("#listaManifestonotafiscalId tr").length;i++){
+			var pracaNome = $('input[name="listaManifestonotafiscal['+i+'].notafiscalsaida.praca.nome"]').val();
+			var id = "#pracanome"+i
+			try{
+				$(id).html($w.quebralinhaDetalhe(10,pracaNome));
+			}catch(err){
+				$(id).html('');
+			}
 		}
 	}
 
-	function naoIncluirNotaDevolucao(){
-		if($("#motivoId3").val().trim()==""){
-			alert("O campo motivo é obrigatório.");			
-		}else{
-			var motivo = $("#motivoId3").val();
-			var login = $("#loginId3").val();
-			var senha = $("#senhaId3").val();
-			
-			$w.getJSONSync("${ctx}/expedicao/crud/Manifesto",{ACAO:'naoIncluirNotaDevolucao','motivo':motivo,'login':login,'senha':senha},				
-				function(json){
-					if(json.error!=''){
-						$("#loginId3").val(null);
-						$("#senhaId3").val(null);
-						alert(json.error);
-					} else {
-						var notasDevolucao = buscaNotasDevolucao();
-						var notasReferencia = buscaReferenciaDasNotas(notasDevolucao);
-						excluirNotas(notasDevolucao,notasReferencia);
-						$("#auditoria-nota-devolucao-dialog").dialog("close");
-						alert('Operação realizada com sucesso!');
-					}
-				}
-			);
+	function quebralinhaCliente(){
+		for(var i=0;i<=$("#listaManifestonotafiscalId tr").length;i++){
+			var clienteNome = $('input[name="listaManifestonotafiscal['+i+'].notafiscalsaida.cliente.nome"]').val();
+			var id = "#clientenome"+i;		
+			try{
+				$(id).html($w.quebralinhaDetalhe(14,clienteNome));
+			}catch(err){
+				$(id).html('');
+			}
 		}
-	}	
-	
-	function openDialogAuditoria(){
-		$("#auditoria-emitirmanifesto-dialog").dialog("open");
 	}
-	
+
+	function showHideBotaoInclusao(){
+		var cdtipoentrega;
+		try {
+		   	cdtipoentrega = $w.getComboIdSelected(form['tipoentrega']);
+		}
+		catch(err) {
+			cdtipoentrega = $w.getValueId($("#tipoentregaHideId").val());
+		}
+		if(cdtipoentrega=='undefined' || cdtipoentrega=="<null>" || cdtipoentrega.trim()=="" || cdtipoentrega=="1" || cdtipoentrega=="2"){
+			$("#incluirNotaId").show();
+			$("#incluirManifestoId").hide();
+			$("#incluirPackingListId").hide();
+		}else if(cdtipoentrega == "4"){
+			$("#incluirPackingListId").show();
+			$("#incluirNotaId").hide();
+			$("#incluirManifestoId").hide();			
+		}else{
+			$("#incluirManifestoId").show();
+			$("#incluirNotaId").hide();
+			$("#incluirPackingListId").hide();
+		}
+		
+	}
+
 	function carregaMotoristaVeiculo(){	
 		var transportador = form['transportador'].value;
 		var deposito = $("#depositoId").val();
-		$w.getJSONSync("${ctx}/expedicao/crud/Manifesto",{ACAO:'carregaMotoristaVeiculoEntrada','transportador':transportador,'deposito':deposito},
+		$w.getJSONSync("${ctx}/expedicao/crud/ManifestoLoja",{ACAO:'carregaMotoristaVeiculoEntrada','transportador':transportador,'deposito':deposito},
 			function(json){
 				if(json!=null){
 					refreshComboMotorista(json.listaMotorista);
@@ -879,7 +1226,7 @@
 			}
 		);
 	}
-	
+
 	function refreshComboMotorista(listaMotorista){
 		if(listaMotorista!=null && listaMotorista.length > 0){
 			$("#motoristaId").removeAttr("disabled");
@@ -917,6 +1264,91 @@
 			$(form['veiculo']).removeOption(/./);
 		}
 	}
+
+	function verificaNotasSemFrete(){
+		var exibeModal = false;
+		
+		$("input[name*=existeFreteClienteNota]").each(function () {
+			if ($(this).val() == 'false'){
+				$(this).parent().parent().css("color", "red");
+				exibeModal = true;
+			}
+			
+		});
+
+		if (exibeModal){$("div.messageblock > ul > li.trace").css("font-size", "14px");}
+
+	}
+
+	function imprimirManifesto(){
+		if(!isManifestoImpresso()){			
+			if(confirm("Uma vez impresso o manifesto não poderá ser editado. Deseja realmente confirmar a operação?")){
+				form.action = '${ctx}/expedicao/report/Emitirmanifesto?ACAO=gerar&cdmanifesto='+$("#cdmanifestoId").val() 
+				form.validate = 'false'; 
+				submitForm();
+			}
+		}
+	}
+
+	function habilitarMotoristaVeiculo(){
+		if(${!consultar}){
+			if($("#veiculoId").val()!='<null>'){
+				$("#veiculoId").removeAttr("disabled");			
+				$("#veiculoId").removeClass("disabled");
+			}
+			if($("#motoristaId").val()!='<null>'){
+				$("#motoristaId").removeAttr("disabled");
+				$("#motoristaId").removeClass("disabled");
+			}
+		}
+	}
+	
+/*	function cancelarManifesto(){
+		if($("#motivoId").val().trim()==""){
+			alert("O campo motivo é obrigatório.");			
+		}else{
+			var motivo = $("#motivoId").val();
+			var cdmanifesto = $("#cdmanifestoId").val();
+			var login = $("#loginId").val();
+			var senha = $("#senhaId").val();
+			
+			$w.getJSONSync("${ctx}/expedicao/crud/ManifestoLoja",{ACAO:'cancelarManifesto','motivo':motivo,'id':cdmanifesto,'login':login,'senha':senha},				
+				function(json){
+					location.reload(true);
+				}
+			);			
+		}
+	}
+
+	function naoIncluirNotaDevolucao(){
+		if($("#motivoId3").val().trim()==""){
+			alert("O campo motivo é obrigatório.");			
+		}else{
+			var motivo = $("#motivoId3").val();
+			var login = $("#loginId3").val();
+			var senha = $("#senhaId3").val();
+			
+			$w.getJSONSync("${ctx}/expedicao/crud/ManifestoLoja",{ACAO:'naoIncluirNotaDevolucao','motivo':motivo,'login':login,'senha':senha},				
+				function(json){
+					if(json.error!=''){
+						$("#loginId3").val(null);
+						$("#senhaId3").val(null);
+						alert(json.error);
+					} else {
+						var notasDevolucao = buscaNotasDevolucao();
+						var notasReferencia = buscaReferenciaDasNotas(notasDevolucao);
+						excluirNotas(notasDevolucao,notasReferencia);
+						$("#auditoria-nota-devolucao-dialog").dialog("close");
+						alert('Operação realizada com sucesso!');
+					}
+				}
+			);
+		}
+	}	
+	
+	function openDialogAuditoria(){
+		$("#auditoria-emitirmanifesto-dialog").dialog("open");
+	}
 	
 	function incluirNotas(){
 		
@@ -930,7 +1362,7 @@
 		if(cdtipoentrega=='undefined' || cdtipoentrega=="<null>" || cdtipoentrega.trim()==""){
 			alert("É necessário selecionar o tipo de entrega antes de inlcuir novas notas.");
 		}else{
-			$w.openPopup("${ctx}/expedicao/crud/Manifesto?ACAO=buscarNotas&tipoentrega.cdtipoentrega="+cdtipoentrega,998,605);
+			$w.openPopup("${ctx}/expedicao/crud/ManifestoLoja?ACAO=buscarNotas&tipoentrega.cdtipoentrega="+cdtipoentrega,998,605);
 		}
 	}
 	
@@ -942,7 +1374,7 @@
 		form[nomeAtributo].value = notas;
 		$("#dialogLoading-dialog").dialog("open");
 		form.ACAO.value ='inserirNotas';
-		form.action = '${ctx}/expedicao/crud/Manifesto'; 
+		form.action = '${ctx}/expedicao/crud/ManifestoLoja'; 
 		form.validate = 'false'; 
 		submitForm();
 	}
@@ -961,15 +1393,6 @@
 		}
 	}
 	
-	function imprimirManifesto(){
-		if(!isManifestoImpresso()){			
-			if(confirm("Uma vez impresso o manifesto não poderá ser editado. Deseja realmente confirmar a operação?")){
-				form.action = '${ctx}/expedicao/report/Emitirmanifesto?ACAO=gerar&cdmanifesto='+$("#cdmanifestoId").val() 
-				form.validate = 'false'; 
-				submitForm();
-			}
-		}
-	}
 	
 	function isManifestoImpresso(){
 		
@@ -992,7 +1415,7 @@
 	}
 	
 	function callConsultar(cdmanifesto){
-		form.action = '${ctx}/expedicao/crud/Manifesto?ACAO=consultar&cdmanifesto='+cdmanifesto; 
+		form.action = '${ctx}/expedicao/crud/ManifestoLoja?ACAO=consultar&cdmanifesto='+cdmanifesto; 
 		form.validate = 'false'; 
 		submitForm();
 	}
@@ -1057,19 +1480,6 @@
 		}
 	}
 	
-	function populaInfoColunaTransbordo(){
-		var count = 0;
-
-		$('input[name$=notafiscalsaida.numero]').each(function(){
-			if($('input[name="listaManifestonotafiscal['+count+'].temDepositoTransbordo"]').val() == "true"){
-				$("#isTransbordo"+count).html('Sim');
-			}else{
-				$("#isTransbordo"+count).html('Não');
-			}
-			count++;
-		})
-	}
-	
 	function visularRetorno(){
 		
 		if($('input[name=cdmanifesto]').val() == undefined){
@@ -1085,7 +1495,7 @@
 			if(confirm("Será necessário salvar antes de prosseguir.\nUma vez solicitado não será possivel editar o manifesto.\nDeseja continuar?")){
 				$('input[name=isSolicitarAprovacao]').val(true);
 				form.ACAO.value ='salvar';
-				form.action = '${ctx}/expedicao/crud/Manifesto'; 
+				form.action = '${ctx}/expedicao/crud/ManifestoLoja'; 
 				form.validate = 'true'; 
 				submitForm();
 			}
@@ -1102,7 +1512,7 @@
 				$('input[name=isSolicitarAprovacao]').val(true);
 				
 				form.ACAO.value ='analisarRota';
-				form.action = '${ctx}/expedicao/crud/Manifesto'; 
+				form.action = '${ctx}/expedicao/crud/ManifestoLoja'; 
 				form.validate = 'true'; 
 				submitForm();
 			}
@@ -1115,7 +1525,7 @@
 		var param = {ACAO:'atualizarRotaGerenciadora','cddeposito':cddeposito};
 		
 		$("#dialogLoading-dialog").dialog("open");
-		$w.getJSON("${ctx}/expedicao/crud/Manifesto",param, function(json){
+		$w.getJSON("${ctx}/expedicao/crud/ManifestoLoja",param, function(json){
 			if(json.listaRotagerenciadora==null || json.retorno!="OK"){
 				alert(json.retorno);
 			}
@@ -1134,33 +1544,12 @@
 	
 	function salvarForCDAE(){
 		form.ACAO.value ='salvar';
-		form.action = '/wmsre/expedicao/crud/Manifesto'; 
+		form.action = '/wmsre/expedicao/crud/ManifestoLoja'; 
 		form.validate = 'true'; 
 		submitForm();
 	}
 	
-	function quebralinhaRota(){
-		for(var i=0;i<=$("#listaManifestonotafiscalId tr").length;i++){
-			var rotaNome = $('input[name="listaManifestonotafiscal['+i+'].notafiscalsaida.praca.listaRotapraca[0].rota.nome"]').val();
-			var id = "#rotanome"+i
-			try{
-				$(id).html($w.quebralinhaDetalhe(17,rotaNome));
-			}catch(err){
-				$(id).html('');
-			}
-		}
-	}
-	function quebralinhaPraca(){
-		for(var i=0;i<=$("#listaManifestonotafiscalId tr").length;i++){
-			var pracaNome = $('input[name="listaManifestonotafiscal['+i+'].notafiscalsaida.praca.nome"]').val();
-			var id = "#pracanome"+i
-			try{
-				$(id).html($w.quebralinhaDetalhe(10,pracaNome));
-			}catch(err){
-				$(id).html('');
-			}
-		}
-	}
+	
 	
 	function reindexaRota(){
 		$("#listaManifestonotafiscalId tr td span[id*='rotanome']").each(function (i) {
@@ -1225,18 +1614,6 @@
 		}
 	}
 	
-	function quebralinhaCliente(){
-		for(var i=0;i<=$("#listaManifestonotafiscalId tr").length;i++){
-			var clienteNome = $('input[name="listaManifestonotafiscal['+i+'].notafiscalsaida.cliente.nome"]').val();
-			var id = "#clientenome"+i;		
-			try{
-				$(id).html($w.quebralinhaDetalhe(14,clienteNome));
-			}catch(err){
-				$(id).html('');
-			}
-		}
-	}
-	
 	function imprimirDescargaProdutos(){
 		if($("#cdmanifestoId").val()!=""){
 			form.action = '${ctx}/expedicao/report/Descargaproduto?ACAO=gerar&cdmanifesto='+$("#cdmanifestoId").val(); 
@@ -1245,36 +1622,14 @@
 		}
 	}
 	
-	function showHideBotaoInclusao(){
-		var cdtipoentrega;
-		try {
-		   	cdtipoentrega = $w.getComboIdSelected(form['tipoentrega']);
-		}
-		catch(err) {
-			cdtipoentrega = $w.getValueId($("#tipoentregaHideId").val());
-		}
-		if(cdtipoentrega=='undefined' || cdtipoentrega=="<null>" || cdtipoentrega.trim()=="" || cdtipoentrega=="1" || cdtipoentrega=="2"){
-			$("#incluirNotaId").show();
-			$("#incluirManifestoId").hide();
-			$("#incluirPackingListId").hide();
-		}else if(cdtipoentrega == "4"){
-			$("#incluirPackingListId").show();
-			$("#incluirNotaId").hide();
-			$("#incluirManifestoId").hide();			
-		}else{
-			$("#incluirManifestoId").show();
-			$("#incluirNotaId").hide();
-			$("#incluirPackingListId").hide();
-		}
-		
-	}
+	
 	
 	function incluirManifesto(){
-		$w.openPopup("${ctx}/expedicao/crud/Manifesto?ACAO=buscarManifesto&cdmanifesto",1028,605);
+		$w.openPopup("${ctx}/expedicao/crud/ManifestoLoja?ACAO=buscarManifesto&cdmanifesto",1028,605);
 	} 
 
 	function incluirPackingList(){
-		$w.openPopup("${ctx}/expedicao/crud/Manifesto?ACAO=buscarPackingList&cdmanifesto",1028,605);
+		$w.openPopup("${ctx}/expedicao/crud/ManifestoLoja?ACAO=buscarPackingList&cdmanifesto",1028,605);
 	} 
 	
 	function inserirManifestos(cdmanifestos){
@@ -1284,7 +1639,7 @@
 			form['selectCdmanifesto'].value += ','+cdmanifestos;
 		}
 		form.ACAO.value ='inserirManifestos';
-		form.action = '${ctx}/expedicao/crud/Manifesto'; 
+		form.action = '${ctx}/expedicao/crud/ManifestoLoja'; 
 		form.validate = 'false'; 
 		submitForm();
 	}
@@ -1293,21 +1648,6 @@
 		$("#filialReferencia-dialog").dialog("open");
 	}
 
-
-	function verificaNotasSemFrete(){
-		var exibeModal = false;
-		
-		$("input[name*=existeFreteClienteNota]").each(function () {
-			if ($(this).val() == 'false'){
-				$(this).parent().parent().css("color", "red");
-				exibeModal = true;
-			}
-			
-		});
-
-		if (exibeModal){$("div.messageblock > ul > li.trace").css("font-size", "14px");}
-
-	}
 
 	function openDialogInfoNotaDevolucao(){
 		$("#info-nota-devolucao").dialog("open");

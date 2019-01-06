@@ -133,12 +133,8 @@ public class ExpedicaoRetiraLojaService extends GenericService<ExpedicaoRetiraLo
 		Report report = new Report("RelatorioTermoEntrega");
 		
 		ExpedicaoRetiraLoja expedicao = expedicaoRetiraLojaDAO.recuperaExpedicaoRetiraLojaPorChaveNota(chaveNotaFiscal, null);
-		
-		// se o termo ja foi impresso através da finalização de expedicao, não deixo imprimir novamente.
-		if (impressaoFinalizarExpedicao && expedicao.getTermoImpresso())
-			throw new WmsException("Não é permitido imprimir o relatório mais de uma vez ao finalizar expedicão.");
-		else
-			atualizarFlagImpressaoTermoExpedicao(expedicao.getCdExpedicaoRetiraLoja());
+	
+		atualizarFlagImpressaoTermoExpedicao(expedicao.getCdExpedicaoRetiraLoja());
 		
 		String cpfStr = expedicao.getNotaFiscalSaida().getCliente().getDocumento();
 		

@@ -1,1 +1,1 @@
-<button type="button" onclick="${tag.url}" title="${description}" ${tag.dynamicAttributesToString}><dobody/></button>
+<button type="button" onclick="${tag.url}" title="${description}" ${tag.dynamicAttributesToString} data-toggle="tooltip"><dobody/></button>

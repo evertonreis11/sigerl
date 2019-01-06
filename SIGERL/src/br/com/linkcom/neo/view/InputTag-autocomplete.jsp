@@ -9,10 +9,12 @@
 	propertyMatch="${tag.autocompleteMatchProperty}"
 	loadFunctionAutocomplete="${tag.loadFunctionAutocomplete}" 
 	beanName="${tag.beanName}"
-	value="${tag.autocompleteDescriptionLabel}"  
+	value="${tag.autocompleteDescriptionLabel}"
+	autocompleteOnExcluir="${tag.autocompleteOnExcluir}"  
 	${tag.dynamicAttributesToString} />
 	<input type="hidden" id="${tag.id}" autocompleteId="${tag.name}_value" name="${tag.name}" value="${tag.autocompleteIdWithDescription}"/>
-	<c:if test="${!consultar}">
+	
+	<%-- <c:if test="${!consultar}">
 		<span autocompleteId="${tag.name}_NaoSelecionado" style="display: none;">
 			<img title="Não selecionado" alt="NÃO SELECIONADO" src="${app}/resource/js/autocomplete/autocomplete_exclamacao.png"/>
 			<img title="Não selecionado" border="0" alt="EXCLUIR" src="${app}/resource/js/autocomplete/autocomplete_excluir.png"/>
@@ -26,5 +28,5 @@
 				<img border="0" src="${app}/imagens/icone/btnNovo.gif" onmouseover="Tip('Novo')" />
 			</span>
 		</c:if>
-	</c:if>
+	</c:if> --%>
 </span>

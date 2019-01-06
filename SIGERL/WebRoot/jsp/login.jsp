@@ -59,7 +59,7 @@
 			 	<div class="row">
 			 		<div class="col-md-3"></div>
 			 		<div class="col-md-6">
-				 		<div class="panel panel-primary">
+				 		<div class="panel panel-primary panel-login">
 				 			<div class="panel-heading"><h4>Gerencimento de Retirada de Produtos na Loja</h4></div>
 				 			
 				 			<div class="panel-body">

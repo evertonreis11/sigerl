@@ -27,7 +27,7 @@ public class RecebimentoRetiraLojaDAO extends GenericDAO<RecebimentoRetiraLoja> 
 		subQuery.select("recebimentoRetiraLoja.cdRecebimentoRetiraLoja")
 				.from(RecebimentoRetiraLojaProduto.class)
 				.join("recebimentoRetiraLojaProduto.recebimentoRetiraLoja recebimentoRetiraLoja")
-				.join("recebimentoRetiraLojaProdutoa.produto produto")
+				.join("recebimentoRetiraLojaProduto.produto produto")
 				.join("produto.listaProdutoCodigoDeBarras produtoCodigoDeBarras")
 				.join("recebimentoRetiraLoja.deposito deposito")
 				.where("produtoCodigoDeBarras.codigo = ".concat(codigoEan))

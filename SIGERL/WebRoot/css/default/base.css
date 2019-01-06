@@ -132,6 +132,10 @@ footer {
 }
 
 .panel{
+	background-color:rgb(243, 246, 149);
+}
+
+.panel-login{
 	background-color:rgba(243,247,129, 0.5);
 }
 
@@ -182,21 +186,6 @@ label{
 	text-align: center !important;
 }
 
-.glyphicon-glyphicon-ok-sign:before{ 
-  font-family: 'Glyphicons Halflings'; 
-  content:"\e084";
-}
-
-.glyphicon-glyphicon-exclamation-sign:before { 
-  font-family: 'Glyphicons Halflings'; 
-  content:"\e101"; 
-}
-
-.glyphicon-glyphicon-remove-sign:before { 
-  font-family: 'Glyphicons Halflings'; 
-  content:"\e083";
-}
-
 .tooltip  {
 	font-size: 14px;
 	width: 130px;
@@ -220,6 +209,24 @@ tr.dataGridBody1{
 	background-color: #8bbf8a !important;
 }
 
+
+/*glyphicons */
+
+.glyphicon-glyphicon-ok-sign:before{ 
+  font-family: 'Glyphicons Halflings'; 
+  content:"\e084";
+}
+
+.glyphicon-glyphicon-exclamation-sign:before { 
+  font-family: 'Glyphicons Halflings'; 
+  content:"\e101"; 
+}
+
+.glyphicon-glyphicon-remove-sign:before { 
+  font-family: 'Glyphicons Halflings'; 
+  content:"\e083";
+}
+
 .glyphicon-modal-window:before{
 	font-family: 'Glyphicons Halflings'; 
 	content:"\e237";
@@ -230,6 +237,30 @@ tr.dataGridBody1{
 	content:"\e088";
 }
 
+.glyphicon-ok:before{
+	font-family: 'Glyphicons Halflings'; 
+	content:"\e013";
+}
+
+.glyphicon-remove:before{
+	font-family: 'Glyphicons Halflings'; 
+	content:"\e014";
+}
+
+.glyphicon-alert:before{
+	font-family: 'Glyphicons Halflings'; 
+	content:"\e209";
+}
+
+.glyphicon-cloud-upload:before{
+	font-family: 'Glyphicons Halflings'; 
+	content:"\e198";
+}
+
+.glyphicon-plus-sign:before{
+	font-family: 'Glyphicons Halflings'; 
+	content:"\e081";
+}
 
 fieldset{
 	border: 1px solid #ddd !important;
@@ -255,25 +286,6 @@ legend{
 
 #fc{
 	width: 15%;
-}
-
-.glyphicon-ok:before{
-	font-family: 'Glyphicons Halflings'; 
-	content:"\e013";
-}
-
-.glyphicon-remove:before{
-	font-family: 'Glyphicons Halflings'; 
-	content:"\e014";
-}
-
-.glyphicon-remove:before{
-	font-family: 'Glyphicons Halflings'; 
-	content:"\e014";
-}
-.glyphicon-alert:before{
-	font-family: 'Glyphicons Halflings'; 
-	content:"\e209";
 }
 
 /*erro*/
