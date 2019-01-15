@@ -1,7 +1,11 @@
 package br.com.ricardoeletro.sigerl.expedicao.report;
 
+import org.apache.commons.lang.StringUtils;
+import org.springframework.web.servlet.ModelAndView;
+
 import br.com.linkcom.neo.authorization.report.ReportAuthorizationModule;
 import br.com.linkcom.neo.controller.Controller;
+import br.com.linkcom.neo.controller.resource.ResourceGenerationException;
 import br.com.linkcom.neo.core.web.WebRequestContext;
 import br.com.linkcom.neo.report.IReport;
 import br.com.linkcom.wms.geral.service.ExpedicaoRetiraLojaService;
@@ -26,5 +30,19 @@ public class TermoEntregaReport extends WmsReport<TermoEntregaFiltro> {
 	public String getTitulo() {
 		return "Termo de Entrega";
 	}
-
+	
+	@Override
+	public ModelAndView doFiltro(WebRequestContext request, TermoEntregaFiltro filtro)
+			throws ResourceGenerationException {
+		
+		limpar(filtro);
+		
+		return super.doFiltro(request, filtro);
+	}
+	
+	private void limpar(TermoEntregaFiltro filtro) {
+		if (StringUtils.isNotBlank(filtro.getChaveNotaFiscal())){
+			filtro.setChaveNotaFiscal(null);
+		}
+	}
 }

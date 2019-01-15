@@ -15,6 +15,10 @@ public class GestaoPedidoVO {
 	private String situacao;
 	
 	private String cliente;
+	
+	private Long ultimaNota;
+	
+	private String chaveNfe;
 
 	public String getNumeroNota() {
 		return numeroNota;
@@ -62,6 +66,22 @@ public class GestaoPedidoVO {
 
 	public void setDataChegada(Timestamp dataChegada) {
 		this.dataChegada = dataChegada;
+	}
+
+	public Long getUltimaNota() {
+		return ultimaNota;
+	}
+
+	public void setUltimaNota(Long ultimaNota) {
+		this.ultimaNota = ultimaNota;
+	}
+
+	public String getChaveNfe() {
+		return chaveNfe;
+	}
+
+	public void setChaveNfe(String chaveNfe) {
+		this.chaveNfe = chaveNfe;
 	}
 	
 }

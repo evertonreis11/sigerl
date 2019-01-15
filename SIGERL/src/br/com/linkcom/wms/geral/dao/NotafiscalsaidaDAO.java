@@ -217,39 +217,38 @@ public class NotafiscalsaidaDAO extends GenericDAO<Notafiscalsaida>{
 		try {
 			StringBuilder sql = new StringBuilder();
 			
-			sql.append(" SELECT DISTINCT NF.NUMERO NRO_NF,                                                           ");
-			sql.append("        NF.NUMEROPEDIDO PEDIDO,                                                              ");
-			sql.append("        NF.DTEMISSAO DT_EMISSAO_NF,                                                          ");
-			sql.append("        RL.DTRECEBIMENTO AS DT_RECEBIMENTO_LOJA,                                             ");
-			sql.append("        CL.NOME AS CLIENTE,                                                                  ");
-			sql.append("        CASE                                                                                 ");
-			sql.append("          WHEN ES.CDEXPEDICAORETLOJASTATUS IS NOT NULL                                        ");
-			sql.append("             THEN ES.NOME                                                                    ");
-			sql.append("          WHEN RS.CDRECEBRETIRALOJASTATUS IS NOT NULL AND ES.CDEXPEDICAORETLOJASTATUS IS NULL ");
-			sql.append("             THEN RS.NOME                                                                    ");
-			sql.append("          ELSE                                                                               ");
-			sql.append("           'EM TRANSFERENCIA PARA A LOJA'                                                    ");
-			sql.append("        END AS SITUACAO                                                                      ");
-			sql.append("   FROM NOTAFISCALSAIDA NF                                                                   ");
-			sql.append("   JOIN PESSOA CL                                                                            ");
-			sql.append("     ON CL.CDPESSOA = NF.CDCLIENTE                                                           ");
-			sql.append("   JOIN NOTAFISCALSAIDAPRODUTO NP                                                            ");
-			sql.append("     ON NP.CDNOTAFISCALSAIDA = NF.CDNOTAFISCALSAIDA                                          ");
-			sql.append("   JOIN PRODUTO PR                                                                           ");
-			sql.append("     ON PR.CDPRODUTO = NP.CDPRODUTO                                                          ");
-			sql.append("   LEFT JOIN RECEBRETIRALOJAPRODUTO RP                                                       ");
-			sql.append("     ON RP.CDNOTAFISCALSAIDA = NF.CDNOTAFISCALSAIDA                                          ");
-			sql.append("   LEFT JOIN RECEBIMENTORETIRALOJA RL                                                        ");
-			sql.append("     ON RL.CDRECEBIMENTORETIRALOJA = RP.CDRECEBIMENTORETIRALOJA                              ");
-			sql.append("   LEFT JOIN RECEBRETIRALOJASTATUS RS                                                        ");
-			sql.append("     ON RS.CDRECEBRETIRALOJASTATUS = RL.CDRECEBRETIRALOJASTATUS                              ");
-			sql.append("   LEFT JOIN EXPEDICAORETIRALOJA EL                                                          ");
-			sql.append("     ON EL.CDNOTAFISCALSAIDA = NF.CDNOTAFISCALSAIDA                                          ");
-			sql.append("   LEFT JOIN EXPEDICAORETLOJASTATUS ES                                                       ");
-			sql.append("     ON ES.CDEXPEDICAORETLOJASTATUS = EL.CDEXPEDICAORETLOJASTATUS                            ");
-			sql.append("  WHERE NF.CDTIPONF = 4																	     ");
-			sql.append("    AND NF.CDTIPOVENDA = 2																	 ");
-			sql.append("    AND NF.NRO_LOJA_RETIRADA = ? 															 ");
+			sql.append(" SELECT X.*,                                                                                              ");
+			sql.append("  (SELECT MAX(RR.DTRECEBIMENTO)                                                                                ");
+			sql.append(" 	FROM RECEBIMENTORETIRALOJA RR,                                                                        ");
+			sql.append(" 		 RECEBRETIRALOJAPRODUTO RP                                                                        ");
+			sql.append("    WHERE RR.CDRECEBIMENTORETIRALOJA = RP.CDRECEBIMENTORETIRALOJA                                         ");
+			sql.append("      AND RP.CDNOTAFISCALSAIDA = X.ULTIMA_NOTA) AS DT_RECEBIMENTO_LOJA,                                   ");          
+			sql.append("                                                                                                          ");
+			sql.append("   (SELECT PC.DESCRICAO                                                                                   ");
+			sql.append("      FROM PONTODECONTROLE PC,                                                                            ");
+			sql.append(" 	      PEDIDOPONTOCONTROLE PP                                                                          ");
+			sql.append(" 	WHERE PP.CDPONTODECONTROLE = PC.CDPONTODECONTROLE                                                     ");
+			sql.append(" 	  AND  PP.CDPEDIDOPONTOCONTROLE IN(SELECT MAX(PXX.CDPEDIDOPONTOCONTROLE)                              ");
+			sql.append(" 										 FROM PEDIDOPONTOCONTROLE PXX                                     ");
+			sql.append(" 										WHERE PXX.PEDIDOERP = X.PEDIDO                                    ");
+			sql.append(" 										  AND PXX.CHAVENFE = X.CHAVENFE)) AS PONTO_CONTROLE               ");
+			sql.append("                                                                                                          ");
+			sql.append("  FROM ( SELECT DISTINCT NF.NUMERO NRO_NF,                                                                ");
+			sql.append("                NF.NUMEROPEDIDO PEDIDO,                                                                   ");
+			sql.append("                NF.CHAVENFE,                                                                              ");
+			sql.append("                CL.NOME AS CLIENTE ,                                                                      ");
+			sql.append("                NF.DTEMISSAO DT_EMISSAO_NF,                                                               ");
+			sql.append("                MAX(NF.CDNOTAFISCALSAIDA) AS ULTIMA_NOTA                                                  ");
+			sql.append("          FROM NOTAFISCALSAIDA NF                                                                         ");
+			sql.append("          JOIN PESSOA CL                                                                                  ");
+			sql.append("            ON CL.CDPESSOA = NF.CDCLIENTE                                                                 ");
+			sql.append("          JOIN NOTAFISCALSAIDAPRODUTO NP                                                                  ");
+			sql.append("            ON NP.CDNOTAFISCALSAIDA = NF.CDNOTAFISCALSAIDA                                                ");
+			sql.append("          JOIN PRODUTO PR                                                                                 ");
+			sql.append("            ON PR.CDPRODUTO = NP.CDPRODUTO                                                                ");
+			sql.append("         WHERE NF.CDTIPONF = 4                                                                            ");
+			sql.append("           AND NF.CDTIPOVENDA = 2                                                                         ");
+			sql.append("           AND NF.NRO_LOJA_RETIRADA = ?                                                                   ");
 			
 			args.add(deposito.getCodigoerp());		
 			
@@ -283,6 +282,13 @@ public class NotafiscalsaidaDAO extends GenericDAO<Notafiscalsaida>{
 				args.add("%".concat(filtro.getNomeCliente().toUpperCase()).concat("%"));
 			}
 			
+			sql.append("           GROUP BY NF.NUMERO,                                                                            ");
+			sql.append(" 				   NF.NUMEROPEDIDO,                                                                       ");
+			sql.append(" 				   NF.DTEMISSAO,                                                                          ");
+			sql.append(" 				   CL.NOME,                                                                               ");
+			sql.append(" 				   NF.CHAVENFE                                                                            ");
+			sql.append("       ) X                                                                                                ");
+			
 			
 			@SuppressWarnings("unchecked")
 			List<GestaoPedidoVO> dados = (List<GestaoPedidoVO>) getJdbcTemplate().query(sql.toString(), args.toArray(), new ResultSetExtractor() {
@@ -300,7 +306,9 @@ public class NotafiscalsaidaDAO extends GenericDAO<Notafiscalsaida>{
 						vo.setDataPedido(rs.getTimestamp("DT_EMISSAO_NF"));
 						vo.setDataChegada(rs.getTimestamp("DT_RECEBIMENTO_LOJA"));
 						vo.setCliente(rs.getString("CLIENTE"));
-						vo.setSituacao(rs.getString("SITUACAO"));
+						vo.setSituacao(rs.getString("PONTO_CONTROLE"));
+						vo.setUltimaNota(rs.getLong("ULTIMA_NOTA"));
+						vo.setChaveNfe(rs.getString("CHAVENFE"));
 
 						registros.add(vo);
 					}
